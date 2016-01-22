@@ -1,4 +1,4 @@
-package net.sorted;
+package net.sorted.exchange;
 
 
 public enum OrderType {

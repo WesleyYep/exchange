@@ -1,13 +1,13 @@
 package net.sorted.exchange.messages;
 
 
-import net.sorted.OrderType;
+import net.sorted.exchange.OrderType;
 import net.sorted.exchange.Side;
 
 public class ExchangeOrder {
 
     public enum State {
-        open, filled, partial, cancelled
+        unsubmitted, open, filled, partial, cancelled
     }
 
 
@@ -21,7 +21,8 @@ public class ExchangeOrder {
     private OrderType type;
     private State state;
 
-    public ExchangeOrder(String orderId, String clientId, String correlationId, String instrument, long quantity, String price, Side side, OrderType type, State state) {
+    public ExchangeOrder(String orderId, String clientId, String correlationId, String instrument, long quantity,
+                         String price, Side side, OrderType type, State state) {
         this.orderId = orderId;
         this.clientId = clientId;
         this.correlationId = correlationId;
@@ -67,5 +68,20 @@ public class ExchangeOrder {
 
     public State getState() {
         return state;
+    }
+
+    @Override
+    public String toString() {
+        return "ExchangeOrder{" +
+                "orderId='" + orderId + '\'' +
+                ", clientId='" + clientId + '\'' +
+                ", correlationId='" + correlationId + '\'' +
+                ", instrument='" + instrument + '\'' +
+                ", quantity=" + quantity +
+                ", price='" + price + '\'' +
+                ", side=" + side +
+                ", type=" + type +
+                ", state=" + state +
+                '}';
     }
 }

@@ -1,7 +1,5 @@
 package net.sorted.exchange;
 
-import net.sorted.OrderType;
-
 public class Order {
 
     private String id;
