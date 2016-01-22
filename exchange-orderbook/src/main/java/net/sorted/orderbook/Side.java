@@ -1,9 +1,9 @@
-package net.sorted;
+package net.sorted.orderbook;
 
 
 public enum Side {
-    BID('B'),
-    ASK('A');
+    BUY('B'),
+    SELL('S');
 
     private char charVal;
     Side(char charVal) {
@@ -13,4 +13,6 @@ public enum Side {
     char toChar() {
         return charVal;
     }
+
+    Side other() { return (this == BUY) ? SELL: BUY; }
 }

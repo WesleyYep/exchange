@@ -1,4 +1,4 @@
-package net.sorted;
+package net.sorted.orderbook;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,16 +6,16 @@ import java.util.List;
 public class OrdersAtPrice {
     private List<Order> orders = new LinkedList<Order>();
 
-    long size;
+    private long quantityAtPrice;
 
     public void addOrder(Order order) {
         orders.add(order);
-        size = size + order.getSize();
+        quantityAtPrice = quantityAtPrice + order.getQuantity();
     }
 
     public void removeOrder(Order order) {
         orders.remove(order);
-        size = size - order.getSize();
+        quantityAtPrice = quantityAtPrice - order.getQuantity();
     }
 
 
@@ -23,7 +23,7 @@ public class OrdersAtPrice {
         return orders;
     }
 
-    public long getSize() {
-        return size;
+    public long getQuantity() {
+        return quantityAtPrice;
     }
 }
