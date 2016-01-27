@@ -14,6 +14,5 @@ public class Exchange {
         submitOrderReceiver.startReceiving();
         System.out.println("Listening for orders");
 
-        //JobLauncher launcher=(JobLauncher)context.getBean("launcher");
     }
 }

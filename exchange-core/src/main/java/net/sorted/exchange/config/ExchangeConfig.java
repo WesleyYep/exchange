@@ -43,7 +43,7 @@ public class ExchangeConfig {
     @Bean
     public SubmitOrderReceiver submitOrderReceiver() {
         SubmitOrderReceiver receiver = new SubmitOrderReceiver(rabbitMqConfig().getSubmitOrderChannel(),
-                RabbitMqConfig.ORDER_SUBMIT_CHANNEL_NAME,
+                RabbitMqConfig.ORDER_SUBMIT_QUEUE_NAME,
                 orderProcessorLocator(),
                 orderIdDao(),
                 jsonConverter());
@@ -69,10 +69,14 @@ public class ExchangeConfig {
     @Bean
     public OrderProcessorLocator orderProcessorLocator() {
         OrderProcessorLocator locator =  new OrderProcessorLocator();
-        OrderBook amznOrderBook = new OrderBookInMemory(tradeIdDao());
 
+        OrderBook amznOrderBook = new OrderBookInMemory(tradeIdDao());
         OrderProcessor orderProcessor = new OrderProcessorInMemory(amznOrderBook, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher());
         locator.addOrderProcessor("AMZN", orderProcessor);
+
+        OrderBook dellOrderBook = new OrderBookInMemory(tradeIdDao());
+        OrderProcessor dellOrderProcessor = new OrderProcessorInMemory(dellOrderBook, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher());
+        locator.addOrderProcessor("DELL", dellOrderProcessor);
 
         return locator;
     }
