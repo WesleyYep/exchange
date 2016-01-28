@@ -31,7 +31,7 @@ public class OrderProcessorTest {
     @Before
     public void before() {
 
-        orderBook = new OrderBookInMemory(new TradeIdDaoInMemory());
+        orderBook = new OrderBookInMemory("INSTR", new TradeIdDaoInMemory());
         OrderIdDao orderIdDao = new OrderIdDaoInMemory();
         privateTradePublisher = mock(PrivateTradePublisher.class);
         publicTradePublisher = mock(PublicTradePublisher.class);
@@ -61,7 +61,7 @@ public class OrderProcessorTest {
         ArgumentCaptor<OrderBookSnapshot> snapshotCaptor = ArgumentCaptor.forClass(OrderBookSnapshot.class);
         verify(snapshotPublisher, times(1)).publishSnapshot(snapshotCaptor.capture());
         assertEquals(1, snapshotCaptor.getValue().getBuyLevels().size());
-        assertEquals(1000, snapshotCaptor.getValue().getBuyLevels().get(0).getVolume());
+        assertEquals(1000, snapshotCaptor.getValue().getBuyLevels().get(0).getQuantity());
         assertEquals(0, snapshotCaptor.getValue().getSellLevels().size());
 
     }
@@ -92,7 +92,7 @@ public class OrderProcessorTest {
         verify(snapshotPublisher, times(4)).publishSnapshot(snapshotCaptor.capture());
         OrderBookSnapshot snapshot = snapshotCaptor.getAllValues().get(3);
         assertEquals(1, snapshot.getBuyLevels().size());
-        assertEquals(500, snapshot.getBuyLevels().get(0).getVolume());
+        assertEquals(500, snapshot.getBuyLevels().get(0).getQuantity());
         assertEquals(0, snapshot.getSellLevels().size());
 
     }

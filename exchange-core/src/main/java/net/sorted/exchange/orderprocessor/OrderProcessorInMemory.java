@@ -47,23 +47,22 @@ public class OrderProcessorInMemory implements OrderProcessor {
 
     @Override
     public void updateOrder(Order order) {
-
+        // TODO - implement
+        throw new RuntimeException("Not yet implemented");
     }
 
     @Override
     public void cancelOrder(Order order) {
+        // TODO - implement
+        throw new RuntimeException("Not yet implemented");
+    }
 
+    @Override
+    public OrderBookSnapshot getSnapshot() {
+        synchronized (lock) {
+            return orderBook.getSnapshot();
+        }
     }
 
 
-//    private Order getOrder(ExchangeOrder exchangeOrder) {
-//        String orderId = orderIdDao.getNextOrderId();
-//        Order o = new Order(orderId,
-//                Double.parseDouble(exchangeOrder.getPrice()),
-//                exchangeOrder.getSide(),
-//                exchangeOrder.getQuantity(),
-//                exchangeOrder.getInstrument());
-//
-//        return o;
-//    }
 }

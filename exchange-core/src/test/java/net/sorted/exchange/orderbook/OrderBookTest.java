@@ -19,7 +19,7 @@ public class OrderBookTest {
     @Before
     public void before() {
 
-        orderBook = new OrderBookInMemory(new TradeIdDaoInMemory());
+        orderBook = new OrderBookInMemory("INSTR", new TradeIdDaoInMemory());
     }
 
 

@@ -3,18 +3,18 @@ package net.sorted.exchange.orderbook;
 
 public class OrderBookLevelSnapshot {
     private final double price;
-    private final long volume;
+    private final long quantity;
 
-    public OrderBookLevelSnapshot(double price, long volume) {
+    public OrderBookLevelSnapshot(double price, long quantity) {
         this.price = price;
-        this.volume = volume;
+        this.quantity = quantity;
     }
 
     public double getPrice() {
         return price;
     }
 
-    public long getVolume() {
-        return volume;
+    public long getQuantity() {
+        return quantity;
     }
 }

@@ -2,13 +2,18 @@ package net.sorted.exchange.messages;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.LinkedList;
 import net.sorted.exchange.OrderType;
 import net.sorted.exchange.Side;
 import net.sorted.exchange.Trade;
+import net.sorted.exchange.orderbook.*;
+import net.sorted.exchange.orderbook.OrderBookSnapshot;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -77,10 +82,57 @@ public class JsonConverter {
         return jsonObjToString(obj);
     }
 
-    private String jsonObjToString(JSONObject obj) {
+
+    public String snapshotToJson(OrderBookSnapshot snapshot) {
+        JSONObject json = new JSONObject();
+
+        /* Each side is an array of price/volume in level order (for buy level 1 is the highest price, for sell level 1 is the lowest price)
+        "INSTR": {
+           buy: [
+            { price: 1.1, volume: 99 },
+            { price: 1.0, volume: 50 }
+           ],
+           sell: [
+            { price: 1.2, volume: 100 },
+            { price: 1.3, volume: 200 }
+          ]
+        }
+     */
+
+        JSONArray buys = new JSONArray();
+        for (OrderBookLevelSnapshot level : snapshot.getBuyLevels()) {
+            buys.add(orderLevelToJsonObject(level));
+        }
+
+        JSONArray sells = new JSONArray();
+        for (OrderBookLevelSnapshot level : snapshot.getSellLevels()) {
+            sells.add(orderLevelToJsonObject(level));
+        }
+
+        JSONObject instr = new JSONObject();
+        instr.put("buy", buys);
+        instr.put("sell", sells);
+
+        json.put(snapshot.getInstrumentId(), instr);
+
+        return jsonObjToString(json);
+
+    }
+
+    private JSONObject orderLevelToJsonObject(OrderBookLevelSnapshot level) {
+        JSONObject json = new JSONObject();
+
+        json.put("quantity", level.getQuantity());
+        json.put("price", level.getPrice());
+
+        return json;
+    }
+
+
+    private String jsonObjToString(JSONObject json) {
         StringWriter out = new StringWriter();
         try {
-            obj.writeJSONString(out);
+            json.writeJSONString(out);
         } catch (IOException e) {
             // wont happen - its a StringWriter so no actual IO
         }
@@ -88,4 +140,42 @@ public class JsonConverter {
         return out.toString();
     }
 
+    public static final void main(String[] args) throws IOException {
+
+        JSONObject json = new JSONObject();
+
+        LinkedList<String> sells = new LinkedList<>();
+        sells.add("one");
+        sells.add("two");
+        sells.add("three");
+
+
+        JSONArray jarray = new JSONArray();
+        JSONObject j1 = new JSONObject();
+        j1.put("quantity", 1000);
+        j1.put("price", "99.99");
+
+        JSONObject j2 = new JSONObject();
+        j2.put("quantity", 1001);
+        j2.put("price", "99.99");
+
+        JSONObject j3 = new JSONObject();
+        j3.put("quantity", 1002);
+        j3.put("price", "99.99");
+
+
+
+        jarray.add(j1);
+        jarray.add(j2);
+        jarray.add(j3);
+
+
+        String array = JSONValue.toJSONString(sells);
+        System.out.println("Array=" + array);
+        json.put("sell", jarray);
+
+        StringWriter out = new StringWriter();
+        json.writeJSONString(out);
+        System.out.println("> "+out.toString());
+    }
 }

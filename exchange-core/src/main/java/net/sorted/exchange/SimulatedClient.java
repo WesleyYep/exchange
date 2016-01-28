@@ -35,12 +35,25 @@ public class SimulatedClient {
         Channel submit = rabbitMqConfig.getSubmitOrderChannel();
         SimulatedClient client = new SimulatedClient(submit, "doug");
 
+        client.submitLimitOrder("DELL", 500, "100.02", "SELL");
+        client.submitLimitOrder("DELL", 500, "100.03", "SELL");
+        client.submitLimitOrder("DELL", 500, "100.04", "SELL");
 
-        client.submitLimitOrder("AMZN", 1000, "100.02", "SELL");
-        client.submitLimitOrder("DELL", 1000, "100.02", "BUY");
+        client.submitLimitOrder("DELL", 1000, "99.99", "BUY");
+        client.submitLimitOrder("DELL", 1000, "100.00", "BUY");
+
+
+        client.submitLimitOrder("AMZN", 500, "100.02", "SELL");
+        client.submitLimitOrder("AMZN", 500, "100.03", "SELL");
+        client.submitLimitOrder("AMZN", 500, "100.04", "SELL");
+
+        client.submitLimitOrder("AMZN", 1000, "99.99", "BUY");
+        client.submitLimitOrder("AMZN", 1000, "100.00", "BUY");
+        client.submitLimitOrder("AMZN", 1000, "100.03", "BUY");
+
+
         client.submitLimitOrder("REJECT", 1000, "100.02", "SELL");
-        client.submitLimitOrder("AMZN", 1000, "100.02", "BUY");
-        client.submitLimitOrder("DELL", 1000, "100.02", "SELL");
+
 
         System.exit(0);
     }

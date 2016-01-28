@@ -15,6 +15,7 @@ import static net.sorted.exchange.Side.*;
 
 public class OrderBookInMemory implements OrderBook {
 
+    private final String instrumentId;
     private final TradeIdDao tradeIdDao;
 
     private OrdersForSide buyOrders = new OrdersForSide(true);
@@ -23,7 +24,8 @@ public class OrderBookInMemory implements OrderBook {
     private Map<String, OrdersForSide> orderIdToOrdersForSide = new HashMap<>();
 
 
-    public OrderBookInMemory(TradeIdDao tradeIdDao) {
+    public OrderBookInMemory(String instrumentId, TradeIdDao tradeIdDao) {
+        this.instrumentId = instrumentId;
         this.tradeIdDao = tradeIdDao;
     }
 
@@ -80,14 +82,13 @@ public class OrderBookInMemory implements OrderBook {
         List<OrderBookLevelSnapshot> buys = getSnapshotForSide(buyOrders);
         List<OrderBookLevelSnapshot> sells = getSnapshotForSide(sellOrders);
 
-        return new OrderBookSnapshot(buys, sells);
+        return new OrderBookSnapshot(instrumentId, buys, sells);
     }
 
     private List<OrderBookLevelSnapshot> getSnapshotForSide(OrdersForSide orders) {
         int level = 1;
         List<OrderBookLevelSnapshot> snapshots = new ArrayList<>();
-        List<Order> ordersAtLevel = null;
-        while ((ordersAtLevel = orders.getOrdersAtLevel(level)).size() > 0) {
+        while ((orders.getOrdersAtLevel(level)).size() > 0) {
             OrderBookLevelSnapshot levelSnapshot = new OrderBookLevelSnapshot(orders.getPriceAtLevel(level), orders.getSizeAtLevel(level));
             snapshots.add(levelSnapshot);
             level++;
@@ -147,7 +148,6 @@ public class OrderBookInMemory implements OrderBook {
                     Trade passiveForOrder = getTradeForOrder(o, qtyToMatch, levelPrice);
                     passiveTrades.add(passiveForOrder);
 
-//                    modifyOrder(o.getId(), o.getQuantity() - qtyToMatch);
                     OrdersForSide orders = orderIdToOrdersForSide.get(o.getId());
                     orders.modifyOrder(o.getId(), o.getQuantity() - qtyToMatch);
                     qtyAtLevel += qtyToMatch;

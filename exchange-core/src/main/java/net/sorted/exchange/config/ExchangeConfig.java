@@ -70,11 +70,11 @@ public class ExchangeConfig {
     public OrderProcessorLocator orderProcessorLocator() {
         OrderProcessorLocator locator =  new OrderProcessorLocator();
 
-        OrderBook amznOrderBook = new OrderBookInMemory(tradeIdDao());
+        OrderBook amznOrderBook = new OrderBookInMemory("AMZN", tradeIdDao());
         OrderProcessor orderProcessor = new OrderProcessorInMemory(amznOrderBook, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher());
         locator.addOrderProcessor("AMZN", orderProcessor);
 
-        OrderBook dellOrderBook = new OrderBookInMemory(tradeIdDao());
+        OrderBook dellOrderBook = new OrderBookInMemory("DELL", tradeIdDao());
         OrderProcessor dellOrderProcessor = new OrderProcessorInMemory(dellOrderBook, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher());
         locator.addOrderProcessor("DELL", dellOrderProcessor);
 
@@ -94,6 +94,6 @@ public class ExchangeConfig {
 
     @Bean
     public OrderSnapshotPublisher orderSnapshotPublisher() {
-        return new OrderSnapshotPublisherRabbit();
+        return new OrderSnapshotPublisherRabbit(rabbitMqConfig().getSnapshotChannel(), RabbitMqConfig.SNAPSHOT_EXCHANGE_NAME, jsonConverter());
     }
 }

@@ -15,10 +15,12 @@ public class RabbitMqConfig {
 
     public static final String PUBLIC_TRADE_EXCHANGE_NAME = "public.trade.exchange";
 
+    public static final String SNAPSHOT_EXCHANGE_NAME = "snapshot.exchange";
 
 
     private final Channel orderChannel;
     private final Channel publicTradeChannel;
+    private final Channel snapshotChannel;
 
     public RabbitMqConfig(String hostname) {
         ConnectionFactory factory = new ConnectionFactory();
@@ -44,6 +46,9 @@ public class RabbitMqConfig {
             publicTradeChannel = connection.createChannel();
             publicTradeChannel.exchangeDeclare(PUBLIC_TRADE_EXCHANGE_NAME, "fanout");
 
+            // Setup snapshot topic
+            snapshotChannel = connection.createChannel();
+            snapshotChannel.exchangeDeclare(SNAPSHOT_EXCHANGE_NAME, "fanout");
 
         } catch (Exception e) {
             throw new RuntimeException("Cannot configure rabbit mq", e);
@@ -56,5 +61,9 @@ public class RabbitMqConfig {
 
     public Channel getPublicTradeChannel() {
         return publicTradeChannel;
+    }
+
+    public Channel getSnapshotChannel() {
+        return snapshotChannel;
     }
 }

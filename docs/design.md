@@ -130,6 +130,24 @@ PublicTrade
             "tradeDate":"28-01-2016"
         }
 
+Snapshot
+    The snapshot state of the orderbook. 
+    
+    Messages are JSON objects, e.g.
+     Each side is an array of price/quantity in level order (for buy level 1 is the highest price, for sell level 1 is the lowest price)
+    {
+      "AMZN" {
+         buy: [  
+          { price: 1.1, quantity: 99 },  
+          { price: 1.0, quantity: 50 }
+         ],
+         sell: [  
+          { price: 1.2, quantity: 100 },  
+          { price: 1.3, quantity: 200 }
+        ]
+      }
+    }
+
 OrderUpdate
     Order messages - all parts of the message are filled in and correct.
 
