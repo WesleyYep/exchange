@@ -118,6 +118,18 @@ Channels
 Channels supply feedback from the server to clients.
 Clients should filter messages on the client id
 
+PublicTrade
+    Trades are made public on this channel. These do not have trade Ids, orderIds and are rolled up trades (not each partial fill)
+
+    These are JSON objects, e.g.
+    
+        {
+            "instrumentId":"DELL",
+            "quantity":1000,
+            "price":100.02,
+            "tradeDate":"28-01-2016"
+        }
+
 OrderUpdate
     Order messages - all parts of the message are filled in and correct.
 

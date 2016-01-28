@@ -39,8 +39,8 @@ public class SimulatedClient {
         client.submitLimitOrder("AMZN", 1000, "100.02", "SELL");
         client.submitLimitOrder("DELL", 1000, "100.02", "BUY");
         client.submitLimitOrder("REJECT", 1000, "100.02", "SELL");
-        client.submitLimitOrder("AMZN", 1000, "100.02", "SELL");
-        client.submitLimitOrder("DELL", 1000, "100.02", "BUY");
+        client.submitLimitOrder("AMZN", 1000, "100.02", "BUY");
+        client.submitLimitOrder("DELL", 1000, "100.02", "SELL");
 
         System.exit(0);
     }

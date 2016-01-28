@@ -13,7 +13,12 @@ public class RabbitMqConfig {
     public static final String ORDER_SUBMIT_DEAD_CHANNEL_NAME = "submit.order.dead";
     public static final String ORDER_SUBMIT_DEAD_EXCHANGE = "submit.order.dead.exchange";
 
+    public static final String PUBLIC_TRADE_EXCHANGE_NAME = "public.trade.exchange";
+
+
+
     private final Channel orderChannel;
+    private final Channel publicTradeChannel;
 
     public RabbitMqConfig(String hostname) {
         ConnectionFactory factory = new ConnectionFactory();
@@ -23,9 +28,9 @@ public class RabbitMqConfig {
             connection = factory.newConnection();
             orderChannel = connection.createChannel();
 
-            // Setup dead message exchange
+            // Setup Submit Order with dead message exchange
             String deadQueueName = orderChannel.queueDeclare(ORDER_SUBMIT_DEAD_CHANNEL_NAME, false, false, false, null).getQueue();
-            orderChannel.exchangeDeclare(ORDER_SUBMIT_DEAD_EXCHANGE, "direct"); // NB fanout important as this is required for ALL dead letters regardless of routing key
+            orderChannel.exchangeDeclare(ORDER_SUBMIT_DEAD_EXCHANGE, "direct");
             orderChannel.queueBind(deadQueueName, ORDER_SUBMIT_DEAD_EXCHANGE, "");
 
             orderChannel.exchangeDeclare(ORDER_SUBMIT_EXCHANGE_NAME, "direct");
@@ -34,6 +39,12 @@ public class RabbitMqConfig {
             String submitQueueName = orderChannel.queueDeclare(ORDER_SUBMIT_QUEUE_NAME, false, false, false, args).getQueue();
             orderChannel.queueBind(submitQueueName, ORDER_SUBMIT_EXCHANGE_NAME, "");
 
+
+            // Setup public trade topic
+            publicTradeChannel = connection.createChannel();
+            publicTradeChannel.exchangeDeclare(PUBLIC_TRADE_EXCHANGE_NAME, "fanout");
+
+
         } catch (Exception e) {
             throw new RuntimeException("Cannot configure rabbit mq", e);
         }
@@ -41,5 +52,9 @@ public class RabbitMqConfig {
 
     public Channel getSubmitOrderChannel() {
         return orderChannel;
+    }
+
+    public Channel getPublicTradeChannel() {
+        return publicTradeChannel;
     }
 }

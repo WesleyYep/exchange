@@ -83,7 +83,8 @@ public class ExchangeConfig {
 
     @Bean
     public PublicTradePublisher publicTradePublisher() {
-        return new PublicTradePublisherRabbit();
+
+        return new PublicTradePublisherRabbit(rabbitMqConfig().getPublicTradeChannel(), RabbitMqConfig.PUBLIC_TRADE_EXCHANGE_NAME, jsonConverter());
     }
 
     @Bean

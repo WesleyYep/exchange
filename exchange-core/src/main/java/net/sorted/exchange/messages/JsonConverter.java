@@ -4,11 +4,17 @@ import java.io.IOException;
 import java.io.StringWriter;
 import net.sorted.exchange.OrderType;
 import net.sorted.exchange.Side;
+import net.sorted.exchange.Trade;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class JsonConverter {
+
+    private final DateTimeFormatter dateFormat = DateTimeFormat.forPattern("dd-MM-yyyy");
 
     public ExchangeOrder exchangeOrderFromJson(String json) {
         JSONParser parser = new JSONParser();
@@ -57,6 +63,21 @@ public class JsonConverter {
         obj.put("type", order.getType());
         obj.put("state", order.getState());
 
+        return jsonObjToString(obj);
+    }
+
+    public String publicTradeToJson(Trade trade) {
+        JSONObject obj = new JSONObject();
+
+        obj.put("instrumentId", trade.getInstrumentId());
+        obj.put("quantity", trade.getQuantity());
+        obj.put("price", trade.getPrice());
+        obj.put("tradeDate", dateFormat.print(trade.getTradeDate()));
+
+        return jsonObjToString(obj);
+    }
+
+    private String jsonObjToString(JSONObject obj) {
         StringWriter out = new StringWriter();
         try {
             obj.writeJSONString(out);
@@ -67,11 +88,4 @@ public class JsonConverter {
         return out.toString();
     }
 
-    public static final void main(String[] args) {
-        String order = "{ \"orderId\": \"0\", \"clientId\": \"fred\", \"instrument\": \"AMZN\", \"quantity\": 999, \"price\": \"100.12\" }";
-
-        JsonConverter converter = new JsonConverter();
-        ExchangeOrder eo = converter.exchangeOrderFromJson(order);
-        System.out.println(eo);
-    }
 }

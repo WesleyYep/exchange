@@ -22,6 +22,10 @@ public class Trade {
         this.tradeDate = tradeDate;
     }
 
+    public String getTradeId() {
+        return tradeId;
+    }
+
     public String getOrderId() {
         return orderId;
     }
@@ -38,7 +42,24 @@ public class Trade {
         return price;
     }
 
+    public Side getSide() {
+        return side;
+    }
+
     public DateTime getTradeDate() {
         return tradeDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Trade{" +
+                "tradeId='" + tradeId + '\'' +
+                ", orderId='" + orderId + '\'' +
+                ", instrumentId='" + instrumentId + '\'' +
+                ", quantity=" + quantity +
+                ", price=" + price +
+                ", side=" + side +
+                ", tradeDate=" + tradeDate +
+                '}';
     }
 }
