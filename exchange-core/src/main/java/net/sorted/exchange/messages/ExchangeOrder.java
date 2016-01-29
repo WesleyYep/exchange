@@ -21,6 +21,10 @@ public class ExchangeOrder {
     private OrderType type;
     private State state;
 
+    public ExchangeOrder() {
+
+    }
+
     public ExchangeOrder(String orderId, String clientId, String correlationId, String instrument, long quantity,
                          String price, Side side, OrderType type, State state) {
         this.orderId = orderId;

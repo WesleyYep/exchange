@@ -1,0 +1,9 @@
+{
+  "orderId": "abc",
+  "clientId": "doug",
+  "correlationId": "00001",
+  "instrument": "AMZN",
+  "quantity": 1001,
+  "price": "99.96",
+  "side": "BUY"
+}
