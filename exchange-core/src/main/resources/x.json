@@ -1,0 +1,6 @@
+{
+  "buy": "[
+    {\"quantity\":1000,\"price\":100.0},
+    {\"quantity\":1000,\"price\":99.99}]",
+  "sell": "[{\"quantity\":500,\"price\":100.02},{\"quantity\":500,\"price\":100.03},{\"quantity\":500,\"price\":100.04}]"
+}

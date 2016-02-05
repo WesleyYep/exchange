@@ -4,6 +4,6 @@
   "correlationId": "00001",
   "instrument": "AMZN",
   "quantity": 1001,
-  "price": "99.96",
+  "price": "99.0",
   "side": "BUY"
 }

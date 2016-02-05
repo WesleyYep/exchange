@@ -29,7 +29,7 @@ public class OrderSnapshotPublisherRabbit implements OrderSnapshotPublisher {
         try {
             byte[] bytes = message.getBytes("UTF-8");
             channel.basicPublish(exchangeName, snapshot.getInstrumentId(), null, bytes);
-            log.debug("Published snapshot " + message);
+            log.debug("Published snapshot " + message + " to exchange " + exchangeName + " with routingKey " + snapshot.getInstrumentId());
         } catch (UnsupportedEncodingException e) {
             // This should never be able to happen!!!
             log.error("Cannot convert snapshot message " + snapshot + " to json", e);
