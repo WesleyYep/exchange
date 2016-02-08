@@ -1,9 +1,10 @@
-package net.sorted.exchange;
+package net.sorted.exchange.publishers;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import com.rabbitmq.client.Channel;
+import net.sorted.exchange.domain.Trade;
 import net.sorted.exchange.messages.JsonConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

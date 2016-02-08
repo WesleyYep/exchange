@@ -2,13 +2,13 @@ package net.sorted.exchange.orderprocessor;
 
 
 import java.util.List;
-import net.sorted.exchange.OrderIdDao;
-import net.sorted.exchange.OrderIdDaoInMemory;
-import net.sorted.exchange.OrderSnapshotPublisher;
-import net.sorted.exchange.PrivateTradePublisher;
-import net.sorted.exchange.PublicTradePublisher;
+import net.sorted.exchange.dao.OrderIdDao;
+import net.sorted.exchange.dao.OrderIdDaoInMemory;
+import net.sorted.exchange.publishers.OrderSnapshotPublisher;
+import net.sorted.exchange.publishers.PrivateTradePublisher;
+import net.sorted.exchange.publishers.PublicTradePublisher;
 import net.sorted.exchange.TradeIdDaoInMemory;
-import net.sorted.exchange.Order;
+import net.sorted.exchange.domain.Order;
 import net.sorted.exchange.orderbook.OrderBook;
 import net.sorted.exchange.orderbook.OrderBookInMemory;
 import net.sorted.exchange.orderbook.OrderBookSnapshot;
@@ -16,7 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import static net.sorted.exchange.Side.*;
+import static net.sorted.exchange.domain.Side.*;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 

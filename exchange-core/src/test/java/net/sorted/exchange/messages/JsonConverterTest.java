@@ -1,12 +1,11 @@
 package net.sorted.exchange.messages;
 
 
-import net.sorted.exchange.Side;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static net.sorted.exchange.Side.*;
-import static net.sorted.exchange.OrderType.*;
+import static net.sorted.exchange.domain.Side.*;
+import static net.sorted.exchange.domain.OrderType.*;
 
 public class JsonConverterTest {
 

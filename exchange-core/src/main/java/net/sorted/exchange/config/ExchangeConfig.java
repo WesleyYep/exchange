@@ -1,14 +1,14 @@
 package net.sorted.exchange.config;
 
-import net.sorted.exchange.OrderIdDao;
-import net.sorted.exchange.OrderIdDaoInMemory;
+import net.sorted.exchange.dao.OrderIdDao;
+import net.sorted.exchange.dao.OrderIdDaoInMemory;
 import net.sorted.exchange.OrderProcessorLocator;
-import net.sorted.exchange.OrderSnapshotPublisher;
-import net.sorted.exchange.OrderSnapshotPublisherRabbit;
-import net.sorted.exchange.PrivateTradePublisher;
-import net.sorted.exchange.PrivateTradePublisherRabbit;
-import net.sorted.exchange.PublicTradePublisher;
-import net.sorted.exchange.PublicTradePublisherRabbit;
+import net.sorted.exchange.publishers.OrderSnapshotPublisher;
+import net.sorted.exchange.publishers.OrderSnapshotPublisherRabbit;
+import net.sorted.exchange.publishers.PrivateTradePublisher;
+import net.sorted.exchange.publishers.PrivateTradePublisherRabbit;
+import net.sorted.exchange.publishers.PublicTradePublisher;
+import net.sorted.exchange.publishers.PublicTradePublisherRabbit;
 import net.sorted.exchange.SubmitOrderReceiver;
 import net.sorted.exchange.TradeIdDao;
 import net.sorted.exchange.TradeIdDaoInMemory;

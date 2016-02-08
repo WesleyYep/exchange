@@ -1,15 +1,15 @@
 package net.sorted.exchange.orderbook;
 
-import net.sorted.exchange.Order;
-import net.sorted.exchange.Side;
+import net.sorted.exchange.domain.Order;
+import net.sorted.exchange.domain.Side;
 import net.sorted.exchange.TradeIdDaoInMemory;
-import net.sorted.exchange.Trade;
+import net.sorted.exchange.domain.Trade;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
 
-import static net.sorted.exchange.Side.*;
+import static net.sorted.exchange.domain.Side.*;
 import static org.junit.Assert.*;
 
 public class OrderBookTest {

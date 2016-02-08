@@ -1,7 +1,7 @@
 package net.sorted.exchange.orderbook;
 
 import java.util.*;
-import net.sorted.exchange.Order;
+import net.sorted.exchange.domain.Order;
 
 public class OrdersForSide {
     private final TreeMap<Double, OrdersAtPrice> priceToOrderAtPrice;

@@ -1,11 +1,11 @@
 package net.sorted.exchange.orderprocessor;
 
 
-import net.sorted.exchange.OrderSnapshotPublisher;
-import net.sorted.exchange.PrivateTradePublisher;
-import net.sorted.exchange.PublicTradePublisher;
+import net.sorted.exchange.publishers.OrderSnapshotPublisher;
+import net.sorted.exchange.publishers.PrivateTradePublisher;
+import net.sorted.exchange.publishers.PublicTradePublisher;
 import net.sorted.exchange.orderbook.MatchedTrades;
-import net.sorted.exchange.Order;
+import net.sorted.exchange.domain.Order;
 import net.sorted.exchange.orderbook.OrderBook;
 import net.sorted.exchange.orderbook.OrderBookSnapshot;
 

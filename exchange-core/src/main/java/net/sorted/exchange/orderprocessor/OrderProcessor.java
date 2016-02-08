@@ -1,7 +1,7 @@
 package net.sorted.exchange.orderprocessor;
 
 
-import net.sorted.exchange.Order;
+import net.sorted.exchange.domain.Order;
 import net.sorted.exchange.orderbook.OrderBookSnapshot;
 
 public interface OrderProcessor {

@@ -2,7 +2,7 @@ package net.sorted.exchange.orderbook;
 
 
 import java.util.List;
-import net.sorted.exchange.Trade;
+import net.sorted.exchange.domain.Trade;
 
 public class MatchedTrades {
     private final List<Trade> aggressorTrades;

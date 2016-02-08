@@ -1,4 +1,4 @@
-package net.sorted.exchange;
+package net.sorted.exchange.domain;
 
 
 import org.joda.time.DateTime;

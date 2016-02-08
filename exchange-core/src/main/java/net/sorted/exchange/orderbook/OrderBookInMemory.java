@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sorted.exchange.Order;
-import net.sorted.exchange.Side;
+import net.sorted.exchange.domain.Order;
+import net.sorted.exchange.domain.Side;
 import net.sorted.exchange.TradeIdDao;
-import net.sorted.exchange.Trade;
+import net.sorted.exchange.domain.Trade;
 import org.joda.time.DateTime;
 
-import static net.sorted.exchange.Side.*;
+import static net.sorted.exchange.domain.Side.*;
 
 public class OrderBookInMemory implements OrderBook {
 

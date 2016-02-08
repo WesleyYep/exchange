@@ -1,4 +1,4 @@
-package net.sorted.exchange;
+package net.sorted.exchange.publishers;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;

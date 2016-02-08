@@ -1,8 +1,8 @@
 package net.sorted.exchange.messages;
 
 
-import net.sorted.exchange.OrderType;
-import net.sorted.exchange.Side;
+import net.sorted.exchange.domain.OrderType;
+import net.sorted.exchange.domain.Side;
 
 public class ExchangeOrder {
 

@@ -1,4 +1,4 @@
-package net.sorted.exchange;
+package net.sorted.exchange.dao;
 
 
 public class OrderIdDaoInMemory implements OrderIdDao {

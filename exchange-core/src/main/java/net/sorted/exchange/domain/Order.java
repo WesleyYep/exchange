@@ -1,4 +1,4 @@
-package net.sorted.exchange;
+package net.sorted.exchange.domain;
 
 public class Order {
 

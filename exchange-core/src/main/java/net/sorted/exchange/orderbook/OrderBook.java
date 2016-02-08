@@ -1,8 +1,8 @@
 package net.sorted.exchange.orderbook;
 
 import java.util.List;
-import net.sorted.exchange.Order;
-import net.sorted.exchange.Side;
+import net.sorted.exchange.domain.Order;
+import net.sorted.exchange.domain.Side;
 
 public interface OrderBook {
 

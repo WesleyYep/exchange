@@ -7,6 +7,8 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+import net.sorted.exchange.dao.OrderIdDao;
+import net.sorted.exchange.domain.Order;
 import net.sorted.exchange.messages.ExchangeOrder;
 import net.sorted.exchange.messages.JsonConverter;
 import net.sorted.exchange.orderprocessor.OrderProcessor;
