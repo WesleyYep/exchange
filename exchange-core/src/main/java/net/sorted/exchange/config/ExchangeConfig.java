@@ -33,6 +33,10 @@ public class ExchangeConfig {
     @Value("${instrumentCSL}")
     private String supportedInstrumentCSL;
 
+    private final JsonConverter jsonConverter = new JsonConverter();
+    private final OrderIdDao orderIdDao = new OrderIdDaoInMemory();
+    private final TradeIdDao tradeIdDao = new TradeIdDaoInMemory();
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
@@ -56,17 +60,17 @@ public class ExchangeConfig {
 
     @Bean
     public JsonConverter jsonConverter() {
-        return new JsonConverter();
+        return jsonConverter;
     }
 
     @Bean
     public OrderIdDao orderIdDao() {
-        return new OrderIdDaoInMemory();
+        return orderIdDao;
     }
 
     @Bean
     public TradeIdDao tradeIdDao() {
-        return new TradeIdDaoInMemory();
+        return tradeIdDao;
     }
 
     @Bean
@@ -91,7 +95,7 @@ public class ExchangeConfig {
 
     @Bean
     public PrivateTradePublisher privateTradePublisher() {
-        return new PrivateTradePublisherRabbit();
+        return new PrivateTradePublisherRabbit(rabbitMqConfig().getPrivateTradeChannel(), RabbitMqConfig.PRIVATE_TRADE_EXCHANGE_NAME, jsonConverter());
     }
 
     @Bean

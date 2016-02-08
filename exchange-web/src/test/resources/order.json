@@ -3,7 +3,7 @@
   "clientId": "doug",
   "correlationId": "00001",
   "instrument": "AMZN",
-  "quantity": 1001,
+  "quantity": 2001,
   "price": "99.0",
-  "side": "BUY"
+  "side": "SELL"
 }

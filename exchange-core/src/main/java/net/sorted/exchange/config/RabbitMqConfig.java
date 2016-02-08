@@ -14,12 +14,14 @@ public class RabbitMqConfig {
     public static final String ORDER_SUBMIT_DEAD_EXCHANGE = "submit.order.dead.exchange";
 
     public static final String PUBLIC_TRADE_EXCHANGE_NAME = "public.trade.exchange";
+    public static final String PRIVATE_TRADE_EXCHANGE_NAME = "private.trade.exchange";
 
     public static final String SNAPSHOT_EXCHANGE_NAME = "snapshot.exchange";
 
 
     private final Channel orderChannel;
     private final Channel publicTradeChannel;
+    private final Channel privateTradeChannel;
     private final Channel snapshotChannel;
 
     public RabbitMqConfig(String hostname) {
@@ -46,6 +48,10 @@ public class RabbitMqConfig {
             publicTradeChannel = connection.createChannel();
             publicTradeChannel.exchangeDeclare(PUBLIC_TRADE_EXCHANGE_NAME, "fanout");
 
+            // Setup private trade topic
+            privateTradeChannel = connection.createChannel();
+            privateTradeChannel.exchangeDeclare(PRIVATE_TRADE_EXCHANGE_NAME, "fanout");
+
             // Setup snapshot topic
             snapshotChannel = connection.createChannel();
             snapshotChannel.exchangeDeclare(SNAPSHOT_EXCHANGE_NAME, "fanout");
@@ -61,6 +67,10 @@ public class RabbitMqConfig {
 
     public Channel getPublicTradeChannel() {
         return publicTradeChannel;
+    }
+
+    public Channel getPrivateTradeChannel() {
+        return privateTradeChannel;
     }
 
     public Channel getSnapshotChannel() {
