@@ -4,7 +4,7 @@ import net.sorted.exchange.config.ExchangeConfig;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-public class Exchange {
+public class ExchangeNode {
 
     public static final void main(String[] args) {
         ApplicationContext ctx =

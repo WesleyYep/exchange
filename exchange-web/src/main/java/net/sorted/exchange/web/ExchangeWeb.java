@@ -26,44 +26,11 @@ public class ExchangeWeb extends SpringBootServletInitializer {
         ApplicationContext ctx = SpringApplication.run(ExchangeWeb.class, args);
         System.out.println("Got spring context");
 
-        SubmitOrderReceiver submitOrderReceiver = ctx.getBean(SubmitOrderReceiver.class);
-        submitOrderReceiver.startReceiving();
-        System.out.println("Listening for orders");
+// If this is uncommented, no exchange nodes need to be started. This is useful for testing
+//        SubmitOrderReceiver submitOrderReceiver = ctx.getBean(SubmitOrderReceiver.class);
+//        submitOrderReceiver.startReceiving();
+//        System.out.println("Listening for orders");
 
-//        System.out.println("Let's inspect the beans provided by Spring Boot:");
-//
-//        String[] beanNames = ctx.getBeanDefinitionNames();
-//        Arrays.sort(beanNames);
-//        for (String beanName : beanNames) {
-//            System.out.println(beanName);
-//        }
-
-//        WebSocketSender sender = ctx.getBean(WebSocketSender.class);
-//        Thread t = new Thread(new Sender(sender));
-//        t.start();
-
-    }
-
-    private static class Sender implements Runnable {
-        private final WebSocketSender websocket;
-
-        public Sender(WebSocketSender websocket) {
-            this.websocket = websocket;
-        }
-
-
-        @Override
-        public void run() {
-            int count = 0;
-            while (true) {
-                websocket.sendMessage("/topic/test", "" + count++);
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    return;
-                }
-            }
-        }
     }
 
 }

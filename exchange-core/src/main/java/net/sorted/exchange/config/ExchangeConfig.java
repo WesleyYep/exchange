@@ -30,6 +30,9 @@ public class ExchangeConfig {
     @Value("${rabbit.hostname}")
     private String rabbitHostname;
 
+    @Value("${instrumentCSL}")
+    private String supportedInstrumentCSL;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
@@ -70,13 +73,12 @@ public class ExchangeConfig {
     public OrderProcessorLocator orderProcessorLocator() {
         OrderProcessorLocator locator =  new OrderProcessorLocator();
 
-        OrderBook amznOrderBook = new OrderBookInMemory("AMZN", tradeIdDao());
-        OrderProcessor orderProcessor = new OrderProcessorInMemory(amznOrderBook, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher());
-        locator.addOrderProcessor("AMZN", orderProcessor);
-
-        OrderBook dellOrderBook = new OrderBookInMemory("DELL", tradeIdDao());
-        OrderProcessor dellOrderProcessor = new OrderProcessorInMemory(dellOrderBook, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher());
-        locator.addOrderProcessor("DELL", dellOrderProcessor);
+        String[] instruments = supportedInstrumentCSL.split(",");
+        for (String instrument : instruments) {
+            OrderBook amznOrderBook = new OrderBookInMemory(instrument, tradeIdDao());
+            OrderProcessor orderProcessor = new OrderProcessorInMemory(amznOrderBook, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher());
+            locator.addOrderProcessor(instrument, orderProcessor);
+        }
 
         return locator;
     }
