@@ -39,22 +39,31 @@ public class OrderProcessorInMemory implements OrderProcessor {
             snapshot = orderBook.getSnapshot();
         }
 
-        privateTradePublisher.publishTrades(matches.getAggressorTrades());
-        privateTradePublisher.publishTrades(matches.getPassiveTrades());
-        publicTradePublisher.publishTrades(matches.getPublicTrades());
-        snapshotPublisher.publishSnapshot(snapshot);
+        publishResult(matches, snapshot);
     }
 
     @Override
     public void updateOrder(Order order) {
-        // TODO - implement
-        throw new RuntimeException("Not yet implemented");
+        MatchedTrades matches = null;
+        OrderBookSnapshot snapshot = null;
+        synchronized (lock) {
+            matches = orderBook.modifyOrder(order.getId(), order.getQuantity());
+            snapshot = orderBook.getSnapshot();
+        }
+
+        publishResult(matches, snapshot);
     }
 
     @Override
     public void cancelOrder(Order order) {
-        // TODO - implement
-        throw new RuntimeException("Not yet implemented");
+        MatchedTrades matches = null;
+        OrderBookSnapshot snapshot = null;
+        synchronized (lock) {
+            orderBook.removeOrder(order.getId());
+            snapshot = orderBook.getSnapshot();
+        }
+
+        snapshotPublisher.publishSnapshot(snapshot);
     }
 
     @Override
@@ -64,5 +73,12 @@ public class OrderProcessorInMemory implements OrderProcessor {
         }
     }
 
+
+    private void publishResult(MatchedTrades matches, OrderBookSnapshot snapshot) {
+        privateTradePublisher.publishTrades(matches.getAggressorTrades());
+        privateTradePublisher.publishTrades(matches.getPassiveTrades());
+        publicTradePublisher.publishTrades(matches.getPublicTrades());
+        snapshotPublisher.publishSnapshot(snapshot);
+    }
 
 }
