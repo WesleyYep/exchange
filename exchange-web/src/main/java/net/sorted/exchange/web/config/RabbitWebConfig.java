@@ -24,21 +24,15 @@ public class RabbitWebConfig {
     }
 
     @Bean
-    @Qualifier("snapshotChannel")
-    public Channel snapshotChannel() throws IOException {
-        return exchangeConfig.rabbitMqConfig().getSnapshotChannel();
+    @Qualifier("submitExchangeName")
+    public String submitExchangeName() {
+        return RabbitMqConfig.ORDER_SUBMIT_EXCHANGE_NAME;
     }
+
 
     @Bean
     public Channel privateTradeChannel() throws IOException {
         return exchangeConfig.rabbitMqConfig().getPrivateTradeChannel();
-    }
-
-
-    @Bean
-    @Qualifier("submitExchangeName")
-    public String submitExchangeName() {
-        return RabbitMqConfig.ORDER_SUBMIT_EXCHANGE_NAME;
     }
 
     @Bean
@@ -46,5 +40,24 @@ public class RabbitWebConfig {
     public String privateTradeExchangeName() {
         return RabbitMqConfig.PRIVATE_TRADE_EXCHANGE_NAME;
     }
+
+    @Bean
+    public Channel publicTradeChannel() throws IOException {
+        return exchangeConfig.rabbitMqConfig().getPrivateTradeChannel();
+    }
+
+    @Bean
+    @Qualifier("publicTradeExchangeName")
+    public String publicTradeExchangeName() {
+        return RabbitMqConfig.PUBLIC_TRADE_EXCHANGE_NAME;
+    }
+
+
+    @Bean
+    @Qualifier("snapshotChannel")
+    public Channel snapshotChannel() throws IOException {
+        return exchangeConfig.rabbitMqConfig().getSnapshotChannel();
+    }
+
 
 }
