@@ -24,13 +24,18 @@ public class WebSocketSender implements ApplicationListener<BrokerAvailabilityEv
         log.debug("WebSocket sender initialised");
     }
 
-    public void sendMessage(String channel, String content) {
-        log.debug("Sending to channel '" + channel + "' message: '"+ content + "");
-        messagingTemplate.convertAndSend(channel, content);
+    public void sendMessage(String destination, String content) {
+        log.debug("Sending to websocket '" + destination + "' message: '"+ content + "");
+        messagingTemplate.convertAndSend(destination, content);
     }
 
     @Override
     public void onApplicationEvent(BrokerAvailabilityEvent event) {
-        log.debug("WebSocketSender got an application event "+event);
+        log.debug("WebSocketSender got an application event " + event);
+    }
+
+    public void sendMessageToUser(String destination, String user, String message) {
+        log.debug("Send to destination {} and user {} message {}", destination, user, message);
+        messagingTemplate.convertAndSendToUser(user, destination, message);
     }
 }

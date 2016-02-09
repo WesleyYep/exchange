@@ -33,7 +33,7 @@ public class PrivateTradePublisherRabbit implements PrivateTradePublisher {
 
     @Override
     public void publishTrade(Trade trade) {
-        String message = converter.publicTradeToJson(trade);
+        String message = converter.privateTradeToJson(trade);
         try {
             byte[] bytes = message.getBytes("UTF-8");
             channel.basicPublish(exchangeName, "", null, bytes);

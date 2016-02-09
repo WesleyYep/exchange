@@ -24,19 +24,27 @@ public class RabbitWebConfig {
     }
 
     @Bean
-    @Qualifier("snapshotTopic")
+    @Qualifier("snapshotChannel")
     public Channel snapshotChannel() throws IOException {
-        Channel channel = exchangeConfig.rabbitMqConfig().getSnapshotChannel();
-//        String queueName = channel.queueDeclare().getQueue();
-//        channel.queueBind(queueName, RabbitMqConfig.SNAPSHOT_EXCHANGE_NAME, "AMZN");
-
-        return channel;
+        return exchangeConfig.rabbitMqConfig().getSnapshotChannel();
     }
+
+    @Bean
+    public Channel privateTradeChannel() throws IOException {
+        return exchangeConfig.rabbitMqConfig().getPrivateTradeChannel();
+    }
+
 
     @Bean
     @Qualifier("submitExchangeName")
     public String submitExchangeName() {
-
         return RabbitMqConfig.ORDER_SUBMIT_EXCHANGE_NAME;
     }
+
+    @Bean
+    @Qualifier("privateTradeExchangeName")
+    public String privateTradeExchangeName() {
+        return RabbitMqConfig.PRIVATE_TRADE_EXCHANGE_NAME;
+    }
+
 }

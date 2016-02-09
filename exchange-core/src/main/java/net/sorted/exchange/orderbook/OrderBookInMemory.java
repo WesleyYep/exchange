@@ -157,7 +157,7 @@ public class OrderBookInMemory implements OrderBook {
             }
 
             if (qtyAtLevel > 0) {
-                Trade publicTrade = new Trade(null, null, newOrder.getSymbol(), qtyAtLevel, levelPrice, newOrder.getSide(), new DateTime());
+                Trade publicTrade = new Trade(null, null, null, newOrder.getSymbol(), qtyAtLevel, levelPrice, newOrder.getSide(), new DateTime());
                 Trade aggressorForOrder = getTradeForOrder(newOrder, qtyAtLevel, levelPrice);
                 aggressorTrades.add(aggressorForOrder);
                 publicTrades.add(publicTrade);
@@ -192,7 +192,7 @@ public class OrderBookInMemory implements OrderBook {
     }
 
     private Trade getTradeForOrder(Order o, long qty, double price ) {
-        return new Trade(tradeIdDao.getNextTradeId(), o.getId(), o.getSymbol(), qty, price, o.getSide(), new DateTime());
+        return new Trade(tradeIdDao.getNextTradeId(), o.getId(), o.getClientId(), o.getSymbol(), qty, price, o.getSide(), new DateTime());
     }
 
 

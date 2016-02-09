@@ -28,4 +28,13 @@ public class MatchedTrades {
     }
 
     public boolean hasMatches() { return aggressorTrades.size() > 0; }
+
+    @Override
+    public String toString() {
+        return "MatchedTrades{" +
+                "aggressorTrades=" + aggressorTrades +
+                ", passiveTrades=" + passiveTrades +
+                ", publicTrades=" + publicTrades +
+                '}';
+    }
 }

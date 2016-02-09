@@ -87,7 +87,7 @@ public class SubmitOrderReceiver {
         }
         Optional<OrderProcessor> processor = orderProcessorLocator.getProcessor(order.getInstrument());
         if (processor.isPresent()) {
-            Order o = new Order(orderIdDao.getNextOrderId(), Double.parseDouble(order.getPrice()), order.getSide(), order.getQuantity(), order.getInstrument());
+            Order o = new Order(orderIdDao.getNextOrderId(), Double.parseDouble(order.getPrice()), order.getSide(), order.getQuantity(), order.getInstrument(), order.getClientId());
             processor.get().submitOrder(o);
         } else {
             throw new RuntimeException("No processor for instrument "+order.getInstrument());

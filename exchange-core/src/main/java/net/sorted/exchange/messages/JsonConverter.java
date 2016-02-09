@@ -8,6 +8,9 @@ import net.sorted.exchange.domain.Side;
 import net.sorted.exchange.domain.Trade;
 import net.sorted.exchange.orderbook.*;
 import net.sorted.exchange.orderbook.OrderBookSnapshot;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.json.simple.JSONArray;
@@ -19,6 +22,7 @@ import org.json.simple.parser.ParseException;
 public class JsonConverter {
 
     private final DateTimeFormatter dateFormat = DateTimeFormat.forPattern("dd-MM-yyyy");
+    private Logger log = LogManager.getLogger(JsonConverter.class);
 
     public ExchangeOrder exchangeOrderFromJson(String json) {
         JSONParser parser = new JSONParser();
@@ -70,6 +74,7 @@ public class JsonConverter {
         return jsonObjToString(obj);
     }
 
+
     public String publicTradeToJson(Trade trade) {
         JSONObject obj = new JSONObject();
 
@@ -81,6 +86,53 @@ public class JsonConverter {
         return jsonObjToString(obj);
     }
 
+    public String privateTradeToJson(Trade trade) {
+        JSONObject obj = new JSONObject();
+
+        obj.put("tradeId", trade.getTradeId());
+        obj.put("orderId", trade.getOrderId());
+        obj.put("clientId", trade.getClientId());
+        obj.put("instrumentId", trade.getInstrumentId());
+        obj.put("quantity", trade.getQuantity());
+        obj.put("price", trade.getPrice());
+        obj.put("tradeDate", dateFormat.print(trade.getTradeDate()));
+
+        return jsonObjToString(obj);
+    }
+
+    public Trade jsonToTrade(String json) {
+
+        JSONParser parser = new JSONParser();
+        Trade trade = null;
+        try {
+            Object parsed = parser.parse(json);
+            if (parsed instanceof JSONObject) {
+                JSONObject o = (JSONObject) parsed;
+                String clientId = (String)o.get("clientId");
+                String tradeId = (String)o.get("tradeId");
+                String orderId = (String)o.get("orderId");
+                String instrumentId = (String)o.get("instrumentId");
+                long quantity = (Long)o.get("quantity");
+                Double price = (Double)o.get("price");
+                String side = (String)o.get("side");
+                String tradeDate = (String)o.get("tradeDate");
+
+                Side s = (side != null) ? Side.valueOf(side): null;
+                log.debug("clientId={}  json={}", clientId, json);
+
+                // TODO - parse the tradeDate
+                trade = new Trade(tradeId, orderId, clientId, instrumentId, quantity, price, s, new DateTime());
+
+
+            } else {
+                throw new RuntimeException("Cannot parse Trade message ["+json+"]");
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException("Cannot parse Trade message ["+json+"]", e);
+        }
+
+        return trade;
+    }
 
     public String snapshotToJson(OrderBookSnapshot snapshot) {
         JSONObject json = new JSONObject();

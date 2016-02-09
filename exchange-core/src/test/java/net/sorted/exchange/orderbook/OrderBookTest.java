@@ -38,7 +38,7 @@ public class OrderBookTest {
 
     @Test
     public void testAddSingleBuyOrder() {
-        MatchedTrades matching = orderBook.addOrder(new Order("0", (double) 100.0, BUY, 1000, "USDAUD"));
+        MatchedTrades matching = orderBook.addOrder(new Order("0", (double) 100.0, BUY, 1000, "USDAUD", "client1"));
 
         assertNotNull(matching);
         assertTrue(matching.hasMatches() == false);
@@ -52,9 +52,9 @@ public class OrderBookTest {
     @Test
     public void testAddManyBuyOrdersSamePrice() {
 
-        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD"));
-        orderBook.addOrder(new Order("10", (double) 100.0, BUY, 2000, "USDAUD"));
-        orderBook.addOrder(new Order("20", (double) 100.0, BUY, 500, "USDAUD"));
+        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("10", (double) 100.0, BUY, 2000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("20", (double) 100.0, BUY, 500, "USDAUD", "client1"));
 
         List<Order> bids = orderBook.getAllOrdersForSide(BUY);
         assertNotNull(bids);
@@ -68,9 +68,9 @@ public class OrderBookTest {
     @Test
     public void testAddManyBuyOrdersDifferentPrice() {
 
-        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD"));
-        orderBook.addOrder(new Order("10", (double) 200.0, BUY, 2000, "USDAUD"));
-        orderBook.addOrder(new Order("20", (double) 50.0, BUY, 500, "USDAUD"));
+        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("10", (double) 200.0, BUY, 2000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("20", (double) 50.0, BUY, 500, "USDAUD", "client1"));
 
         List<Order> bids = orderBook.getAllOrdersForSide(BUY);
         assertNotNull(bids);
@@ -83,14 +83,14 @@ public class OrderBookTest {
     @Test
     public void testAddManyBuyAndSellOrdersDifferentPrice() {
 
-        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD"));
-        orderBook.addOrder(new Order("10", (double)200.0, BUY, 2000, "USDAUD"));
-        orderBook.addOrder(new Order("20", (double) 50.0, BUY, 500, "USDAUD"));
+        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("10", (double)200.0, BUY, 2000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("20", (double) 50.0, BUY, 500, "USDAUD", "client1"));
 
-        orderBook.addOrder(new Order("100", (double) 2000.0, SELL, 1000, "USDAUD"));
-        orderBook.addOrder(new Order("101", (double) 3000.0, SELL, 2000, "USDAUD"));
-        orderBook.addOrder(new Order("102", (double) 4000.0, SELL, 500, "USDAUD"));
-        orderBook.addOrder(new Order("103", (double) 5000.0, SELL, 500, "USDAUD"));
+        orderBook.addOrder(new Order("100", (double) 2000.0, SELL, 1000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("101", (double) 3000.0, SELL, 2000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("102", (double) 4000.0, SELL, 500, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("103", (double) 5000.0, SELL, 500, "USDAUD", "client1"));
 
         List<Order> bids = orderBook.getAllOrdersForSide(BUY);
         assertNotNull(bids);
@@ -110,14 +110,14 @@ public class OrderBookTest {
 
     @Test
     public void testPriceAtLevel() {
-        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD"));
-        orderBook.addOrder(new Order("10", (double)200.0, BUY, 2000, "USDAUD"));
-        orderBook.addOrder(new Order("20", (double)50.0, BUY, 500, "USDAUD"));
+        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("10", (double)200.0, BUY, 2000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("20", (double)50.0, BUY, 500, "USDAUD", "client1"));
 
-        orderBook.addOrder(new Order("100", (double)300.0, SELL, 1000, "USDAUD"));
-        orderBook.addOrder(new Order("101", (double)400.0, SELL, 2000, "USDAUD"));
-        orderBook.addOrder(new Order("102", (double) 500.0, SELL, 500, "USDAUD"));
-        orderBook.addOrder(new Order("103", (double) 600.0, SELL, 500, "USDAUD"));
+        orderBook.addOrder(new Order("100", (double)300.0, SELL, 1000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("101", (double)400.0, SELL, 2000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("102", (double) 500.0, SELL, 500, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("103", (double) 600.0, SELL, 500, "USDAUD", "client1"));
 
         assertEquals(200.0, orderBook.getPriceAtLevel(BUY, 1), 0.0001);
         assertEquals(100.0, orderBook.getPriceAtLevel(BUY, 2), 0.0001);
@@ -135,14 +135,14 @@ public class OrderBookTest {
 
     @Test
     public void testSizeAtLevel() {
-        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD"));
-        orderBook.addOrder(new Order("10", (double)200.0, BUY, 2000, "USDAUD"));
-        orderBook.addOrder(new Order("20", (double)50.0, BUY, 500, "USDAUD"));
+        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("10", (double)200.0, BUY, 2000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("20", (double)50.0, BUY, 500, "USDAUD", "client1"));
 
-        orderBook.addOrder(new Order("100", (double)2000.0, SELL, 1000, "USDAUD"));
-        orderBook.addOrder(new Order("101", (double)3000.0, SELL, 2000, "USDAUD"));
-        orderBook.addOrder(new Order("102", (double) 3000.0, SELL, 500, "USDAUD"));
-        orderBook.addOrder(new Order("103", (double) 3000.0, SELL, 500, "USDAUD"));
+        orderBook.addOrder(new Order("100", (double)2000.0, SELL, 1000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("101", (double)3000.0, SELL, 2000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("102", (double) 3000.0, SELL, 500, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("103", (double) 3000.0, SELL, 500, "USDAUD", "client1"));
 
         assertEquals(2000, orderBook.getSizeAtLevel(BUY, 1));
         assertEquals(1000, orderBook.getSizeAtLevel(BUY, 2));
@@ -159,9 +159,9 @@ public class OrderBookTest {
 
     @Test
     public void testRemoveOrder() {
-        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD"));
-        orderBook.addOrder(new Order("10", (double) 200.0, BUY, 2000, "USDAUD"));
-        orderBook.addOrder(new Order("20", (double) 50.0, BUY, 500, "USDAUD"));
+        orderBook.addOrder(new Order("0", (double)100.0, BUY, 1000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("10", (double) 200.0, BUY, 2000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("20", (double) 50.0, BUY, 500, "USDAUD", "client1"));
 
         orderBook.removeOrder("10");
         List<Order> bids = orderBook.getAllOrdersForSide(BUY);
@@ -179,9 +179,9 @@ public class OrderBookTest {
 
     @Test
     public void testModifyOrder() {
-        orderBook.addOrder(new Order("0", (double) 100.0, BUY, 1000, "USDAUD"));
-        orderBook.addOrder(new Order("10", (double) 200.0, BUY, 2000, "USDAUD"));
-        orderBook.addOrder(new Order("20", (double) 50.0, BUY, 500, "USDAUD"));
+        orderBook.addOrder(new Order("0", (double) 100.0, BUY, 1000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("10", (double) 200.0, BUY, 2000, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("20", (double) 50.0, BUY, 500, "USDAUD", "client1"));
 
         orderBook.modifyOrder("10", 3000);
         List<Order> bids = orderBook.getAllOrdersForSide(BUY);
@@ -200,10 +200,10 @@ public class OrderBookTest {
 
     @Test
     public void testMatchesSingleTradeBothFilled() {
-        MatchedTrades match = orderBook.addOrder(new Order("0", (double) 100.0, BUY, 1000, "USDAUD"));
+        MatchedTrades match = orderBook.addOrder(new Order("0", (double) 100.0, BUY, 1000, "USDAUD", "client1"));
         assertFalse("Should be no matches", match.hasMatches());
 
-        match = orderBook.addOrder(new Order("1", (double) 100.0, SELL, 1000, "USDAUD"));
+        match = orderBook.addOrder(new Order("1", (double) 100.0, SELL, 1000, "USDAUD", "client1"));
         assertNotNull(match);
         assertTrue(match.hasMatches());
         assertNotNull(match.getPassiveTrades());
@@ -226,10 +226,10 @@ public class OrderBookTest {
 
     @Test
     public void testMatchesSingleTradeAggressorFilledPassivePartial() {
-        MatchedTrades match = orderBook.addOrder(new Order("0", (double) 100.0, BUY, 10000, "USDAUD"));
+        MatchedTrades match = orderBook.addOrder(new Order("0", (double) 100.0, BUY, 10000, "USDAUD", "client1"));
         assertFalse("Should be no matches", match.hasMatches());
 
-        match = orderBook.addOrder(new Order("1", (double) 100.0, SELL, 1000, "USDAUD"));
+        match = orderBook.addOrder(new Order("1", (double) 100.0, SELL, 1000, "USDAUD", "client1"));
         assertNotNull(match);
         assertTrue(match.hasMatches());
         assertNotNull(match.getPassiveTrades());
@@ -257,12 +257,12 @@ public class OrderBookTest {
 
     @Test
     public void testMultiBuyAndSellTradesFromOrder() {
-        orderBook.addOrder(new Order("0", (double) 98.0, SELL, 490, "USDAUD"));
-        orderBook.addOrder(new Order("10", (double) 97.0, SELL, 375, "USDAUD"));
-        orderBook.addOrder(new Order("20", (double) 96.0, SELL, 100, "USDAUD"));
-        orderBook.addOrder(new Order("30", (double) 96.0, SELL, 150, "USDAUD"));
+        orderBook.addOrder(new Order("0", (double) 98.0, SELL, 490, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("10", (double) 97.0, SELL, 375, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("20", (double) 96.0, SELL, 100, "USDAUD", "client1"));
+        orderBook.addOrder(new Order("30", (double) 96.0, SELL, 150, "USDAUD", "client1"));
 
-        MatchedTrades match = orderBook.addOrder(new Order("40", (double) 97.0, BUY, 600, "USDAUD"));
+        MatchedTrades match = orderBook.addOrder(new Order("40", (double) 97.0, BUY, 600, "USDAUD", "client1"));
         assertNotNull(match);
         List<Trade> passive = match.getPassiveTrades();
         assertNotNull(passive);

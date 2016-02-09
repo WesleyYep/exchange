@@ -5,17 +5,34 @@
 </head>
 <body>
 <div>
-    <h3>Messages:</h3>
-    <ol id="messages"></ol>
+    <h3>Snapshots:</h3>
+    <ol id="snapshots"></ol>
 </div>
+
+<div>
+    <h3>Public trades:</h3>
+    <ol id="publicTrades"></ol>
+</div>
+
+<div>
+    <h3>Private trades:</h3>
+    <ol id="privateTrades"></ol>
+</div>
+
 
 <script type="text/javascript" src="//cdn.jsdelivr.net/jquery/1.11.2/jquery.min.js"></script>
 <script type="text/javascript" src="//cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<!--<script type="text/javascript" src="connect_queues.js"/>-->
 
 <script type="text/javascript">
+
+//    $(document).ready(connect_queues());
+
     $(document).ready(function() {
-        var messageList = $("#messages");
+        var snapshotsList = $("#snapshots");
+        var publicTradeList = $("#publicTrades");
+        var privateTradeList = $("#privateTrades");
 
         // defined a connection to a new socket endpoint
         var socket = new SockJS('/exchange');
@@ -23,10 +40,22 @@
         var stompClient = Stomp.over(socket);
 
         stompClient.connect({ }, function(frame) {
+
             // subscribe to the /topic/message endpoint
             stompClient.subscribe("/topic/snapshot", function(data) {
                 var message = data.body;
-                messageList.append("<li>" + message + "</li>");
+                snapshotsList.append("<li>" + message + "</li>");
+            });
+
+            stompClient.subscribe("/topic/public.trade", function(data) {
+                var message = data.body;
+                publicTradeList.append("<li>" + message + "</li>");
+            });
+
+            // subscribe to the users private queue (note the /user )
+            stompClient.subscribe("/user/queue/private.trade", function(data) {
+                var message = data.body;
+                privateTradeList.append("<li>" + message + "</li>");
             });
         });
     });

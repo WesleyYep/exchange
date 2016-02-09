@@ -1,6 +1,7 @@
 package net.sorted.exchange.web.rest;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MessageProperties;
@@ -31,8 +32,8 @@ public class OrderSubmission {
     private Logger log = LogManager.getLogger(OrderSubmission.class);
 
     @RequestMapping(value="/orders", method = {RequestMethod.POST })
-    public void newOrder(@RequestBody String order) {
-        log.info("Got a new order {}", order);
+    public void newOrder(@RequestBody String order, Principal principal) {
+        log.info("Got a new order {} from {}", order, principal.getName());
         try {
             channel.basicPublish(exchangeName, "", MessageProperties.PERSISTENT_TEXT_PLAIN, order.getBytes("UTF-8"));
         } catch (IOException e) {

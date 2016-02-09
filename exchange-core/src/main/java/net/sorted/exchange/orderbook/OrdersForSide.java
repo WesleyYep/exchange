@@ -53,7 +53,7 @@ public class OrdersForSide {
             Double price = new Double(order.getPrice());
             OrdersAtPrice orders = priceToOrderAtPrice.get(price);
             orders.removeOrder(order);
-            Order n = new Order(order.getId(), order.getPrice(), order.getSide(), size, order.getSymbol());
+            Order n = new Order(order.getId(), order.getPrice(), order.getSide(), size, order.getSymbol(), order.getClientId());
             orders.addOrder(n);
             idToOrder.put(orderId, n);
         }
