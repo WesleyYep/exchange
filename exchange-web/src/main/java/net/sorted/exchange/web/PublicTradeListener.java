@@ -7,6 +7,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
+import net.sorted.exchange.domain.Trade;
 import net.sorted.exchange.messages.JsonConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -51,8 +52,8 @@ public class PublicTradeListener {
 
     private void sendPublicTradeToClient(String message) {
         log.debug("Received public trade '" + message + "'");
-
-        webSocketSender.sendMessage("/topic/public.trade", message);
+        Trade t = jsonConverter.jsonToTrade(message);
+        webSocketSender.sendMessage("/topic/public.trade/" + t.getInstrumentId(), message);
     }
 
 }

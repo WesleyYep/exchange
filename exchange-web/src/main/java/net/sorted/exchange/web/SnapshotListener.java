@@ -8,6 +8,7 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import net.sorted.exchange.config.RabbitMqConfig;
+import net.sorted.exchange.messages.JsonConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +21,15 @@ public class SnapshotListener {
     private final WebSocketSender webSocketSender;
     private final Channel snapshotChannel;
     private final Consumer consumer;
+    private final JsonConverter jsonConverter;
 
     private Logger log = LogManager.getLogger(SnapshotListener.class);
 
     @Autowired
-    public SnapshotListener(WebSocketSender webSocketSender, @Qualifier("snapshotChannel") Channel snapshotChannel) throws IOException {
+    public SnapshotListener(WebSocketSender webSocketSender, @Qualifier("snapshotChannel") Channel snapshotChannel, JsonConverter jsonConverter) throws IOException {
         this.webSocketSender = webSocketSender;
         this.snapshotChannel = snapshotChannel;
+        this.jsonConverter = jsonConverter;
 
         String queueName = snapshotChannel.queueDeclare().getQueue();
         snapshotChannel.queueBind(queueName, RabbitMqConfig.SNAPSHOT_EXCHANGE_NAME, "");
@@ -44,8 +47,10 @@ public class SnapshotListener {
     }
 
     private void sendSnapshotToAll(String message) {
-        log.debug("Received snapshot '" + message + "'");
-        webSocketSender.sendMessage("/topic/snapshot", message);
+
+        String instrumentId = jsonConverter.getInstrumentIdFromSnapshotJson(message);
+        webSocketSender.sendMessage("/topic/snapshot/"+instrumentId, message);
+        log.debug("Sent snapshot for instrument {} message= {}", instrumentId, message);
     }
 
 }

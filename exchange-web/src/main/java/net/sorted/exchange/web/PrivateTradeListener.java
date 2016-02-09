@@ -58,7 +58,7 @@ public class PrivateTradeListener {
         Trade t = jsonConverter.jsonToTrade(message);
 
         log.debug("Sending private trade to {}", t.getClientId());
-        webSocketSender.sendMessageToUser("/queue/private.trade", t.getClientId(), message);
+        webSocketSender.sendMessageToUser("/queue/private.trade/" + t.getInstrumentId(), t.getClientId(), message);
     }
 
 }

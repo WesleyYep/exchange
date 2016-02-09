@@ -191,6 +191,25 @@ public class JsonConverter {
         return out.toString();
     }
 
+    public String getInstrumentIdFromSnapshotJson(String json) {
+        String instrumentId = null;
+        JSONParser parser = new JSONParser();
+        try {
+            Object parsed = parser.parse(json);
+
+            if (parsed instanceof JSONObject) {
+                JSONObject o = (JSONObject) parsed;
+                instrumentId = (String) o.keySet().iterator().next();
+             //   instrumentId = (String) o.get("instrumentId");
+            }
+        } catch (ParseException e) {
+            throw new RuntimeException("Cannot parse snapshot message ["+json+"]", e);
+        }
+        return instrumentId;
+    }
+
+
+
     public static final void main(String[] args) throws IOException {
 
         JSONObject json = new JSONObject();
