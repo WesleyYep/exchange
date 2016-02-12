@@ -68,6 +68,7 @@
 
     <modules>
         <module>exchange-core</module>
+        <module>exchange-react-client</module>
         <module>exchange-web</module>
     </modules>
 
