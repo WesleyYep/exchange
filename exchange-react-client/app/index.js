@@ -1,6 +1,7 @@
 
 import React from "react";
 import dom from "react-dom";
+import OrderForm from "./components/order-form";
 import PublicTrades from "./components/public-trades";
 import PrivateTrades from "./components/private-trades";
 import Snapshot from "./components/snapshot";
@@ -19,6 +20,8 @@ class Exchange extends React.Component {
                     this.instruments.map(instrument => {
                         return (
                             <div>
+                                <OrderForm  instrument={instrument}/>
+                                <hr/>
                                 <Snapshot instrument={instrument}/>
                                 <hr/>
                                 <PublicTrades instrument={instrument}/>

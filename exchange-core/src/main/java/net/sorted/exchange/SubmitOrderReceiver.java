@@ -53,7 +53,7 @@ public class SubmitOrderReceiver {
                     orderChannel.basicAck(envelope.getDeliveryTag(), false);
                     log.debug("Processed message '{}'", message);
                 } catch (Throwable t) {
-                    log.info("Error processing message", t);
+                    log.info("Error processing message " + message, t);
                     orderChannel.basicNack(envelope.getDeliveryTag(), false, false);
                 }
             }

@@ -35,12 +35,16 @@ public class JsonConverter {
                 String orderId = (String)o.get("orderId");
                 String correlationId = (String)o.get("correlationId");
 
+                Object qty = o.get("quantity");
+                Long quantity = (qty instanceof Long) ? (Long) qty : Long.parseLong(""+qty);
+
+
                 order = new ExchangeOrder(
                         (String)o.get("orderId"),
                         (String)o.get("clientId"),
                         (String)o.get("correlationId"),
                         (String)o.get("instrument"),
-                        (Long)o.get("quantity"),
+                        quantity,
                         (String)o.get("price"),
                         (o.get("side") != null) ? Side.valueOf((String)o.get("side")) : null,
                         (o.get("type") != null) ? OrderType.valueOf((String)o.get("type")) : null,
@@ -48,10 +52,10 @@ public class JsonConverter {
                 );
 
             } else {
-                throw new RuntimeException("Cannot parse ExchangeOrder message ["+json+"]");
+                throw new RuntimeException("Cannot parse ExchangeOrder message '"+json+"'");
             }
         } catch (ParseException e) {
-            throw new RuntimeException("Cannot parse ExchangeOrder message ["+json+"]", e);
+            throw new RuntimeException("Cannot parse ExchangeOrder message '"+json+"'", e);
         }
 
 
@@ -61,19 +65,26 @@ public class JsonConverter {
     public String exchangeOrderToJson(ExchangeOrder order) {
         JSONObject obj = new JSONObject();
 
-        obj.put("orderId", order.getOrderId());
-        obj.put("clientId", order.getClientId());
-        obj.put("correlationId", order.getCorrelationId());
-        obj.put("instrument", order.getInstrument());
-        obj.put("quantity", order.getQuantity());
-        obj.put("price", ""+order.getPrice());
-        obj.put("side", order.getSide());
-        obj.put("type", order.getType());
-        obj.put("state", order.getState());
+
+        addIfNotNull(obj, "orderId", order.getOrderId());
+        addIfNotNull(obj, "clientId", order.getClientId());
+        addIfNotNull(obj, "correlationId", order.getCorrelationId());
+        addIfNotNull(obj, "instrument", order.getInstrument());
+        addIfNotNull(obj, "quantity", order.getQuantity());
+        addIfNotNull(obj, "price", order.getPrice());
+        addIfNotNull(obj, "side", order.getSide());
+        addIfNotNull(obj, "type", order.getType());
+        addIfNotNull(obj, "state", order.getState());
 
         return jsonObjToString(obj);
     }
 
+
+    private void addIfNotNull(JSONObject obj, String key, Object value) {
+        if (value != null) {
+            obj.put(key, value.toString());
+        }
+    }
 
     public String publicTradeToJson(Trade trade) {
         JSONObject obj = new JSONObject();

@@ -7,6 +7,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MessageProperties;
 import net.sorted.exchange.config.RabbitMqConfig;
 import net.sorted.exchange.messages.ExchangeOrder;
+import net.sorted.exchange.messages.JsonConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +29,23 @@ public class OrderSubmission {
     @Qualifier("submitExchangeName")
     private String exchangeName;
 
+    @Autowired
+    private JsonConverter jsonConverter;
+
 
     private Logger log = LogManager.getLogger(OrderSubmission.class);
 
+
     @RequestMapping(value="/orders", method = {RequestMethod.POST })
-    public void newOrder(@RequestBody String order, Principal principal) {
+    public void newOrder(@RequestBody ExchangeOrder order, Principal principal) {
         log.info("Got a new order {} from {}", order, principal.getName());
+
+        order.setClientId(principal.getName());
+        // TODO - should be using a better way to convert object to json (or not using json to the backend at all)
+        String orderJson = jsonConverter.exchangeOrderToJson(order);
+
         try {
-            channel.basicPublish(exchangeName, "", MessageProperties.PERSISTENT_TEXT_PLAIN, order.getBytes("UTF-8"));
+            channel.basicPublish(exchangeName, "", MessageProperties.PERSISTENT_TEXT_PLAIN, orderJson.getBytes("UTF-8"));
         } catch (IOException e) {
             log.error("Error receiving submit order message ", e);
             throw new RuntimeException("Error receiving submit order message ", e);

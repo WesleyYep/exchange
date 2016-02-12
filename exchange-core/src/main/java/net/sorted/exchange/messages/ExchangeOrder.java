@@ -17,7 +17,7 @@ public class ExchangeOrder {
     private String instrument;
     private long quantity;
     private String price;
-    private Side side;
+    private Side side = Side.BUY;
     private OrderType type;
     private State state;
 
@@ -72,6 +72,27 @@ public class ExchangeOrder {
 
     public State getState() {
         return state;
+    }
+
+
+    public void setClientId(String clientId) {
+        this.clientId = clientId;
+    }
+
+    public void setQuantity(long quantity) {
+        this.quantity = quantity;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public void setSide(Side side) {
+        this.side = side;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     @Override
