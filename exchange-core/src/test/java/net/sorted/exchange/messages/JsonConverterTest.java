@@ -70,18 +70,18 @@ public class JsonConverterTest {
         assertEquals(ExchangeOrder.State.unsubmitted, e.getState());
     }
 
-    @Test
-    public void testExchangeOrderToJason() {
-        ExchangeOrder order = new ExchangeOrder("0", "fred", "1234", "AMZN", 999, "100.12", BUY, LIMIT, ExchangeOrder.State.unsubmitted);
-        String json = jsonConverter.exchangeOrderToJson(order);
-        assertTrue(json.indexOf("\"orderId\":\"0\",") >= 0);
-        assertTrue(json.indexOf("\"clientId\":\"fred\"") >= 0);
-        assertTrue(json.indexOf("\"correlationId\":\"1234\"") >= 0);
-        assertTrue(json.indexOf("\"instrument\":\"AMZN\"") >= 0);
-        assertTrue(json.indexOf("\"quantity\":999") >= 0);
-        assertTrue(json.indexOf("\"price\":\"100.12\"") >= 0);
-        assertTrue(json.indexOf("\"side\":BUY") >= 0);
-        assertTrue(json.indexOf("\"type\":LIMIT") >= 0);
-        assertTrue(json.indexOf("\"state\":unsubmitted") >= 0);
-    }
+//    @Test
+//    public void testExchangeOrderToJason() {
+//        ExchangeOrder order = new ExchangeOrder("0", "fred", "1234", "AMZN", 999, "100.12", BUY, LIMIT, ExchangeOrder.State.unsubmitted);
+//        String json = jsonConverter.exchangeOrderToJson(order);
+//        assertTrue(json.indexOf("\"orderId\":\"0\",") >= 0);
+//        assertTrue(json.indexOf("\"clientId\":\"fred\"") >= 0);
+//        assertTrue(json.indexOf("\"correlationId\":\"1234\"") >= 0);
+//        assertTrue(json.indexOf("\"instrument\":\"AMZN\"") >= 0);
+//        assertTrue(json.indexOf("\"quantity\":999") >= 0);
+//        assertTrue(json.indexOf("\"price\":\"100.12\"") >= 0);
+//        assertTrue(json.indexOf("\"side\":BUY") >= 0);
+//        assertTrue(json.indexOf("\"type\":LIMIT") >= 0);
+//        assertTrue(json.indexOf("\"state\":unsubmitted") >= 0);
+//    }
 }

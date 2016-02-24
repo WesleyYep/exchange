@@ -82,7 +82,11 @@ public class JsonConverter {
 
     private void addIfNotNull(JSONObject obj, String key, Object value) {
         if (value != null) {
-            obj.put(key, value.toString());
+            if (value instanceof Long || value instanceof Integer) {
+                obj.put(key, value);
+            } else {
+                obj.put(key, value.toString());
+            }
         }
     }
 
