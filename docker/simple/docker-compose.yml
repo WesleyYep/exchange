@@ -1,0 +1,14 @@
+#exchangeweb:
+#    image: sortednet/exchange-webserver
+#    ports:
+#        - "8888:8080"
+#    links:
+#        - rabbit_1.sorted.net
+
+rabbit_1.sorted.net:
+    image: rabbitmq:3-management
+    ports:
+        - "4369:4369"
+        - "5671-5672:5671-5672" # client connectors
+        - "25672:25672"
+        - "9090:15672" # Admin webpage
