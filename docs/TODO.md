@@ -9,8 +9,7 @@
 
 # Docker 
 
-* Create a container for the application
-* Create a compose file for the system
+* Create a compose file for clustered system
 * Create a containerised build (this may need to be considered as part of a larger build system with a swarm) 
 
 
@@ -22,9 +21,15 @@ OpenID
 ???
 
 The authentication needs to
-* Integrate with Spring (Web and Rest and Messaging)
+* Integrate with Spring (Web and Rest and Messaging) - need to have web page submit to REST API that is not on the machine it loaded from
 * Be setup as a docker image (and be setup in docker-compose)
 * Be fast enough for microservices
+
+
+# Interprocess comms
+
+* Kill json on the server side.
+   Use protoc or some other messaging. No json in messages going into ExchangeNodes - only use for web submissions (and get rid there too if possible)
 
 
 # Clustered system
