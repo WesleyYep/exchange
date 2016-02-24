@@ -36,12 +36,12 @@ class OrderForm extends React.Component {
                 <form onSubmit={(evt) => this.submitForm(evt)}>
                     <fieldset>
                         <legend>Order</legend>
-                        Price <input type="text" ref="price" /><br/>
-                        Quantity <input type="text" ref="quantity" /><br/>
+                        Price <input type="text" ref="price" />
+                        Quantity <input type="text" ref="quantity" />
                         Side <select ref="side">
                             <option value="BUY">Buy</option>
                             <option value="SELL">Sell</option>
-                        </select> <br/>
+                        </select>
                         <input type="submit" value="Submit" />
                     </fieldset>
                 </form>

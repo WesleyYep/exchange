@@ -19,14 +19,11 @@ class Exchange extends React.Component {
                 {
                     this.instruments.map(instrument => {
                         return (
-                            <div>
-                                <OrderForm  instrument={instrument}/>
-                                <hr/>
-                                <Snapshot instrument={instrument}/>
-                                <hr/>
-                                <PublicTrades instrument={instrument}/>
-                                <hr/>
-                                <PrivateTrades instrument={instrument}/>
+                            <div className="container-fluid">
+                                <div ><OrderForm  instrument={instrument}/></div>
+                                <div ><Snapshot instrument={instrument}/></div>
+                                <div className="col-md-8"><PublicTrades instrument={instrument}/></div>
+                                <div className="col-md-4"><PrivateTrades instrument={instrument}/></div>
                             </div>
 
                         )
