@@ -6,5 +6,5 @@ This is a "Dev Ops" project with each of the elements wrapped in a docker image 
 
 ## Details
 
-[Design docs](docs/design.md) 
-[TODO](docs/TODO.md)
+* [Design docs](docs/design.md) 
+* [TODO](docs/TODO.md)

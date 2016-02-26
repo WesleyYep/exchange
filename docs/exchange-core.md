@@ -159,6 +159,7 @@ The hostname of the rabbit s
 
 ## System properties
 
-| property name             | property file                | notes |
-| instrumentCSL             | exchange.properties          | |
-| rabbit.hostname           | exchange.properties          | |
+| property name             | property file                | notes                                                                  |
+|---------------------------|------------------------------|------------------------------------------------------------------------|
+| instrumentCSL             | exchange.properties          | comma separated list of ticker symbols of the instruments on this node |
+| rabbit.hostname           | exchange.properties          | The hostname of the Rabbit MQ server                                   |
