@@ -12,7 +12,7 @@ OrderBook
 OrderProcessor
 ExchangeNode
 
-[Full docs](docs/exchange-core.md)
+[Full docs](exchange-core.md)
 
 ### exchange-web
 This has the web layer or the system. This comprises of
@@ -20,7 +20,7 @@ This has the web layer or the system. This comprises of
 * Websockets
 * Web Security
 
-[Full Docs](docs/exchange-web.md)
+[Full Docs](exchange-web.md)
 
 ## Operations
 
