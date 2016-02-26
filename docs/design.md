@@ -24,9 +24,9 @@ This has the web layer or the system. This comprises of
 
 ## Operations
 
-The systems is intended to be deployed in docker containers.
+The system is intended to be deployed in docker containers.
 
-### Images
+### Docker Images
 
 sortednet/exchange-node
 
