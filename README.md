@@ -8,3 +8,20 @@ This is a "Dev Ops" project with each of the elements wrapped in a docker image 
 
 * [Design docs](docs/design.md) 
 * [TODO](docs/TODO.md)
+
+
+## Quickstart
+
+### Build
+
+    mvn install
+
+### Run 
+
+    cd docker/nocluster
+    docker-compose up
+
+If on windows or mac, get the ip of the docker VM (docker-machine env default)
+Webpage available on IP:8888
+
+login as either doug or john with password ‘password’
