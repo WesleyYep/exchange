@@ -7,6 +7,13 @@
     Get list of authorised instruments from server
     Add control to top of screen to switch instrument (eg combo box)
 
+# Documentation
+
+* Finish docs for current implementation of each of the modules
+* Write up target system design (start with architecture, security, clustering etc)
+* Write up testing strategy
+
+
 # Server
 
 * Add REST service to get the instruments available to a user (initial implementation can just be a fixed set of instruments for every user)
