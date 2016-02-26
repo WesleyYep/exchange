@@ -14,10 +14,11 @@
 * Write up testing strategy
 
 
-# Server
+# Server 
 
 * Add REST service to get the instruments available to a user (initial implementation can just be a fixed set of instruments for every user)
-
+* Order status - Order status updates need to be reported back to order submitter (including the actual assigned order id)
+* Implement 'Fill or Kill'
 
 # Docker 
 

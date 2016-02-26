@@ -4,24 +4,6 @@
 
 Represents a single orderbook. This is the book for a single instrument. This is a single threaded implementation with a java API.
 
-    public interface OrderBook {
-    
-        void addOrder(Order order);
-    
-        void removeOrder(long orderId);
-    
-        void modifyOrder(long orderId, long size);
-    
-        double getPriceAtLevel(char side, int level);
-    
-        long getSizeAtLevel(char side, int level);
-    
-        List<Order> getAllOrdersForSide(char side);
-
-        MatchingOrders getMatchingOrdersByPrice();
-    }
-
-
     -------------        -----------------        -----------------
     | OrderBook | --2--> | OrdersForSide | --*--> | OrdersAtPrice |
     -------------        -----------------        -----------------
@@ -58,7 +40,7 @@ This component is multi-threaded and has a RabbitMQ messaging API.
 
 The may be multiple ExchangeNodes setup to shard the processing by instrument.
 
-# API
+# ExchangeNode API
 
 ## Messages
 
@@ -73,10 +55,6 @@ ExchangeOrder
     type (limit or FillOrKill)
     state  (open, filled, partial, cancelled)
     
-SnapshotRequest
-    clientId
-    correlationId
-    instrument
     
 OrderBookSnapshot - lists are ordered by price and time of subbmission.
     clientId
@@ -84,16 +62,35 @@ OrderBookSnapshot - lists are ordered by price and time of subbmission.
     List<Order> buys
     List<Order> sells
 
-PriceSubscription
+PublicTrade
+    instrumentId
+    quantity
+    price
+    tradeDate
+
+PrivateTrade
+    tradeId
+    orderId
     clientId
-    instrument
+    instrumentId
+    quantity
+    price
+    tradeDate
         
-PriceSnapshot
-    clientId
-    instrument
-    bidPrice
-    askPrice
-        
+
+### Message flow
+    TODO - describe ALL message flows
+    
+ExchangeOrder comes in, 
+
+    if matches then 
+        private trades sent to parties involved 
+        OrderBookSnapshot + public trades sent to anyone who is listening
+    else
+        OrderBookSnapshot sent to anyone who is listening
+   
+
+
 
 ## Queues
 
