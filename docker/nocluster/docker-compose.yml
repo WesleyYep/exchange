@@ -1,3 +1,26 @@
+rabbit_1:
+    image: rabbitmq:3-management
+    ports:
+        - "5671-5672:5671-5672" # client connectors
+        - "9090:15672" # Admin webpage
+
+
+exchange_node_1:
+    image: sortednet/exchange-node
+    environment:
+      RABBIT_HOSTNAME: rabbit_1.sorted.net
+      INSTRUMENTS: AMZN,GOOG
+    links:
+        - rabbit_1:rabbit_1.sorted.net
+
+exchange_node_2:
+    image: sortednet/exchange-node
+    environment:
+      RABBIT_HOSTNAME: rabbit_1.sorted.net
+      INSTRUMENTS: WBC,CBA
+    links:
+        - rabbit_1:rabbit_1.sorted.net
+
 exchangeweb:
     image: sortednet/exchange-web
     ports:
@@ -6,13 +29,4 @@ exchangeweb:
         - rabbit_1:rabbit_1.sorted.net
 
 
-exchange_node_1:
-    image: sortednet/exchange-node
-    links:
-        - rabbit_1:rabbit_1.sorted.net
 
-rabbit_1:
-    image: rabbitmq:3-management
-    ports:
-        - "5671-5672:5671-5672" # client connectors
-        - "9090:15672" # Admin webpage

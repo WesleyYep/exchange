@@ -7,6 +7,11 @@
     Get list of authorised instruments from server
     Add control to top of screen to switch instrument (eg combo box)
 
+# Server
+
+* Add REST service to get the instruments available to a user (initial implementation can just be a fixed set of instruments for every user)
+
+
 # Docker 
 
 * Create a compose file for clustered system
@@ -36,13 +41,17 @@ The authentication needs to
 
 ## Clustered back end
 
-* ExchangeNode shard on instruments.
+* ExchangeNode - shard on instruments.
+* Can look at how to have multiple nodes for a single orderbook (eg using in memory DB).  
  
 ## Clustered web
  
-Web nodes - cluster for reliability. 
-Will need the authentication sorted first. 
-Need to setup load balancer
+* Web nodes - cluster for reliability. 
+* Will need the authentication sorted first - SSO?. 
+* Setup load balancer
+
+## Clustered RabbitMQ
+Readup on the docs for doing this.
 
 
 
