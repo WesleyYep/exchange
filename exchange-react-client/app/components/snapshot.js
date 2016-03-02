@@ -16,7 +16,6 @@ class Snapshot extends React.Component {
                 var snapshot = JSON.parse(data.body);
                 var buy = _.sortBy(snapshot[this.props.instrument].buy, "price");
                 var sell = _.sortBy(snapshot[this.props.instrument].sell, "price");
-                sell = _.reverse(sell);
                 this.setState({buy, sell});
             });
         });
@@ -24,8 +23,8 @@ class Snapshot extends React.Component {
 
     render() {
         return (
-            <table>
-                <thead><tr><td>Sell</td><td>Price</td><td>Buy</td></tr></thead>
+            <table className="table table-bordered">
+                <thead><tr><th>Sell</th><th>Price</th><th>Buy</th></tr></thead>
                 <tbody>
 
                 {this.state.buy.map((order, index) => {

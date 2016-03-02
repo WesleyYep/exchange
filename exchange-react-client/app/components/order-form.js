@@ -33,17 +33,25 @@ class OrderForm extends React.Component {
     render() {
         return (
 
-                <form onSubmit={(evt) => this.submitForm(evt)}>
-                    <fieldset>
-                        <legend>Order</legend>
-                        Price <input type="text" ref="price" />
-                        Quantity <input type="text" ref="quantity" />
-                        Side <select ref="side">
+                <form className="form-inline" onSubmit={(evt) => this.submitForm(evt)}>
+                    <div className="form-group">
+                        <label forName="price" >Price</label>
+                        <input className="form-control" type="text" ref="price" id="price"/>
+                    </div>
+                    <div className="form-group">
+                        <label forName="quantity" >Quantity</label>
+                        <input className="form-control" type="text" ref="quantity" id="quantity"/>
+                    </div>
+                    <div className="form-group">
+                        <label forName="side" >Side</label>
+                        <select ref="side" id="side">
                             <option value="BUY">Buy</option>
                             <option value="SELL">Sell</option>
                         </select>
-                        <input type="submit" value="Submit" />
-                    </fieldset>
+                    </div>
+
+                    <button className="btn btn-default" type="submit" >Submit</button>
+
                 </form>
         )
     }

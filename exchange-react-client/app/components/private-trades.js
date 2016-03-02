@@ -22,8 +22,8 @@ class PrivateTrades extends React.Component {
 
     render() {
         return (
-            <table>
-                <thead><tr><td>Price</td><td>Quantity</td><td>Trade Id</td><td>Order Id</td></tr></thead>
+            <table className="table table-bordered">
+                <thead><tr><th>Price</th><th>Quantity</th><th>Trade Id</th><th>Order Id</th></tr></thead>
                 <tbody>
                 {this.state.trades.map((trade, index) => {
                   return (

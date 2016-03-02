@@ -22,8 +22,8 @@ class PublicTrades extends React.Component {
 
     render() {
         return (
-            <table>
-                <thead><tr><td>Price</td><td>Quantity</td></tr></thead>
+            <table className="table table-bordered">
+                <thead><tr><th>Price</th><th>Quantity</th></tr></thead>
                 <tbody>
                 {this.state.trades.map((trade, index) => {
                   return (
