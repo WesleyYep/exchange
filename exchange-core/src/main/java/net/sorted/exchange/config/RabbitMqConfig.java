@@ -6,6 +6,8 @@ import java.util.Map;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class RabbitMqConfig {
     public static final String ORDER_SUBMIT_EXCHANGE_NAME = "submit.order.exchange";
@@ -18,6 +20,9 @@ public class RabbitMqConfig {
 
     public static final String SNAPSHOT_EXCHANGE_NAME = "snapshot.exchange";
 
+    private Logger log = LogManager.getLogger(RabbitMqConfig.class);
+
+    private final Map<String, Object> submitQueueArgs = new HashMap<String, Object>();
 
     private final Channel orderChannel;
     private final Channel publicTradeChannel;
@@ -32,17 +37,12 @@ public class RabbitMqConfig {
             connection = factory.newConnection();
             orderChannel = connection.createChannel();
 
-            // Setup Submit Order with dead message exchange
+            // Setup Submit Order exchange with dead message exchange
             String deadQueueName = orderChannel.queueDeclare(ORDER_SUBMIT_DEAD_CHANNEL_NAME, false, false, false, null).getQueue();
             orderChannel.exchangeDeclare(ORDER_SUBMIT_DEAD_EXCHANGE, "direct");
             orderChannel.queueBind(deadQueueName, ORDER_SUBMIT_DEAD_EXCHANGE, "");
-
             orderChannel.exchangeDeclare(ORDER_SUBMIT_EXCHANGE_NAME, "direct");
-            Map<String, Object> args = new HashMap<String, Object>();
-            args.put("x-dead-letter-exchange", ORDER_SUBMIT_DEAD_EXCHANGE);
-            String submitQueueName = orderChannel.queueDeclare(ORDER_SUBMIT_QUEUE_NAME, false, false, false, args).getQueue();
-            orderChannel.queueBind(submitQueueName, ORDER_SUBMIT_EXCHANGE_NAME, "");
-
+            submitQueueArgs.put("x-dead-letter-exchange", ORDER_SUBMIT_DEAD_EXCHANGE);
 
             // Setup public trade topic
             publicTradeChannel = connection.createChannel();
@@ -61,7 +61,24 @@ public class RabbitMqConfig {
         }
     }
 
-    public Channel getSubmitOrderChannel() {
+    // Add a queue to the ORDER_SUBMIT exchange for a specific instrument
+    // Name of bound queue is returned
+    public String getSubmitOrderChannel(String instrument) {
+        String instrumentQueueName = ORDER_SUBMIT_QUEUE_NAME + "-" + instrument;
+        try {
+            // NB - queue per instrument bound to channel
+            orderChannel.queueDeclare(instrumentQueueName, false, false, false, submitQueueArgs);
+            orderChannel.queueBind(instrumentQueueName, ORDER_SUBMIT_EXCHANGE_NAME, instrument);
+            orderChannel.basicQos(1);
+            log.info("bound queue {} to exchange {}", instrumentQueueName, ORDER_SUBMIT_EXCHANGE_NAME);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot configure rabbit mq with queue for submitting instrument " + instrument, e);
+        }
+
+        return instrumentQueueName;
+    }
+
+    public Channel getOrderChannel() {
         return orderChannel;
     }
 

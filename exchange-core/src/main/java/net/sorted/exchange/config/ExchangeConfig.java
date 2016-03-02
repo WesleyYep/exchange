@@ -1,8 +1,9 @@
 package net.sorted.exchange.config;
 
+import com.rabbitmq.client.Channel;
+import net.sorted.exchange.OrderMqReceivers;
 import net.sorted.exchange.dao.OrderIdDao;
 import net.sorted.exchange.dao.OrderIdDaoInMemory;
-import net.sorted.exchange.OrderProcessorLocator;
 import net.sorted.exchange.publishers.OrderSnapshotPublisher;
 import net.sorted.exchange.publishers.OrderSnapshotPublisherRabbit;
 import net.sorted.exchange.publishers.PrivateTradePublisher;
@@ -47,16 +48,6 @@ public class ExchangeConfig {
         return new RabbitMqConfig(rabbitHostname);
     }
 
-    @Bean
-    public SubmitOrderReceiver submitOrderReceiver() {
-        SubmitOrderReceiver receiver = new SubmitOrderReceiver(rabbitMqConfig().getSubmitOrderChannel(),
-                RabbitMqConfig.ORDER_SUBMIT_QUEUE_NAME,
-                orderProcessorLocator(),
-                orderIdDao(),
-                jsonConverter());
-
-        return receiver;
-    }
 
     @Bean
     public JsonConverter jsonConverter() {
@@ -74,22 +65,29 @@ public class ExchangeConfig {
     }
 
     @Bean
-    public OrderProcessorLocator orderProcessorLocator() {
-        OrderProcessorLocator locator =  new OrderProcessorLocator();
+    public OrderMqReceivers orderMqReceivers() {
+        OrderMqReceivers orderMqReceivers = new OrderMqReceivers();
 
         String[] instruments = supportedInstrumentCSL.split(",");
         for (String instrument : instruments) {
-            OrderBook amznOrderBook = new OrderBookInMemory(instrument, tradeIdDao());
-            OrderProcessor orderProcessor = new OrderProcessorInMemory(amznOrderBook, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher());
-            locator.addOrderProcessor(instrument, orderProcessor);
+            OrderBook orderBook = new OrderBookInMemory(instrument, tradeIdDao());
+            OrderProcessor orderProcessor = new OrderProcessorInMemory(orderBook, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher());
+            String instrumentQueueName = rabbitMqConfig().getSubmitOrderChannel(instrument);
+            Channel orderChannel = rabbitMqConfig().getOrderChannel();
+            SubmitOrderReceiver receiver = new SubmitOrderReceiver(orderChannel,
+                    instrumentQueueName,
+                    orderProcessor,
+                    orderIdDao(),
+                    jsonConverter());
+
+            orderMqReceivers.addReceiver(receiver);
         }
 
-        return locator;
+        return orderMqReceivers;
     }
 
     @Bean
     public PublicTradePublisher publicTradePublisher() {
-
         return new PublicTradePublisherRabbit(rabbitMqConfig().getPublicTradeChannel(), RabbitMqConfig.PUBLIC_TRADE_EXCHANGE_NAME, jsonConverter());
     }
 

@@ -22,7 +22,7 @@ public class SimulatedClient {
     public void submitLimitOrder(String instrument, int qty, String price, String side) {
         String message = "{\"clientId\":\"" + clientId + "\",\"instrument\":\"" + instrument + "\",\"quantity\":" + qty + ",\"price\":\"" + price + "\",\"side\":\"" + side + "\",\"type\":\"LIMIT\"}";
         try {
-            submit.basicPublish(RabbitMqConfig.ORDER_SUBMIT_EXCHANGE_NAME, "", MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes("UTF-8"));
+            submit.basicPublish(RabbitMqConfig.ORDER_SUBMIT_EXCHANGE_NAME, instrument, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes("UTF-8"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -32,15 +32,8 @@ public class SimulatedClient {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(ExchangeConfig.class);
 
         RabbitMqConfig rabbitMqConfig = ctx.getBean(RabbitMqConfig.class);
-        Channel submit = rabbitMqConfig.getSubmitOrderChannel();
-        SimulatedClient client = new SimulatedClient(submit, "doug");
-
-        client.submitLimitOrder("DELL", 500, "100.02", "SELL");
-        client.submitLimitOrder("DELL", 500, "100.03", "SELL");
-        client.submitLimitOrder("DELL", 500, "100.04", "SELL");
-
-        client.submitLimitOrder("DELL", 1000, "99.99", "BUY");
-        client.submitLimitOrder("DELL", 1000, "100.00", "BUY");
+        rabbitMqConfig.getSubmitOrderChannel("AMZN");
+        SimulatedClient client = new SimulatedClient(rabbitMqConfig.getOrderChannel(), "doug");
 
 
         client.submitLimitOrder("AMZN", 500, "100.02", "SELL");

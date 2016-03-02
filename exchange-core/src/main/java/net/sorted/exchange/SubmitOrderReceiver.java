@@ -20,27 +20,22 @@ import org.apache.logging.log4j.Logger;
 public class SubmitOrderReceiver {
     private final Channel orderChannel;
     private final String queueName;
-    private final OrderProcessorLocator orderProcessorLocator;
+    private final OrderProcessor orderProcessor;
     private final OrderIdDao orderIdDao;
     private final JsonConverter jsonConverter;
     private final Consumer consumer;
 
     private Logger log = LogManager.getLogger(SubmitOrderReceiver.class);
 
-    public SubmitOrderReceiver(Channel orderChannel, String queueName, OrderProcessorLocator orderProcessorLocator,
+    public SubmitOrderReceiver(Channel orderChannel, String queueName, OrderProcessor orderProcessor,
                                OrderIdDao orderIdDao, JsonConverter jsonConverter) {
 
         this.orderChannel = orderChannel;
         this.queueName = queueName;
-        this.orderProcessorLocator = orderProcessorLocator;
+        this.orderProcessor = orderProcessor;
         this.orderIdDao = orderIdDao;
         this.jsonConverter = jsonConverter;
 
-        try {
-            orderChannel.basicQos(1);
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot set SubmitOrder queue to only send one message at a time", e);
-        }
 
         consumer = new DefaultConsumer(orderChannel) {
             @Override
@@ -66,6 +61,7 @@ public class SubmitOrderReceiver {
 
         try {
             orderChannel.basicConsume(queueName, false, consumer);
+            log.info("Started consuming messages from {} ", queueName);
         } catch (IOException e) {
             log.info("Error receiving submit order messages. Listener stopping.", e);
             throw new RuntimeException("Error consuming message ", e);
@@ -76,6 +72,7 @@ public class SubmitOrderReceiver {
     public void stopReceiving() {
         try {
             orderChannel.basicCancel(queueName);
+            log.info("Stopped consuming messages from {} ", queueName);
         } catch (IOException e) {
             throw new RuntimeException("Error stopping listening for order messages", e);
         }
@@ -85,12 +82,8 @@ public class SubmitOrderReceiver {
         if (order.getInstrument().equals("REJECT")) {
             throw new RuntimeException("REJECTING order");
         }
-        Optional<OrderProcessor> processor = orderProcessorLocator.getProcessor(order.getInstrument());
-        if (processor.isPresent()) {
-            Order o = new Order(orderIdDao.getNextOrderId(), Double.parseDouble(order.getPrice()), order.getSide(), order.getQuantity(), order.getInstrument(), order.getClientId());
-            processor.get().submitOrder(o);
-        } else {
-            throw new RuntimeException("No processor for instrument "+order.getInstrument());
-        }
+
+        Order o = new Order(orderIdDao.getNextOrderId(), Double.parseDouble(order.getPrice()), order.getSide(), order.getQuantity(), order.getInstrument(), order.getClientId());
+        orderProcessor.submitOrder(o);
     }
 }

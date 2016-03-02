@@ -33,9 +33,12 @@ If the order is partially matched, settle on partial and modify Order to buy/sel
 If the order is not matched, delete it
 
 
-### ExchangeNode
+## SubmitOrderReceiver
+This handles the RabbitMQ side and delegates the business logic out to an OrderProcessor
 
-This is a collection of OrderProcessors. It accepts general order messages and utilises the specific order processor. 
+## ExchangeNode
+
+This is a collection of SubmitOrderReceivers (by way of a MqOrderReceiver object). It accepts general order messages and utilises the specific order processor. 
 This component is multi-threaded and has a RabbitMQ messaging API.
 
 The may be multiple ExchangeNodes setup to shard the processing by instrument.
@@ -98,6 +101,9 @@ All three queues are for client -> server communications.
 SubmitOrder - Submit an order for an instrument at a price
     Order messages - Instrument is the Routing Key (to allow consumers to process on specific instruments)
                    - orderId and state is ignored
+In RabbitMQ SubmitOrder is a "direct" exchange. Messages are sent to the exchange with a "routing key" of the instrument name. 
+The ExchangeNodes only listen for submissions for the instruments they are processing by binding a queue for each instrument using the instrument as the "binding key".
+                   
     
 CancelOrder
     Order messages - Only the order id and the correlation id are used. 

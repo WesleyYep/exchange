@@ -18,9 +18,9 @@ public class RabbitWebConfig {
     private ExchangeConfig exchangeConfig;
 
     @Bean
-    @Qualifier("submitQueue")
-    public Channel submitQueue() {
-        return exchangeConfig.rabbitMqConfig().getSubmitOrderChannel();
+    @Qualifier("submitExchange")
+    public Channel submitExchange() {
+        return exchangeConfig.rabbitMqConfig().getOrderChannel();
     }
 
     @Bean

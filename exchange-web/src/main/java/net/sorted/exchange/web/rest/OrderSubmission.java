@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderSubmission {
 
     @Autowired
-    @Qualifier("submitQueue")
+    @Qualifier("submitExchange")
     private Channel channel;
 
     @Autowired
@@ -45,7 +45,7 @@ public class OrderSubmission {
         String orderJson = jsonConverter.exchangeOrderToJson(order);
 
         try {
-            channel.basicPublish(exchangeName, "", MessageProperties.PERSISTENT_TEXT_PLAIN, orderJson.getBytes("UTF-8"));
+            channel.basicPublish(exchangeName, order.getInstrument(), MessageProperties.PERSISTENT_TEXT_PLAIN, orderJson.getBytes("UTF-8"));
         } catch (IOException e) {
             log.error("Error receiving submit order message ", e);
             throw new RuntimeException("Error receiving submit order message ", e);
