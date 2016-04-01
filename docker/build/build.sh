@@ -1,6 +1,13 @@
 #!/bin/bash -eux
 
+SRC=${PWD}
 
-# docker run --privileged -it --name build -v /Users/dougbarthram/projects/ext/sorted/exchange:/src -v /Users/dougbarthram/.m2/repositoryD:/maven-repository --rm sortednet/build
+if [ $# == 1 ]; then
+	SRC=$1
+	if [ ! -d $SRC ]; then
+		echo "Specified source dir does not exist ( $SRC )"
+		exit 1
+	fi
+fi
 
-docker run --privileged --name build -it -v ${PWD}:/src -v ${HOME}/.m2/respositoryD:/root/.m2/repository 10.100.192.200:5000/exchangebuild
+docker run --privileged --name build -it -v ${SRC}:/src -v ${HOME}/.m2/respository:/maven-repository --rm 192.168.160.235:5000/exchangebuild 
