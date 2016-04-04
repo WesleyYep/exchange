@@ -137,7 +137,6 @@
             <plugin>
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
-                <version>0.3.8</version>
                 <executions>
                     <execution>
                         <id>docker-image</id>
@@ -146,16 +145,31 @@
                             <goal>build</goal>
                         </goals>
                         <configuration>
-                            <imageName>sortednet/exchange-web</imageName>
-                            <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>
+                            <imageName>${docker.registry}/exchange-web</imageName>
+                            <baseImage>${docker.registry}/java:8</baseImage>
+                            <workdir>/</workdir>
+                            <cmd>["start-exchange-web.sh"]</cmd>
                             <resources>
                                 <resource> <!-- Copy the spring boot jar to dockerfile dir -->
                                     <targetPath>/</targetPath>
                                     <directory>${project.build.directory}</directory>
                                     <include>${project.build.finalName}.jar</include>
                                 </resource>
+                                <resource> <!-- Copy the start script to Image - NB classes used in case we need ot filter this later -->
+                                    <targetPath>/</targetPath>
+                                    <directory>${project.build.directory}/classes</directory>
+                                    <include>start-exchange-web.sh</include>
+                                </resource>
                             </resources>
-                            <!--<registryUrl></registryUrl>-->
+                            <runs>
+                                <run>ln -s ${project.build.finalName}.jar exchange-web.jar</run>
+                            </runs>
+                            <pushImage>true</pushImage>
+                            <forceTags>true</forceTags>
+                            <imageTags>
+                                <imageTag>${project.version}</imageTag>
+                                <imageTag>latest</imageTag>
+                            </imageTags>
                         </configuration>
                     </execution>
                 </executions>
