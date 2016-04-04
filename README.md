@@ -12,6 +12,8 @@ This is a "Dev Ops" project with each of the elements wrapped in a docker image 
 
 ## Quickstart
 
+Install docker
+
 ### Build
 
     mvn install

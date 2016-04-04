@@ -1,3 +1,8 @@
 #!/bin/bash -eux
 
-service docker start && /usr/sbin/sshd -D
+service docker start
+
+echo "start-services.sh called" >> /tmp/startup.log
+service docker status >> /tmp/startup.log
+
+/usr/sbin/sshd -D
