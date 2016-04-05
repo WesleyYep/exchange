@@ -96,7 +96,7 @@
                             <imageName>${docker.registry}/exchange-node</imageName>
                             <baseImage>${docker.registry}/java:8</baseImage>
                             <workdir>/</workdir>
-                            <cmd>["start-exchange-node.sh"]</cmd>
+                            <cmd>["/start-exchange-node.sh"]</cmd>
                             <resources>
                                 <resource> <!-- Copy the spring boot jar to Image -->
                                     <targetPath>/</targetPath>
@@ -110,6 +110,7 @@
                                 </resource>
                             </resources>
                             <runs>
+                                <run>chmod +x /start-exchange-node.sh</run>
                                 <run>ln -s ${project.build.finalName}.jar exchange-core.jar</run>
                             </runs>
                             <pushImage>true</pushImage>

@@ -148,7 +148,7 @@
                             <imageName>${docker.registry}/exchange-web</imageName>
                             <baseImage>${docker.registry}/java:8</baseImage>
                             <workdir>/</workdir>
-                            <cmd>["start-exchange-web.sh"]</cmd>
+                            <cmd>["/start-exchange-web.sh"]</cmd>
                             <resources>
                                 <resource> <!-- Copy the spring boot jar to dockerfile dir -->
                                     <targetPath>/</targetPath>
@@ -162,6 +162,7 @@
                                 </resource>
                             </resources>
                             <runs>
+                                <run>chmod +x /start-exchange-web.sh</run>
                                 <run>ln -s ${project.build.finalName}.jar exchange-web.jar</run>
                             </runs>
                             <pushImage>true</pushImage>
