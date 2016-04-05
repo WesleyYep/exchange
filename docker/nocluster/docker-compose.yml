@@ -1,32 +1,44 @@
-rabbit_1:
+version: "2"
+services:
+  rabbit:
     image: rabbitmq:3-management
     ports:
-        - "5671-5672:5671-5672" # client connectors
-        - "9090:15672" # Admin webpage
+      - "5671-5672:5671-5672" # client connectors
+      - "9393:15672" # Admin webpage
+    networks:
+      - exchange
 
 
-exchange_node_1:
-    image: sortednet/exchange-node
+  exchangeNode1:
+    image: 192.168.160.235:5000/exchange-node
     environment:
-      RABBIT_HOSTNAME: rabbit_1.sorted.net
+      RABBIT_HOSTNAME: rabbit
       INSTRUMENTS: AMZN,GOOG
-    links:
-        - rabbit_1:rabbit_1.sorted.net
+    networks:
+      - exchange
 
-exchange_node_2:
-    image: sortednet/exchange-node
+
+  exchangeNode2:
+    image: 192.168.160.235:5000/exchange-node
     environment:
-      RABBIT_HOSTNAME: rabbit_1.sorted.net
+      RABBIT_HOSTNAME: rabbit
       INSTRUMENTS: WBC,CBA
-    links:
-        - rabbit_1:rabbit_1.sorted.net
+    networks:
+      - exchange
 
-exchangeweb:
-    image: sortednet/exchange-web
+
+  exchangeweb:
+    image: 192.168.160.235:5000/exchange-web
     ports:
-        - "8888:8080"
-    links:
-        - rabbit_1:rabbit_1.sorted.net
+      - "8888:8080"
+    environment:
+      RABBIT_HOSTNAME: rabbit
+      INSTRUMENTS: AMZN,GOOG,WBC,CBA
+    networks:
+      - exchange
 
+networks:
+  exchange:
+    driver: overlay
 
 
