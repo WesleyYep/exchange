@@ -1,4 +1,4 @@
-FROM 192.168.160.235:5000/basedocker
+FROM 192.168.160.235:5000/base
 
 # Install JDK
 RUN apt-get -y install openjdk-8-jdk;
@@ -17,4 +17,4 @@ RUN apt-get -y install nodejs=0.10.25~dfsg2-2ubuntu1 ; \
 
 WORKDIR /src
 
-CMD service docker start && mvn install
+CMD mvn install
