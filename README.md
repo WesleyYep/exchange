@@ -32,3 +32,31 @@ On linux, IP is localhost
 
 
 login as either doug or john with password ‘password’
+
+
+
+# Running the application
+
+## ExchangeNode
+
+java -jar exchange-node.jar
+  
+Two system variables must be set
+
+rabbit.hostname     The hostname of the rabbit MQ server
+instrumentCSL       Comma seperated list of instruments to create orderbooks for (eg AMZN,GOOG)
+
+The exchange node will fail to start if these are not set and if a connection cannot be made to the rabbitMQ server
+
+
+## ExchangeWeb
+
+java -jar exchange-web.jar
+  
+Two system variables must be set
+
+rabbit.hostname     The hostname of the rabbit MQ server
+instrumentCSL       Comma seperated list of instruments to create orderbooks for (eg AMZN,GOOG)
+
+The exchange node will fail to start if these are not set and if a connection cannot be made to the rabbitMQ server
+

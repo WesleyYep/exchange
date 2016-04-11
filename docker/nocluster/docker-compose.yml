@@ -3,8 +3,8 @@ services:
   rabbit:
     image: rabbitmq:3-management
     ports:
-      - "5671-5672:5671-5672" # client connectors
-      - "9393:15672" # Admin webpage
+      - "5671-5672" # client connectors
+      - "15672" # Admin webpage
     networks:
       - exchange
 
@@ -30,7 +30,7 @@ services:
   exchangeweb:
     image: 192.168.160.235:5000/exchange-web
     ports:
-      - "8888:8080"
+      - "8080"
     environment:
       RABBIT_HOSTNAME: rabbit
       INSTRUMENTS: AMZN,GOOG,WBC,CBA

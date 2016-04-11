@@ -147,6 +147,9 @@
                         <configuration>
                             <imageName>${docker.registry}/exchange-web</imageName>
                             <baseImage>${docker.registry}/java:8</baseImage>
+                            <exposes>
+                                <expose>8080</expose>
+                            </exposes>
                             <workdir>/</workdir>
                             <cmd>["/start-exchange-web.sh"]</cmd>
                             <resources>
