@@ -5,7 +5,7 @@ import OrderForm from "./components/order-form";
 import PublicTrades from "./components/public-trades";
 import PrivateTrades from "./components/private-trades";
 import Snapshot from "./components/snapshot";
-//import '../bootstrap/dist/css/bootstrap.css';
+import '../bootstrap/dist/css/bootstrap.css';
 
 class Exchange extends React.Component {
 
