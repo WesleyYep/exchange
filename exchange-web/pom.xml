@@ -168,12 +168,22 @@
                                 <run>chmod +x /start-exchange-web.sh</run>
                                 <run>ln -s ${project.build.finalName}.jar exchange-web.jar</run>
                             </runs>
-                            <pushImage>true</pushImage>
+                            <!--<pushImage>true</pushImage>-->
                             <forceTags>true</forceTags>
                             <imageTags>
                                 <imageTag>${project.version}</imageTag>
                                 <imageTag>latest</imageTag>
                             </imageTags>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>push-image</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <imageName>${docker.registry}/exchange-web</imageName>
                         </configuration>
                     </execution>
                 </executions>

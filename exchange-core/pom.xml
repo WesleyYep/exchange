@@ -113,15 +113,24 @@
                                 <run>chmod +x /start-exchange-node.sh</run>
                                 <run>ln -s ${project.build.finalName}.jar exchange-core.jar</run>
                             </runs>
-                            <pushImage>true</pushImage>
-                            <forceTags>true</forceTags>
+                            <!--<pushImage>true</pushImage>-->
+                            <!--<forceTags>true</forceTags>-->
                             <imageTags>
                                 <imageTag>${project.version}</imageTag>
                                 <imageTag>latest</imageTag>
                             </imageTags>
                         </configuration>
                     </execution>
-
+                    <execution>
+                        <id>push-image</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>push</goal>
+                        </goals>
+                        <configuration>
+                            <imageName>${docker.registry}/exchange-node</imageName>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
