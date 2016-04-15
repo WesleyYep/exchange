@@ -32,6 +32,7 @@ public class RabbitMqConfig {
     public RabbitMqConfig(String hostname) {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(hostname);
+        factory.setAutomaticRecoveryEnabled(true);
         Connection connection = null;
         try {
             connection = factory.newConnection();
