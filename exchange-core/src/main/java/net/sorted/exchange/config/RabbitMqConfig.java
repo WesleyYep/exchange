@@ -29,14 +29,34 @@ public class RabbitMqConfig {
     private final Channel privateTradeChannel;
     private final Channel snapshotChannel;
 
+    private final int connectionAttempts = 12;
+    private final long connectionAttemptIntervalMillis = 5000;
+
     public RabbitMqConfig(String hostname) {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(hostname);
         factory.setAutomaticRecoveryEnabled(true);
         Connection connection = null;
         try {
-            log.debug("connecting to rabbit on {} with auto recovery on", hostname);
-            connection = factory.newConnection();
+            log.debug("connecting to rabbit on host '{}' with auto recovery on", hostname);
+
+            // Make a few attempts to connect in case RAbbit is not yet ready
+            int attempt = 0;
+            while (attempt < connectionAttempts) {
+                try {
+                    connection = factory.newConnection();
+                    break;
+                } catch (Exception c) {
+                    log.info("Error connection to RabbitMq (attempt " + attempt + ")", c);
+                    Thread.sleep(connectionAttemptIntervalMillis);
+                    attempt++;
+                }
+            }
+
+            if (connection == null) {
+                throw new RuntimeException("Cannot connect to RabbitMq on host " + hostname + " after " + attempt + " attempts.");
+            }
+
             orderChannel = connection.createChannel();
 
             // Setup Submit Order exchange with dead message exchange
