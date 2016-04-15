@@ -5,6 +5,7 @@ class OrderForm extends React.Component {
 
     constructor(props) {
         super(props);
+        console.log("Created OrderForm for "+this.props.instrument)
     }
 
     submitForm(evt) {

@@ -46,6 +46,7 @@ public class OrderSubmission {
 
         try {
             channel.basicPublish(exchangeName, order.getInstrument(), MessageProperties.PERSISTENT_TEXT_PLAIN, orderJson.getBytes("UTF-8"));
+            log.info("Published order to exchange {} [order json: {}]", exchangeName, orderJson);
         } catch (IOException e) {
             log.error("Error receiving submit order message ", e);
             throw new RuntimeException("Error receiving submit order message ", e);
