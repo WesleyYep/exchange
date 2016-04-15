@@ -35,6 +35,7 @@ public class RabbitMqConfig {
         factory.setAutomaticRecoveryEnabled(true);
         Connection connection = null;
         try {
+            log.debug("connecting to rabbit on {} with auto recovery on", hostname);
             connection = factory.newConnection();
             orderChannel = connection.createChannel();
 
