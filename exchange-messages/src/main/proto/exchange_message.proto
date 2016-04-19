@@ -1,0 +1,70 @@
+package exchange;
+
+option java_package = "net.sorted.exchange.messages";
+option java_outer_classname = "ExchangeMessage";
+
+enum Side {
+    BUY = 0;
+    SELL = 1;
+}
+
+message Order {
+
+
+    enum OrderType {
+        LIMIT = 0;
+        KILL_OR_FILL = 1;
+    }
+
+    enum State {
+        UNSUBMITTED = 0;
+        OPEN = 1;
+        FILLED = 2;
+        PARTIAL = 3;
+        CANCELLED = 4;
+    }
+
+    optional string order_id = 1;
+    optional string client_id = 2;
+    optional string correlation_id = 3;
+    optional string instrument = 4;
+    optional int64 quantity = 5;
+    optional string price = 6;
+    optional Side side = 7;
+    optional OrderType order_type = 8;
+    optional State state = 9;
+
+}
+
+message PrivateTrade {
+    required string tradeId = 1;
+    required string instrumentId = 2;
+    required int64 quantity = 3;
+    required double price = 4;
+    required Side side = 5;
+    required int64 tradeDateMillisSinceEpoch = 6;
+
+    optional string clientId = 7;
+    optional string orderId = 8;
+}
+
+message PublicTrade {
+    required string instrumentId = 1;
+    required int64 quantity = 2;
+    required double price = 3;
+    required int64 tradeDateMillisSinceEpoch = 4;
+}
+
+message OrderBookLevel {
+    required double price = 1;
+    required int64 quantity = 2;
+}
+
+message OrderBookSnapshot {
+
+    optional string instrumentId = 1;
+
+    repeated OrderBookLevel buys = 2;
+    repeated OrderBookLevel sells = 3;
+
+}
