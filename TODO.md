@@ -2,8 +2,6 @@
 
 # Core
 
-* Get rid of JsonConverter. Switch to protobuf for marshalling in and out of core
-
 * OrderProcessorInMemory.publishResults() should run in a thread (not the one that added and did the matching)
 
 * Order status update - order status to update and be published to clients.
@@ -12,11 +10,8 @@
 
 # Web
 
-* Need to respond to use of protobufs on the PublicTradeListener, PrivateTradeListener and SnapshotListener
-  These need to unmarshal from protobuf then encode as json. Not sure if Spring will do the encoding for us or if need to use JAXB/json.
-  It would be useful to have a simple websocket client on the command line - look at the python log stuff I did for Alex. This may help.
-  
-  
+* Break dependency to core. The last remaining dependency, Rabbit config, should move to the messages module
+
 * OrderBookSnapshot REST endpoint. Get the snapshot of an orderbook for the instrument and return as a JSON object.
 
 * Order search - REST endpoint to get all orders. Search on time span with default of today.
