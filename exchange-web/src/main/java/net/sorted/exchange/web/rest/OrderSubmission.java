@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.security.Principal;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.MessageProperties;
-import net.sorted.exchange.domain.Side;
 import net.sorted.exchange.messages.ExchangeMessage;
 import net.sorted.exchange.web.ClientOrder;
+import net.sorted.exchange.web.ClientSide;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public class OrderSubmission {
         exchangeOrder.setOrderType(ExchangeMessage.Order.OrderType.LIMIT);
         exchangeOrder.setPrice(order.getPrice());
         exchangeOrder.setQuantity(order.getQuantity());
-        exchangeOrder.setSide((order.getSide() == Side.BUY) ? ExchangeMessage.Side.BUY : ExchangeMessage.Side.SELL);
+        exchangeOrder.setSide((order.getSide() == ClientSide.BUY) ? ExchangeMessage.Side.BUY : ExchangeMessage.Side.SELL);
         exchangeOrder.setState(ExchangeMessage.Order.State.OPEN);
 
         ExchangeMessage.Order o = exchangeOrder.build();

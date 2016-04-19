@@ -1,8 +1,7 @@
 package net.sorted.exchange.web;
 
 
-import net.sorted.exchange.domain.OrderType;
-import net.sorted.exchange.domain.Side;
+//import net.sorted.exchange.domain.OrderType;
 
 public class ClientOrder {
 
@@ -17,8 +16,8 @@ public class ClientOrder {
     private String instrument;
     private long quantity;
     private String price;
-    private Side side = Side.BUY;
-    private OrderType type;
+    private ClientSide side = ClientSide.BUY;
+    private ClientOrderType type;
     private State state;
 
     public ClientOrder() {
@@ -26,7 +25,7 @@ public class ClientOrder {
     }
 
     public ClientOrder(String orderId, String clientId, String correlationId, String instrument, long quantity,
-                       String price, Side side, OrderType type, State state) {
+                       String price, ClientSide side, ClientOrderType type, State state) {
         this.orderId = orderId;
         this.clientId = clientId;
         this.correlationId = correlationId;
@@ -62,11 +61,11 @@ public class ClientOrder {
         return price;
     }
 
-    public Side getSide() {
+    public ClientSide getSide() {
         return side;
     }
 
-    public OrderType getType() {
+    public ClientOrderType getType() {
         return type;
     }
 
@@ -87,7 +86,7 @@ public class ClientOrder {
         this.price = price;
     }
 
-    public void setSide(Side side) {
+    public void setSide(ClientSide side) {
         this.side = side;
     }
 
