@@ -1,7 +1,7 @@
 
 # sorted/Exchange
 
-An example exchange to be used as part of a test trading system
+An example trading exchange to be used as part of a test trading system
 
 
 ## Modules

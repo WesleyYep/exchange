@@ -9,6 +9,7 @@ RUN apt-get -y install maven=3.3.3-3 ;\
     mkdir /maven-repository ; \
     chmod 777 /maven-repository
 COPY settings.xml /root/.m2/settings.xml
+COPY toolchains.xml /root/.m2/toolchains.xml
 
 # Install node and npm
 RUN apt-get -y install nodejs=0.10.25~dfsg2-2ubuntu1 ; \
@@ -26,8 +27,20 @@ RUN apt-get update ; \
 # Install pip (to install docker-compose)
 RUN apt-get -y install python-pip ; \
     easy_install --upgrade pip ; \
-#    pip install docker-py ; \
     pip install docker-compose
+
+# Install protobuf comiler - have to build from source !!!!
+RUN cd /tmp && \
+    apt-get -y install wget && \
+    wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz && \
+    tar xf protobuf-2.6.1.tar.gz && \
+    cd protobuf-2.6.1 && \
+    ./configure && \
+    make && \
+    make check && \
+    make install && \
+    ldconfig
+
 
 WORKDIR /src
 

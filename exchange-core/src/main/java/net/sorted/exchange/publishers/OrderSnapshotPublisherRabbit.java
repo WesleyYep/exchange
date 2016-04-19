@@ -1,9 +1,10 @@
 package net.sorted.exchange.publishers;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import com.rabbitmq.client.Channel;
+import net.sorted.exchange.messages.ExchangeMessage;
 import net.sorted.exchange.messages.JsonConverter;
+import net.sorted.exchange.orderbook.OrderBookLevelSnapshot;
 import net.sorted.exchange.orderbook.OrderBookSnapshot;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,30 +14,37 @@ public class OrderSnapshotPublisherRabbit implements OrderSnapshotPublisher {
 
     private final Channel channel;
     private final String exchangeName;
-    private final JsonConverter converter;
 
     private Logger log = LogManager.getLogger(OrderSnapshotPublisherRabbit.class);
 
-    public OrderSnapshotPublisherRabbit(Channel channel, String exchangeName, JsonConverter converter) {
+    public OrderSnapshotPublisherRabbit(Channel channel, String exchangeName) {
         this.channel = channel;
         this.exchangeName = exchangeName;
-        this.converter = converter;
     }
 
     @Override
     public void publishSnapshot(OrderBookSnapshot snapshot) {
-        String message = converter.snapshotToJson(snapshot);
         try {
-            byte[] bytes = message.getBytes("UTF-8");
-            channel.basicPublish(exchangeName, snapshot.getInstrumentId(), null, bytes);
+            ExchangeMessage.OrderBookSnapshot message = domainSnapshotToProtobufMessage(snapshot);
+            channel.basicPublish(exchangeName, snapshot.getInstrumentId(), null, message.toByteArray());
             log.debug("Published snapshot " + message + " to exchange " + exchangeName + " with routingKey " + snapshot.getInstrumentId());
-        } catch (UnsupportedEncodingException e) {
-            // This should never be able to happen!!!
-            log.error("Cannot convert snapshot message " + snapshot + " to json", e);
-            throw new RuntimeException("Cannot convert snapshot message to json " + snapshot, e);
         } catch (IOException e) {
             log.error("Cannot publish snapshot message", e);
             throw new RuntimeException("Error publishing snapshot message to exchange " + exchangeName, e);
         }
+    }
+
+    private ExchangeMessage.OrderBookSnapshot domainSnapshotToProtobufMessage(OrderBookSnapshot snapshot) {
+        ExchangeMessage.OrderBookSnapshot.Builder msg = ExchangeMessage.OrderBookSnapshot.newBuilder();
+
+        msg.setInstrumentId(snapshot.getInstrumentId());
+        for (OrderBookLevelSnapshot level : snapshot.getBuyLevels()) {
+            ExchangeMessage.OrderBookLevel.Builder l = ExchangeMessage.OrderBookLevel.newBuilder();
+            l.setPrice(level.getPrice());
+            l.setQuantity(level.getQuantity());
+            msg.addBuys(l.build());
+        }
+
+        return msg.build();
     }
 }

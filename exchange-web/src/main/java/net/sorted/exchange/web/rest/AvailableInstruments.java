@@ -1,18 +1,10 @@
 package net.sorted.exchange.web.rest;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.MessageProperties;
-import net.sorted.exchange.messages.ExchangeOrder;
-import net.sorted.exchange.messages.JsonConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;

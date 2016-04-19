@@ -14,8 +14,8 @@ class Snapshot extends React.Component {
         StompClient.then((client) => {
             client.subscribe(`/topic/snapshot/${this.props.instrument}`, (data) => {
                 var snapshot = JSON.parse(data.body);
-                var buy = _.sortBy(snapshot[this.props.instrument].buy, "price");
-                var sell = _.sortBy(snapshot[this.props.instrument].sell, "price");
+                var buy = _.sortBy(snapshot.buy, "price");
+                var sell = _.sortBy(snapshot.sell, "price");
                 this.setState({buy, sell});
             });
         });

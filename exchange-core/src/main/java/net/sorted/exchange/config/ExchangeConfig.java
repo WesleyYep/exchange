@@ -34,7 +34,6 @@ public class ExchangeConfig {
     @Value("${instrumentCSL}")
     private String supportedInstrumentCSL;
 
-    private final JsonConverter jsonConverter = new JsonConverter();
     private final OrderIdDao orderIdDao = new OrderIdDaoInMemory();
     private final TradeIdDao tradeIdDao = new TradeIdDaoInMemory();
 
@@ -49,10 +48,6 @@ public class ExchangeConfig {
     }
 
 
-    @Bean
-    public JsonConverter jsonConverter() {
-        return jsonConverter;
-    }
 
     @Bean
     public OrderIdDao orderIdDao() {
@@ -77,8 +72,7 @@ public class ExchangeConfig {
             SubmitOrderReceiver receiver = new SubmitOrderReceiver(orderChannel,
                     instrumentQueueName,
                     orderProcessor,
-                    orderIdDao(),
-                    jsonConverter());
+                    orderIdDao());
 
             orderMqReceivers.addReceiver(receiver);
         }
@@ -88,16 +82,16 @@ public class ExchangeConfig {
 
     @Bean
     public PublicTradePublisher publicTradePublisher() {
-        return new PublicTradePublisherRabbit(rabbitMqConfig().getPublicTradeChannel(), RabbitMqConfig.PUBLIC_TRADE_EXCHANGE_NAME, jsonConverter());
+        return new PublicTradePublisherRabbit(rabbitMqConfig().getPublicTradeChannel(), RabbitMqConfig.PUBLIC_TRADE_EXCHANGE_NAME);
     }
 
     @Bean
     public PrivateTradePublisher privateTradePublisher() {
-        return new PrivateTradePublisherRabbit(rabbitMqConfig().getPrivateTradeChannel(), RabbitMqConfig.PRIVATE_TRADE_EXCHANGE_NAME, jsonConverter());
+        return new PrivateTradePublisherRabbit(rabbitMqConfig().getPrivateTradeChannel(), RabbitMqConfig.PRIVATE_TRADE_EXCHANGE_NAME);
     }
 
     @Bean
     public OrderSnapshotPublisher orderSnapshotPublisher() {
-        return new OrderSnapshotPublisherRabbit(rabbitMqConfig().getSnapshotChannel(), RabbitMqConfig.SNAPSHOT_EXCHANGE_NAME, jsonConverter());
+        return new OrderSnapshotPublisherRabbit(rabbitMqConfig().getSnapshotChannel(), RabbitMqConfig.SNAPSHOT_EXCHANGE_NAME);
     }
 }

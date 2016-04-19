@@ -1,7 +1,6 @@
 package net.sorted.exchange;
 
 import java.io.IOException;
-import java.util.Optional;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
@@ -9,8 +8,8 @@ import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import net.sorted.exchange.dao.OrderIdDao;
 import net.sorted.exchange.domain.Order;
-import net.sorted.exchange.messages.ExchangeOrder;
-import net.sorted.exchange.messages.JsonConverter;
+import net.sorted.exchange.domain.Side;
+import net.sorted.exchange.messages.ExchangeMessage;
 import net.sorted.exchange.orderprocessor.OrderProcessor;
 
 
@@ -22,33 +21,30 @@ public class SubmitOrderReceiver {
     private final String queueName;
     private final OrderProcessor orderProcessor;
     private final OrderIdDao orderIdDao;
-    private final JsonConverter jsonConverter;
     private final Consumer consumer;
 
     private Logger log = LogManager.getLogger(SubmitOrderReceiver.class);
 
     public SubmitOrderReceiver(Channel orderChannel, String queueName, OrderProcessor orderProcessor,
-                               OrderIdDao orderIdDao, JsonConverter jsonConverter) {
+                               OrderIdDao orderIdDao) {
 
         this.orderChannel = orderChannel;
         this.queueName = queueName;
         this.orderProcessor = orderProcessor;
         this.orderIdDao = orderIdDao;
-        this.jsonConverter = jsonConverter;
-
 
         consumer = new DefaultConsumer(orderChannel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                String message = new String(body, "UTF-8");
-                log.debug("Received '{}'", message);
+
+                ExchangeMessage.Order order = ExchangeMessage.Order.parseFrom(body);
+
                 try {
-                    ExchangeOrder order = jsonConverter.exchangeOrderFromJson(message);
                     processSubmitOrder(order);
                     orderChannel.basicAck(envelope.getDeliveryTag(), false);
-                    log.debug("Processed message '{}'", message);
+                    log.debug("Processed message '{}'", order);
                 } catch (Throwable t) {
-                    log.info("Error processing message " + message, t);
+                    log.info("Error processing message " + order, t);
                     orderChannel.basicNack(envelope.getDeliveryTag(), false, false);
                 }
             }
@@ -78,12 +74,13 @@ public class SubmitOrderReceiver {
         }
     }
 
-    private void processSubmitOrder(ExchangeOrder order) {
+    private void processSubmitOrder(ExchangeMessage.Order order) {
         if (order.getInstrument().equals("REJECT")) {
             throw new RuntimeException("REJECTING order");
         }
 
-        Order o = new Order(orderIdDao.getNextOrderId(), Double.parseDouble(order.getPrice()), order.getSide(), order.getQuantity(), order.getInstrument(), order.getClientId());
+        Side side = (order.getSide() == ExchangeMessage.Side.BUY) ? Side.BUY : Side.SELL;
+        Order o = new Order(orderIdDao.getNextOrderId(), Double.parseDouble(order.getPrice()), side, order.getQuantity(), order.getInstrument(), order.getClientId());
         orderProcessor.submitOrder(o);
     }
 }

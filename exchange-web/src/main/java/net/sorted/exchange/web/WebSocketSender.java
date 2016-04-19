@@ -24,7 +24,7 @@ public class WebSocketSender implements ApplicationListener<BrokerAvailabilityEv
         log.debug("WebSocket sender initialised");
     }
 
-    public void sendMessage(String destination, String content) {
+    public void sendMessage(String destination, Object content) {
         log.debug("Sending to websocket '" + destination + "' message: '"+ content + "");
         messagingTemplate.convertAndSend(destination, content);
     }
@@ -34,7 +34,7 @@ public class WebSocketSender implements ApplicationListener<BrokerAvailabilityEv
         log.debug("WebSocketSender got an application event " + event);
     }
 
-    public void sendMessageToUser(String destination, String user, String message) {
+    public void sendMessageToUser(String destination, String user, Object message) {
         log.debug("Send to destination {} and user {} message {}", destination, user, message);
         messagingTemplate.convertAndSendToUser(user, destination, message);
     }

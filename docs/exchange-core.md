@@ -1,21 +1,22 @@
+# General Design
+       [ RabbitMQ ]
+  ==ExchangeMessage.Order===> SubmitOrderReceiver --Order---> OrderProcessor ---> OrderBook                     [ RabbitMQ ]
+       (protobuf)                                                            ---> privateTradePublisher  ===ExchangeMessage.Trade===>              
+                                                                             ---> publicTradePublisher   ===ExchangeMessage.Trade===> 
+                                                                             ---> snapshotPublisher      ===ExchangeMessage.Snapshot===> 
+                                                                                                                 ( protobuf )
+
 # Components
 
-## Orderbook
+## ExchangeNode
 
-Represents a single orderbook. This is the book for a single instrument. This is a single threaded implementation with a java API.
+This component is multi-threaded and has a RabbitMQ messaging API.
+This is a Spring main class. It loads the application context and starts the message receivers.  
 
-    -------------        -----------------        -----------------
-    | OrderBook | --2--> | OrdersForSide | --*--> | OrdersAtPrice |
-    -------------        -----------------        -----------------
+There may be multiple ExchangeNodes setup to shard the processing by instrument.
 
-OrderBook holds 2 OrdersForSide.
-
-OrdersForSide is a map of orders for a side (buy or sell). The map is price to OrdersAtPrice
-
-OrdersForPrice is a list of orders at a price in the time order in which they were placed.
-
-MatchingOrders is a list of buys and sells that match as a price. Only filled or partial fills are returned.
-
+## SubmitOrderReceiver
+This handles the RabbitMQ side and delegates the business logic out to an OrderProcessor
 
 ## OrderProcessor
 The Order processor interacts with a single OrderBook, adding, deleting and modifying Orders for the OrderTypes 'Fill of Kill' and 'Limit Order'. 
@@ -33,38 +34,50 @@ If the order is partially matched, settle on partial and modify Order to buy/sel
 If the order is not matched, delete it
 
 
-## SubmitOrderReceiver
-This handles the RabbitMQ side and delegates the business logic out to an OrderProcessor
+## Orderbook
 
-## ExchangeNode
+Represents a single orderbook. The OrderBook holds a collection of unfilled orders for a single common instrument and matches all new orders to the existing ones.
 
-This is a collection of SubmitOrderReceivers (by way of a MqOrderReceiver object). It accepts general order messages and utilises the specific order processor. 
-This component is multi-threaded and has a RabbitMQ messaging API.
+This is a single threaded implementation with a java API.NB, this must be single threaded, ordered must be procesedd in the order that they arrive.
 
-The may be multiple ExchangeNodes setup to shard the processing by instrument.
+    -------------        -----------------        -----------------
+    | OrderBook | --2--> | OrdersForSide | --*--> | OrdersAtPrice |
+    -------------        -----------------        -----------------
+
+OrderBook holds 2 OrdersForSide.
+
+OrdersForSide is a map of orders for a side (buy or sell). The map is price to OrdersAtPrice
+
+OrdersForPrice is a list of orders at a price in the time order in which they were placed.
+
+MatchingOrders is a list of buys and sells that match as a price. Only filled or partial fills are returned.
+
+
+
+
+
 
 # ExchangeNode API
 
 ## Messages
 
-ExchangeOrder
-    orderId 
-    correlationid
-    clientId
-    instrument
-    quantity
-    buy/sell
-    price
-    type (limit or FillOrKill)
-    state  (open, filled, partial, cancelled)
-    
-    
-OrderBookSnapshot - lists are ordered by price and time of subbmission.
-    clientId
-    correlationId
-    List<Order> buys
-    List<Order> sells
+Messages are encoded using protobuf (see https://github.com/google/protobuf)
 
+
+ExchangeOrder
+| Member         | Description                                                          |
+|----------------|----------------------------------------------------------------------|
+| orderId        | The order. Will be ignored for new orders                            |
+| correlationid  | Client supplied id - will be matched in corresponding messages       |
+| clientId       | Client making the order                                              |
+| instrument     | id of the instrument the order is for                                |
+| quantity       | quantity of the order                                                |
+| buy/sell       | buy or sell                                                          |
+| price          | price to pay                                                         |
+| type           | limit or FillOrKill                                                  |
+| state          | new, submitted, filled, partial, cancelled                           | 
+    
+    
 PublicTrade
     instrumentId
     quantity
@@ -79,6 +92,13 @@ PrivateTrade
     quantity
     price
     tradeDate
+
+        
+OrderBookSnapshot - lists are ordered by price and time of subbmission.
+    clientId
+    correlationId
+    List<Order> buys
+    List<Order> sells        
         
 
 ### Message flow
@@ -127,25 +147,25 @@ PublicTrade
             "instrumentId":"AMZN",
             "quantity":1000,
             "price":100.02,
-            "tradeDate":"28-01-2016"
+            "tradeDate":"millis since epoch"
         }
 
 Snapshot
     The snapshot state of the orderbook. 
     
     Messages are JSON objects, e.g.
-     Each side is an array of price/quantity in level order (for buy level 1 is the highest price, for sell level 1 is the lowest price)
+    Each side is an array of price/quantity in level order (for buy level 1 is the highest price, for sell level 1 is the lowest price)
     {
-      "AMZN" {
-         buy: [  
-          { price: 1.1, quantity: 99 },  
-          { price: 1.0, quantity: 50 }
-         ],
-         sell: [  
-          { price: 1.2, quantity: 100 },  
-          { price: 1.3, quantity: 200 }
+        instrumentId: "AMZN" 
+        buy: [  
+            { price: 1.1, quantity: 99 },  
+            { price: 1.0, quantity: 50 }
+        ],
+        sell: [  
+            { price: 1.2, quantity: 100 },  
+            { price: 1.3, quantity: 200 }
         ]
-      }
+      
     }
 
 OrderUpdate

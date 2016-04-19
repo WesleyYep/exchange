@@ -7,8 +7,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import net.sorted.exchange.domain.Trade;
-import net.sorted.exchange.messages.JsonConverter;
+import net.sorted.exchange.messages.ExchangeMessage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,18 +20,15 @@ public class PublicTradeListener {
     private final WebSocketSender webSocketSender;
     private final Channel publicTradeChannel;
     private final Consumer consumer;
-    private final JsonConverter jsonConverter;
 
     private Logger log = LogManager.getLogger(PublicTradeListener.class);
 
     @Autowired
     public PublicTradeListener(WebSocketSender webSocketSender,
                                @Qualifier("publicTradeChannel") Channel publicTradeChannel,
-                               @Qualifier("publicTradeExchangeName") String publicTradeExchangeName,
-                               JsonConverter jsonConverter) throws IOException {
+                               @Qualifier("publicTradeExchangeName") String publicTradeExchangeName) throws IOException {
         this.webSocketSender = webSocketSender;
         this.publicTradeChannel = publicTradeChannel;
-        this.jsonConverter = jsonConverter;
 
         String queueName = publicTradeChannel.queueDeclare().getQueue();
         publicTradeChannel.queueBind(queueName, publicTradeExchangeName, "");
@@ -41,8 +37,8 @@ public class PublicTradeListener {
         consumer = new DefaultConsumer(publicTradeChannel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                String message = new String(body, "UTF-8");
-                sendPublicTradeToClient(message);
+                ExchangeMessage.PublicTrade trade = ExchangeMessage.PublicTrade.parseFrom(body);
+                sendPublicTradeToClient(trade);
             }
         };
 
@@ -50,10 +46,18 @@ public class PublicTradeListener {
         log.debug("Started listening for public trades");
     }
 
-    private void sendPublicTradeToClient(String message) {
-        log.debug("Received public trade '" + message + "'");
-        Trade t = jsonConverter.jsonToTrade(message);
-        webSocketSender.sendMessage("/topic/public.trade/" + t.getInstrumentId(), message);
-    }
+    private void sendPublicTradeToClient(ExchangeMessage.PublicTrade trade) {
+        log.debug("Received public trade '" + trade + "'");
 
+        // Springs Json converter gets upset trying to convert Protobuf objects to Json
+        // There are many fields that should not be converted so create a 'struct' from the protobuf object that exposes exactly what should be
+        // sent back to the client
+        ClientPublicTrade t = new ClientPublicTrade();
+        t.setInstrumentId(trade.getInstrumentId());
+        t.setQuantity(trade.getQuantity());
+        t.setPrice(trade.getPrice());
+        t.setTradeDateMillisSinceEpoch(trade.getTradeDateMillisSinceEpoch());
+
+        webSocketSender.sendMessage("/topic/public.trade/" + trade.getInstrumentId(), t);
+    }
 }
