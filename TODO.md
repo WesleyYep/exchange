@@ -2,7 +2,9 @@
 
 # Core
 
-* OrderProcessorInMemory.publishResults() should run in a thread (not the one that added and did the matching)
+* Add order status to the Order object and update the status as part of its life cycle
+
+* Persist Orders once they have been put in the orderbook and matched (partial or full)
 
 * Order status update - order status to update and be published to clients.
 
