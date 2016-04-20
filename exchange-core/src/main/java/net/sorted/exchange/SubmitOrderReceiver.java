@@ -6,13 +6,11 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import net.sorted.exchange.dao.OrderIdDao;
+import net.sorted.exchange.dao.OrderDao;
 import net.sorted.exchange.domain.Order;
 import net.sorted.exchange.domain.Side;
 import net.sorted.exchange.messages.ExchangeMessage;
 import net.sorted.exchange.orderprocessor.OrderProcessor;
-
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,18 +18,18 @@ public class SubmitOrderReceiver {
     private final Channel orderChannel;
     private final String queueName;
     private final OrderProcessor orderProcessor;
-    private final OrderIdDao orderIdDao;
+    private final OrderDao orderDao;
     private final Consumer consumer;
 
     private Logger log = LogManager.getLogger(SubmitOrderReceiver.class);
 
     public SubmitOrderReceiver(Channel orderChannel, String queueName, OrderProcessor orderProcessor,
-                               OrderIdDao orderIdDao) {
+                               OrderDao orderDao) {
 
         this.orderChannel = orderChannel;
         this.queueName = queueName;
         this.orderProcessor = orderProcessor;
-        this.orderIdDao = orderIdDao;
+        this.orderDao = orderDao;
 
         consumer = new DefaultConsumer(orderChannel) {
             @Override
@@ -80,7 +78,7 @@ public class SubmitOrderReceiver {
         }
 
         Side side = (order.getSide() == ExchangeMessage.Side.BUY) ? Side.BUY : Side.SELL;
-        Order o = new Order(orderIdDao.getNextOrderId(), Double.parseDouble(order.getPrice()), side, order.getQuantity(), order.getInstrument(), order.getClientId());
+        Order o = new Order(orderDao.getNextOrderId(), Double.parseDouble(order.getPrice()), side, order.getQuantity(), order.getInstrument(), order.getClientId());
         orderProcessor.submitOrder(o);
     }
 }

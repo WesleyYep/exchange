@@ -2,47 +2,53 @@ package net.sorted.exchange.orderprocessor;
 
 
 import java.util.List;
-import net.sorted.exchange.dao.OrderIdDao;
-import net.sorted.exchange.dao.OrderIdDaoInMemory;
-import net.sorted.exchange.publishers.OrderSnapshotPublisher;
-import net.sorted.exchange.publishers.PrivateTradePublisher;
-import net.sorted.exchange.publishers.PublicTradePublisher;
+import java.util.concurrent.Executor;
 import net.sorted.exchange.TradeIdDaoInMemory;
+import net.sorted.exchange.dao.OrderDao;
+import net.sorted.exchange.dao.OrderDaoInMemory;
 import net.sorted.exchange.domain.Order;
 import net.sorted.exchange.orderbook.OrderBook;
 import net.sorted.exchange.orderbook.OrderBookInMemory;
 import net.sorted.exchange.orderbook.OrderBookSnapshot;
+import net.sorted.exchange.publishers.OrderSnapshotPublisher;
+import net.sorted.exchange.publishers.PrivateTradePublisher;
+import net.sorted.exchange.publishers.PublicTradePublisher;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import static net.sorted.exchange.domain.Side.*;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import static net.sorted.exchange.domain.Side.BUY;
+import static net.sorted.exchange.domain.Side.SELL;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 
 public class OrderProcessorTest {
 
     private OrderProcessor orderProcessor;
-    OrderBook orderBook;
-    PrivateTradePublisher privateTradePublisher;
-    PublicTradePublisher publicTradePublisher;
-    OrderSnapshotPublisher snapshotPublisher;
+    private OrderBook orderBook;
+    private PrivateTradePublisher privateTradePublisher;
+    private PublicTradePublisher publicTradePublisher;
+    private OrderSnapshotPublisher snapshotPublisher;
+
 
     @Before
     public void before() {
 
         orderBook = new OrderBookInMemory("INSTR", new TradeIdDaoInMemory());
-        OrderIdDao orderIdDao = new OrderIdDaoInMemory();
+        OrderDao orderDao = new OrderDaoInMemory();
         privateTradePublisher = mock(PrivateTradePublisher.class);
         publicTradePublisher = mock(PublicTradePublisher.class);
         snapshotPublisher = mock(OrderSnapshotPublisher.class);
 
-        orderProcessor = new OrderProcessorInMemory(orderBook, privateTradePublisher, publicTradePublisher, snapshotPublisher);
+        orderProcessor = new OrderProcessorInMemory(orderBook, privateTradePublisher, publicTradePublisher, snapshotPublisher, new DirectExecutor());
     }
 
     @Test
     public void testOrderSubmitToEmptyOrderBook() {
-        orderProcessor.submitOrder(new Order("0", (double) 100.0, BUY, 1000, "USDAUD", "client1"));
+        orderProcessor.submitOrder(new Order("0", 100.0, BUY, 1000, "USDAUD", "client1"));
 
         // No matches with only 1 order in the book ...
 
@@ -68,10 +74,10 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitWithMatches() {
-        orderProcessor.submitOrder(new Order("0", (double) 90.0, BUY, 500, "USDAUD", "client1"));
-        orderProcessor.submitOrder(new Order("10", (double) 100.0, BUY, 500, "USDAUD", "client1"));
-        orderProcessor.submitOrder(new Order("20", (double) 100.0, BUY, 500, "USDAUD", "client1"));
-        orderProcessor.submitOrder(new Order("30", (double) 100.0, SELL, 1000, "USDAUD", "client1"));
+        orderProcessor.submitOrder(new Order("0", 90.0, BUY, 500, "USDAUD", "client1"));
+        orderProcessor.submitOrder(new Order("10", 100.0, BUY, 500, "USDAUD", "client1"));
+        orderProcessor.submitOrder(new Order("20", 100.0, BUY, 500, "USDAUD", "client1"));
+        orderProcessor.submitOrder(new Order("30", 100.0, SELL, 1000, "USDAUD", "client1"));
 
         // 2 BUYs match the aggressor SELL
 
@@ -96,4 +102,12 @@ public class OrderProcessorTest {
         assertEquals(0, snapshot.getSellLevels().size());
 
     }
+
+    // Executor that executes on the current thread. In this way, concurrent code is flattened in the tests to a single thread
+    private static class DirectExecutor implements Executor {
+        public void execute(Runnable r) {
+            r.run();
+        }
+    }
+
 }

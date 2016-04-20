@@ -67,24 +67,4 @@ public class PrivateTradeListener {
         webSocketSender.sendMessageToUser("/queue/private.trade/" + trade.getInstrumentId(), trade.getClientId(), t);
     }
 
-//    private class ClientPrivateTrade {
-//        public String tradeId;
-//        public String instrumentId;
-//
-//
-//        public long quantity;
-//        public double price;
-//        public Side side;
-//        public long tradeDateMillisSinceEpoch;
-//
-//        public String clientId;
-//        public String orderId;
-//
-//        public enum Side {
-//            BUY, SELL
-//        }
-//    }
-
-
-
 }

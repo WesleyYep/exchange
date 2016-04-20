@@ -16,11 +16,12 @@ Install docker
 
 ### Build
 
-    mvn install
+    cd to project root dir
+    bin/build.sh
 
 ### Run 
 
-    cd docker/nocluster
+    cd docker/localdev
     docker-compose up
 
 Webpage available on IP:8888

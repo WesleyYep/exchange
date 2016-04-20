@@ -1,15 +1,12 @@
 package net.sorted.exchange;
 
 import net.sorted.exchange.config.ExchangeConfig;
-import net.sorted.exchange.config.RabbitMqConfig;
-import net.sorted.exchange.dao.OrderIdDao;
-import net.sorted.exchange.messages.JsonConverter;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class ExchangeNode {
 
-    public static final void main(String[] args) {
+    public static void main(String[] args) {
 
         ApplicationContext ctx = new AnnotationConfigApplicationContext(ExchangeConfig.class);
 
