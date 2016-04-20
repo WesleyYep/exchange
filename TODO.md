@@ -10,8 +10,6 @@
 
 # Web
 
-* Break dependency to core. The last remaining dependency, Rabbit config, should move to the messages module
-
 * OrderBookSnapshot REST endpoint. Get the snapshot of an orderbook for the instrument and return as a JSON object.
 
 * Order search - REST endpoint to get all orders. Search on time span with default of today.
