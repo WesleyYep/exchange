@@ -11,8 +11,8 @@ public class OrderDaoInMemory implements OrderDao {
     private Map<Long, Order> idToOrder = new HashMap<>();
 
     @Override
-    public String getNextOrderId() {
-        return ""+currentId++;
+    public long getNextOrderId() {
+        return currentId++;
     }
 
     @Override

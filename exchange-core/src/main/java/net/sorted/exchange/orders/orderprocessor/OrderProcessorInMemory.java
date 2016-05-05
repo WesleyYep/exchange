@@ -2,6 +2,7 @@ package net.sorted.exchange.orders.orderprocessor;
 
 
 import java.util.concurrent.Executor;
+import net.sorted.exchange.orders.dao.OrderDao;
 import net.sorted.exchange.orders.domain.Order;
 import net.sorted.exchange.orders.domain.OrderStatus;
 import net.sorted.exchange.orders.domain.OrderType;
@@ -20,20 +21,24 @@ public class OrderProcessorInMemory implements OrderProcessor {
     private Logger log = LogManager.getLogger(OrderProcessorInMemory.class);
 
     private final OrderBook orderBook;
+    private final OrderDao orderDao;
     private final PrivateTradePublisher privateTradePublisher;
     private final PublicTradePublisher publicTradePublisher;
     private final OrderSnapshotPublisher snapshotPublisher;
 
     private final Executor publishExecutor;
 
+
     private final Object lock = new Object();
 
     public OrderProcessorInMemory(OrderBook orderBook,
+                                  OrderDao orderDao,
                                   PrivateTradePublisher privateTradePublisher,
                                   PublicTradePublisher publicTradePublisher,
                                   OrderSnapshotPublisher snapshotPublisher,
                                   Executor publishExecutor) {
         this.orderBook = orderBook;
+        this.orderDao = orderDao;
         this.privateTradePublisher = privateTradePublisher;
         this.publicTradePublisher = publicTradePublisher;
         this.snapshotPublisher = snapshotPublisher;
@@ -44,7 +49,7 @@ public class OrderProcessorInMemory implements OrderProcessor {
 
     @Override
     public long submitOrder(double price, Side side, long quantity, String symbol, String clientId, OrderType type) {
-        long orderId = -1;
+        long orderId = orderDao.getNextOrderId();
         Order order = new Order(orderId, price, side, quantity, symbol, clientId, type, OrderStatus.OPEN);
 
         MatchedTrades matches;

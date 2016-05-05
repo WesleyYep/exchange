@@ -45,7 +45,7 @@ public class OrderProcessorTest {
         publicTradePublisher = mock(PublicTradePublisher.class);
         snapshotPublisher = mock(OrderSnapshotPublisher.class);
 
-        orderProcessor = new OrderProcessorInMemory(orderBook, privateTradePublisher, publicTradePublisher, snapshotPublisher, new DirectExecutor());
+        orderProcessor = new OrderProcessorInMemory(orderBook, orderDao, privateTradePublisher, publicTradePublisher, snapshotPublisher, new DirectExecutor());
     }
 
     @Test

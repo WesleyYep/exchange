@@ -70,7 +70,7 @@ public class ExchangeConfig {
 
         for (String instrument : instruments) {
             OrderBook orderBook = new OrderBookInMemory(instrument, tradeIdDao());
-            OrderProcessor orderProcessor = new OrderProcessorInMemory(orderBook, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher(), publisherExecutor);
+            OrderProcessor orderProcessor = new OrderProcessorInMemory(orderBook, orderIdDao(), privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher(), publisherExecutor);
             String instrumentQueueName = rabbitMqConfig().getSubmitOrderChannel(instrument);
             Channel orderChannel = rabbitMqConfig().getOrderChannel();
             SubmitOrderReceiver receiver = new SubmitOrderReceiver(orderChannel,
