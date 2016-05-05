@@ -3,6 +3,9 @@ package net.sorted.exchange.orders.orderprocessor;
 
 import java.util.concurrent.Executor;
 import net.sorted.exchange.orders.domain.Order;
+import net.sorted.exchange.orders.domain.OrderStatus;
+import net.sorted.exchange.orders.domain.OrderType;
+import net.sorted.exchange.orders.domain.Side;
 import net.sorted.exchange.orders.orderbook.MatchedTrades;
 import net.sorted.exchange.orders.orderbook.OrderBook;
 import net.sorted.exchange.orders.orderbook.OrderBookSnapshot;
@@ -38,8 +41,11 @@ public class OrderProcessorInMemory implements OrderProcessor {
         this.publishExecutor = publishExecutor;
     }
 
+
     @Override
-    public void submitOrder(Order order) {
+    public long submitOrder(double price, Side side, long quantity, String symbol, String clientId, OrderType type) {
+        long orderId = -1;
+        Order order = new Order(orderId, price, side, quantity, symbol, clientId, type, OrderStatus.OPEN);
 
         MatchedTrades matches;
         OrderBookSnapshot snapshot;
@@ -49,6 +55,8 @@ public class OrderProcessorInMemory implements OrderProcessor {
         }
 
         publishResultInBackground(matches, snapshot);
+
+        return orderId;
     }
 
     @Override

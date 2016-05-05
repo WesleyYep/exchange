@@ -145,8 +145,10 @@
                             <goal>build</goal>
                         </goals>
                         <configuration>
-                            <imageName>${docker.registry}/exchange-web</imageName>
-                            <baseImage>${docker.registry}/java:8</baseImage>
+                            <!--<imageName>${docker.registry}/exchange-web</imageName>-->
+                            <!--<baseImage>${docker.registry}/java:8</baseImage>-->
+                            <imageName>exchange-web</imageName>
+                            <baseImage>java:8</baseImage>
                             <exposes>
                                 <expose>8080</expose>
                             </exposes>

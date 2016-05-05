@@ -80,17 +80,13 @@ public class SubmitOrderReceiver {
     private void processSubmitOrder(ExchangeMessage.Order order) {
         Side side = (order.getSide() == ExchangeMessage.Side.BUY) ? Side.BUY : Side.SELL;
 
-        // TODO - Create the Order using the Orders repository so that the ID is created there
-        Order o = new Order(-1,
-                            Double.parseDouble(order.getPrice()),
-                            side,
-                            order.getQuantity(),
-                            order.getInstrument(),
-                            order.getClientId(),
-                            getOrderTypeFromMessage(order.getOrderType()),
-                            getOrderStatusFromMessage(order.getState()));
 
-        orderProcessor.submitOrder(o);
+        orderProcessor.submitOrder(Double.parseDouble(order.getPrice()),
+                side,
+                order.getQuantity(),
+                order.getInstrument(),
+                order.getClientId(),
+                getOrderTypeFromMessage(order.getOrderType()));
     }
 
     private OrderType getOrderTypeFromMessage(ExchangeMessage.Order.OrderType type) {

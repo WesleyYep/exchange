@@ -50,7 +50,7 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitToEmptyOrderBook() {
-        orderProcessor.submitOrder(new Order(0l, 100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT);
 
         // No matches with only 1 order in the book ...
 
@@ -76,10 +76,10 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitWithMatches() {
-        orderProcessor.submitOrder(new Order(0l, 90.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderProcessor.submitOrder(new Order(10l, 100.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderProcessor.submitOrder(new Order(20l, 100.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderProcessor.submitOrder(new Order(30l, 100.0, SELL, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderProcessor.submitOrder(90.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT);
+        orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT);
+        orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT);
+        orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", "client1", OrderType.LIMIT);
 
         // 2 BUYs match the aggressor SELL
 
