@@ -33,7 +33,6 @@ or downloaded ones.
 
    bin/build.sh                             - uses exchange build from local registry
    docker/build/build-image.sh              - pushes and tags to local registry
-   docker/build/settings.xml                - points to local maven repo
    docker/build/Dockerfile                  - relies on base image in local registry
    docker/db/build-image.sh                 - tag and push to local registry
    docker/jenkins-slave/build-image.sh      - tag and push to local registry
