@@ -38,6 +38,9 @@ On linux, IP is localhost
 login as either doug or john with password ‘password’
 
 
+# Development
+
+Full details on developing on the exchange project (tools, processes etc) are [here](docs/development.md) 
 
 # Running the application
 
