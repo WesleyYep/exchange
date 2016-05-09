@@ -57,6 +57,8 @@ These annotations will work for other databases but the sequence will need to be
 
 ## Domain objects
 
+Domain objects are in the package net.sorted.exchange.orders.domain
+They have JPA annotations for persistence
 
 ## Repositories
 
@@ -64,6 +66,7 @@ The repositories are wired into Spring Boot by adding the following annotation t
 
     @EnableJpaRepositories(basePackages = {"net.sorted.exchange.orders.repository"})
 
+They are in the package net.sorted.exchange.orders.repositories
 
 ## Testing
 

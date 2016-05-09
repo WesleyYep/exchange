@@ -15,9 +15,11 @@ import net.sorted.exchange.orders.orderbook.OrderBookSnapshot;
 import net.sorted.exchange.orders.publishers.OrderSnapshotPublisher;
 import net.sorted.exchange.orders.publishers.PrivateTradePublisher;
 import net.sorted.exchange.orders.publishers.PublicTradePublisher;
+import net.sorted.exchange.orders.repository.OrderRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static net.sorted.exchange.orders.domain.Side.BUY;
 import static net.sorted.exchange.orders.domain.Side.SELL;
@@ -35,6 +37,9 @@ public class OrderProcessorTest {
     private PublicTradePublisher publicTradePublisher;
     private OrderSnapshotPublisher snapshotPublisher;
 
+    @Autowired
+    private OrderRepository orderRepository;
+
 
     @Before
     public void before() {
@@ -45,6 +50,7 @@ public class OrderProcessorTest {
         publicTradePublisher = mock(PublicTradePublisher.class);
         snapshotPublisher = mock(OrderSnapshotPublisher.class);
 
+//        orderProcessor = new OrderProcessorInMemory(orderBook, orderDao, privateTradePublisher, publicTradePublisher, snapshotPublisher, new DirectExecutor());
         orderProcessor = new OrderProcessorInMemory(orderBook, orderDao, privateTradePublisher, publicTradePublisher, snapshotPublisher, new DirectExecutor());
     }
 

@@ -51,13 +51,7 @@ public class PrivateTradePublisherRabbit implements PrivateTradePublisher {
         msg.setQuantity(trade.getQuantity());
         msg.setPrice(trade.getPrice());
         msg.setSide((trade.getSide() == Side.BUY) ? ExchangeMessage.Side.BUY : ExchangeMessage.Side.SELL);
-
-        String clientId = trade.getClientId();
-        if (clientId != null) {
-            msg.setClientId(clientId);
-        } else {
-            msg.clearClientId();
-        }
+        msg.setClientId(trade.getClientId());
 
         DateTime tradeDate = trade.getTradeDate();
         if (tradeDate != null) {

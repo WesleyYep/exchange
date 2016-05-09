@@ -2,7 +2,6 @@ package net.sorted.exchange.orders.orderprocessor;
 
 
 import java.util.concurrent.Executor;
-import net.sorted.exchange.orders.dao.OrderDao;
 import net.sorted.exchange.orders.domain.Order;
 import net.sorted.exchange.orders.domain.OrderStatus;
 import net.sorted.exchange.orders.domain.OrderType;
@@ -13,15 +12,16 @@ import net.sorted.exchange.orders.orderbook.OrderBookSnapshot;
 import net.sorted.exchange.orders.publishers.OrderSnapshotPublisher;
 import net.sorted.exchange.orders.publishers.PrivateTradePublisher;
 import net.sorted.exchange.orders.publishers.PublicTradePublisher;
+import net.sorted.exchange.orders.repository.OrderRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class OrderProcessorInMemory implements OrderProcessor {
+public class OrderProcessorDb implements OrderProcessor {
 
-    private Logger log = LogManager.getLogger(OrderProcessorInMemory.class);
+    private Logger log = LogManager.getLogger(OrderProcessorDb.class);
 
     private final OrderBook orderBook;
-    private final OrderDao orderDao;
+    private final OrderRepository orderRepository;
     private final PrivateTradePublisher privateTradePublisher;
     private final PublicTradePublisher publicTradePublisher;
     private final OrderSnapshotPublisher snapshotPublisher;
@@ -31,14 +31,14 @@ public class OrderProcessorInMemory implements OrderProcessor {
 
     private final Object lock = new Object();
 
-    public OrderProcessorInMemory(OrderBook orderBook,
-                                  OrderDao orderDao,
-                                  PrivateTradePublisher privateTradePublisher,
-                                  PublicTradePublisher publicTradePublisher,
-                                  OrderSnapshotPublisher snapshotPublisher,
-                                  Executor publishExecutor) {
+    public OrderProcessorDb(OrderBook orderBook,
+                            OrderRepository orderRepository,
+                            PrivateTradePublisher privateTradePublisher,
+                            PublicTradePublisher publicTradePublisher,
+                            OrderSnapshotPublisher snapshotPublisher,
+                            Executor publishExecutor) {
         this.orderBook = orderBook;
-        this.orderDao = orderDao;
+        this.orderRepository = orderRepository;
         this.privateTradePublisher = privateTradePublisher;
         this.publicTradePublisher = publicTradePublisher;
         this.snapshotPublisher = snapshotPublisher;
@@ -49,8 +49,8 @@ public class OrderProcessorInMemory implements OrderProcessor {
 
     @Override
     public long submitOrder(double price, Side side, long quantity, String symbol, String clientId, OrderType type) {
-        long orderId = orderDao.getNextOrderId();
-        Order order = new Order(orderId, price, side, quantity, symbol, clientId, type, OrderStatus.OPEN);
+
+        Order order = orderRepository.save(new Order(-1, price, side, quantity, symbol, clientId, type, OrderStatus.OPEN));
 
         MatchedTrades matches;
         OrderBookSnapshot snapshot;
@@ -61,16 +61,21 @@ public class OrderProcessorInMemory implements OrderProcessor {
 
         publishResultInBackground(matches, snapshot);
 
-        return orderId;
+        return order.getId();
     }
+
 
     @Override
     public void cancelOrder(Order order) {
+
         OrderBookSnapshot snapshot;
         synchronized (lock) {
             orderBook.removeOrder(order.getId());
             snapshot = orderBook.getSnapshot();
         }
+
+        Order cancelled = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), order.getSymbol(), order.getClientId(), order.getType(), OrderStatus.CANCELLED);
+        orderRepository.save(cancelled);
 
         snapshotPublisher.publishSnapshot(snapshot);
     }
@@ -84,10 +89,10 @@ public class OrderProcessorInMemory implements OrderProcessor {
 
     // Publish the results on a different thread
     private void publishResultInBackground(final MatchedTrades matches, final OrderBookSnapshot snapshot) {
-        publishExecutor.execute(() -> publishResultNow(matches, snapshot));
+        publishExecutor.execute(() -> publishResult(matches, snapshot));
     }
 
-    private void publishResultNow(MatchedTrades matches, OrderBookSnapshot snapshot) {
+    private void publishResult(MatchedTrades matches, OrderBookSnapshot snapshot) {
         privateTradePublisher.publishTrades(matches.getAggressorTrades());
         privateTradePublisher.publishTrades(matches.getPassiveTrades());
         publicTradePublisher.publishTrades(matches.getPublicTrades());

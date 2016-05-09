@@ -20,18 +20,15 @@ public class SubmitOrderReceiver {
     private final Channel orderChannel;
     private final String queueName;
     private final OrderProcessor orderProcessor;
-    private final OrderDao orderDao;
     private final Consumer consumer;
 
     private Logger log = LogManager.getLogger(SubmitOrderReceiver.class);
 
-    public SubmitOrderReceiver(Channel orderChannel, String queueName, OrderProcessor orderProcessor,
-                               OrderDao orderDao) {
+    public SubmitOrderReceiver(Channel orderChannel, String queueName, OrderProcessor orderProcessor) {
 
         this.orderChannel = orderChannel;
         this.queueName = queueName;
         this.orderProcessor = orderProcessor;
-        this.orderDao = orderDao;
 
         consumer = new DefaultConsumer(orderChannel) {
             @Override

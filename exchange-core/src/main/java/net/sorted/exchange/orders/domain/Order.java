@@ -1,5 +1,6 @@
 package net.sorted.exchange.orders.domain;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -14,15 +15,28 @@ public class Order {
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator="orders_id_seq")
     @SequenceGenerator(name="orders_id_seq", sequenceName="orders_id_seq", allocationSize=1)
-    private final long id;
+    private long id;
 
-    private final OrderType type;
-    private final double price;
-    private final Side side;
-    private final long quantity;
-    private final String symbol;
-    private final String clientId;
-    private final OrderStatus status;
+    @Column(name="price")
+    private double price;
+
+    @Column(name="side")
+    private Side side;
+
+    @Column(name="quantity")
+    private long quantity;
+
+    @Column(name="symbol")
+    private String symbol;
+
+    @Column(name="client_id")
+    private String clientId;
+
+    @Column(name="order_type")
+    private OrderType type;
+
+    @Column(name="status")
+    private OrderStatus status;
 
 
     public Order(long id, double price, Side side, long quantity, String symbol, String clientId, OrderType type, OrderStatus status) {
@@ -36,6 +50,9 @@ public class Order {
         this.status = status;
     }
 
+    protected Order() {
+
+    }
 
     public long getId() {
         return id;

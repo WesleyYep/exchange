@@ -13,6 +13,7 @@ import net.sorted.exchange.orders.dao.OrderDaoInMemory;
 import net.sorted.exchange.orders.orderbook.OrderBook;
 import net.sorted.exchange.orders.orderbook.OrderBookInMemory;
 import net.sorted.exchange.orders.orderprocessor.OrderProcessor;
+import net.sorted.exchange.orders.orderprocessor.OrderProcessorDb;
 import net.sorted.exchange.orders.orderprocessor.OrderProcessorInMemory;
 import net.sorted.exchange.orders.publishers.OrderSnapshotPublisher;
 import net.sorted.exchange.orders.publishers.OrderSnapshotPublisherRabbit;
@@ -20,6 +21,8 @@ import net.sorted.exchange.orders.publishers.PrivateTradePublisher;
 import net.sorted.exchange.orders.publishers.PrivateTradePublisherRabbit;
 import net.sorted.exchange.orders.publishers.PublicTradePublisher;
 import net.sorted.exchange.orders.publishers.PublicTradePublisherRabbit;
+import net.sorted.exchange.orders.repository.OrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +38,9 @@ public class ExchangeConfig {
 
     @Value("${instrumentCSL}")
     private String supportedInstrumentCSL;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     private final OrderDao orderDao = new OrderDaoInMemory();
     private final TradeIdDao tradeIdDao = new TradeIdDaoInMemory();
@@ -70,13 +76,13 @@ public class ExchangeConfig {
 
         for (String instrument : instruments) {
             OrderBook orderBook = new OrderBookInMemory(instrument, tradeIdDao());
-            OrderProcessor orderProcessor = new OrderProcessorInMemory(orderBook, orderIdDao(), privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher(), publisherExecutor);
+//            OrderProcessor orderProcessor = new OrderProcessorInMemory(orderBook, orderIdDao(), privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher(), publisherExecutor);
+            OrderProcessor orderProcessor = new OrderProcessorDb(orderBook, orderRepository, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher(), publisherExecutor);
             String instrumentQueueName = rabbitMqConfig().getSubmitOrderChannel(instrument);
             Channel orderChannel = rabbitMqConfig().getOrderChannel();
             SubmitOrderReceiver receiver = new SubmitOrderReceiver(orderChannel,
                     instrumentQueueName,
-                    orderProcessor,
-                    orderIdDao());
+                    orderProcessor);
 
             orderMqReceivers.addReceiver(receiver);
         }
