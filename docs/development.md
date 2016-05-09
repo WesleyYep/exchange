@@ -13,10 +13,26 @@ internal repositories.
 
 The build is done by creating a docker container using a docker image that is created in the project
 
-Create the image
+Create the image:
 
     cd docker/build
     ./build-image.sh
+    
+If you have access to the internal registry, save some time by using the pre-built image:
+    
+    docker pull 192.168.160.235:5000/exchangebuild
+    docker tag 192.168.160.235:5000/exchangebuild exchangebuild
+    
+To build the project, use the build script in the project aprent dir (or sub module)
+    
+    bin/build.sh
+    
+Is the equivalent of running 'mvn install' in the current dir.
+    
+    bin/build.sh -DskipTests clean install
+    
+Is the equivalent of running 'maven -DskipTests clean install' in the current dir.
+    
     
 
 # Running the exchange

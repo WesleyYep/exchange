@@ -7,12 +7,38 @@
     <usePluginRegistry>false</usePluginRegistry>
     <offline>false</offline>
 
-    <mirrors>
-        <mirror>
-            <id>archiva.default</id>
-            <url>http://192.168.160.235:7070/repository/internal/</url>
-            <mirrorOf>external:*</mirrorOf>
-        </mirror>
-    </mirrors>
+    <profiles>
+        <profile>
+            <id>cachingrepo</id>
+            <repositories>
+                <repository>
+                    <id>cachingrepo</id>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <url>http://192.168.160.235:7070/repository/internal/</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <id>cachingrepo</id>
+                    <url>http://192.168.160.235:7070/repository/internal/</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
 
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>cachingrepo</activeProfile>
+    </activeProfiles>
 </settings>

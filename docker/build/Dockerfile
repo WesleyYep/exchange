@@ -1,6 +1,7 @@
 FROM 192.168.160.235:5000/base
 
 # Install JDK
+RUN apt-get update
 RUN apt-get -y install openjdk-8-jdk;
 RUN apt-get install -y ca-certificates-java && update-ca-certificates -f
 
