@@ -2,9 +2,11 @@
 
 # Core
 
-* Add order status to the Order object and update the status as part of its life cycle
-
 * Persist Orders once they have been put in the orderbook and matched (partial or full)
+
+* Add OrderFill objects that link an order and a trade. The presence of OrderFill objects and their combined value will indicate the status of an Order (Open, Partial, filled)
+
+* Add order status to the Order object and update the status as part of its life cycle
 
 * Order status update - order status to update and be published to clients.
 
@@ -25,6 +27,11 @@ connections for that instrument. Old websockets should be closed when components
 
 
 # Build
+
+* Local dev build should not require the swarm (no local maven, npm, docker registry). It should not push any artifacts, just use the locally built 
+or downloaded ones.
+
+* split config into a new module (exchange-config) that will hold common config (eg the flyway details for the DB container so that db-migrations can share the same details as exchange-core)
 
 * Jenkins jobs into source control
 

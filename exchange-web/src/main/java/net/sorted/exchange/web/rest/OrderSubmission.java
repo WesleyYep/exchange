@@ -44,20 +44,14 @@ public class OrderSubmission {
             exchangeOrder.setCorrelationId(correlationId);
         }
 
-        String orderId = order.getOrderId();
-        if (orderId != null) {
-            exchangeOrder.setOrderId(order.getOrderId());
-        } else {
-            exchangeOrder.clearOrderId();
-        }
-
-        exchangeOrder.setClientId(principal.getName());
+        exchangeOrder.setOrderId(order.getOrderId());
+        exchangeOrder.setClientId(principal.getName());  // PUT CLIENT_ID BACK TO STRING !!!!!
         exchangeOrder.setInstrument(order.getInstrument());
         exchangeOrder.setOrderType(ExchangeMessage.Order.OrderType.LIMIT);
         exchangeOrder.setPrice(order.getPrice());
         exchangeOrder.setQuantity(order.getQuantity());
         exchangeOrder.setSide((order.getSide() == ClientSide.BUY) ? ExchangeMessage.Side.BUY : ExchangeMessage.Side.SELL);
-        exchangeOrder.setState(ExchangeMessage.Order.State.OPEN);
+        exchangeOrder.setState(ExchangeMessage.Order.State.UNSUBMITTED);
 
         ExchangeMessage.Order o = exchangeOrder.build();
         try {

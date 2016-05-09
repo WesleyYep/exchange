@@ -7,27 +7,32 @@ services:
       - "9393:15672" # Admin webpage
 
 
+  exchangeDB:
+    image: exchangedb
+    ports:
+      - "5432:5432"
 
   exchangeNode1:
-    image: 192.168.160.235:5000/exchange-node
+    image: exchange-node
     environment:
       RABBIT_HOSTNAME: rabbit
       INSTRUMENTS: AMZN,GOOG
     links:
       - rabbit
-
+      - exchangeDB
 
   exchangeNode2:
-    image: 192.168.160.235:5000/exchange-node
+    image: exchange-node
     environment:
       RABBIT_HOSTNAME: rabbit
       INSTRUMENTS: WBC,CBA
     links:
       - rabbit
+      - exchangeDB
 
 
   exchangeweb:
-    image: 192.168.160.235:5000/exchange-web
+    image: exchange-web
     ports:
       - "8888:8080"
     environment:

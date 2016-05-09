@@ -2,33 +2,33 @@ package net.sorted.exchange.web;
 
 public class ClientPrivateTrade {
 
-    private String tradeId;
+    private long tradeId;
     private String instrumentId;
     private long quantity;
     private double price;
     private Side side;
     private long tradeDateMillisSinceEpoch;
     private String clientId;
-    private String orderId;
+    private long orderId;
 
     public enum Side {
         BUY, SELL
     }
 
 
-    public String getOrderId() {
+    public long getOrderId() {
         return orderId;
     }
 
-    public void setOrderId(String orderId) {
+    public void setOrderId(long orderId) {
         this.orderId = orderId;
     }
 
-    public String getTradeId() {
+    public long getTradeId() {
         return tradeId;
     }
 
-    public void setTradeId(String tradeId) {
+    public void setTradeId(long tradeId) {
         this.tradeId = tradeId;
     }
 
