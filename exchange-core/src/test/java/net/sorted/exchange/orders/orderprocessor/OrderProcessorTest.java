@@ -41,6 +41,8 @@ public class OrderProcessorTest {
     private OrderRepository orderRepository;
     private OrderFillRepository orderFillRepository;
 
+    private OrderFillService orderFillService;
+
     private long orderId = 0;
     private long orderFillId = 0;
 
@@ -76,8 +78,9 @@ public class OrderProcessorTest {
             }
         });
 
+        orderFillService = new OrderFillService(orderFillRepository);
 
-        orderProcessor = new OrderProcessorDb(orderBook, orderRepository, orderFillRepository, privateTradePublisher, publicTradePublisher, snapshotPublisher, new DirectExecutor());
+        orderProcessor = new OrderProcessorDb(orderBook, orderRepository, orderFillRepository, privateTradePublisher, publicTradePublisher, snapshotPublisher, new DirectExecutor(), orderFillService);
 
     }
 

@@ -1,7 +1,7 @@
 
 
 # Core
-
+   
 * Add order status to the Order object and update the status as part of its life cycle
 
 * Order status update - order status to update and be published to clients.

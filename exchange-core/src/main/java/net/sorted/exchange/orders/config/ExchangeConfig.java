@@ -10,6 +10,7 @@ import net.sorted.exchange.orders.dao.TradeIdDaoInMemory;
 import net.sorted.exchange.config.RabbitMqConfig;
 import net.sorted.exchange.orders.orderbook.OrderBook;
 import net.sorted.exchange.orders.orderbook.OrderBookInMemory;
+import net.sorted.exchange.orders.orderprocessor.OrderFillService;
 import net.sorted.exchange.orders.orderprocessor.OrderProcessor;
 import net.sorted.exchange.orders.orderprocessor.OrderProcessorDb;
 import net.sorted.exchange.orders.publishers.OrderSnapshotPublisher;
@@ -43,6 +44,9 @@ public class ExchangeConfig {
     @Autowired
     private OrderFillRepository orderFillRepository;
 
+    @Autowired
+    private OrderFillService orderFillService;
+
     private final TradeIdDao tradeIdDao = new TradeIdDaoInMemory();
 
     @Bean
@@ -69,7 +73,10 @@ public class ExchangeConfig {
 
         for (String instrument : instruments) {
             OrderBook orderBook = new OrderBookInMemory(instrument, tradeIdDao());
-            OrderProcessor orderProcessor = new OrderProcessorDb(orderBook, orderRepository, orderFillRepository, privateTradePublisher(), publicTradePublisher(), orderSnapshotPublisher(), publisherExecutor);
+
+            OrderProcessor orderProcessor = new OrderProcessorDb(orderBook, orderRepository, orderFillRepository, privateTradePublisher(),
+                    publicTradePublisher(), orderSnapshotPublisher(), publisherExecutor, orderFillService);
+
             String instrumentQueueName = rabbitMqConfig().getSubmitOrderChannel(instrument);
             Channel orderChannel = rabbitMqConfig().getOrderChannel();
             SubmitOrderReceiver receiver = new SubmitOrderReceiver(orderChannel,

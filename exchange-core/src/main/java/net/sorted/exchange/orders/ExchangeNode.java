@@ -6,10 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 
 @ComponentScan("net.sorted.exchange.orders")
 @EnableJpaRepositories(basePackages = {"net.sorted.exchange.orders.repository"})
+@EnableTransactionManagement
 @SpringBootApplication
 public class ExchangeNode  {
 

@@ -18,6 +18,9 @@ import net.sorted.exchange.orders.repository.OrderFillRepository;
 import net.sorted.exchange.orders.repository.OrderRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 public class OrderProcessorDb implements OrderProcessor {
 
@@ -31,9 +34,10 @@ public class OrderProcessorDb implements OrderProcessor {
     private final OrderSnapshotPublisher snapshotPublisher;
 
     private final Executor publishExecutor;
-
+    private final OrderFillService orderFillService;
 
     private final Object lock = new Object();
+
 
     public OrderProcessorDb(OrderBook orderBook,
                             OrderRepository orderRepository,
@@ -41,7 +45,8 @@ public class OrderProcessorDb implements OrderProcessor {
                             PrivateTradePublisher privateTradePublisher,
                             PublicTradePublisher publicTradePublisher,
                             OrderSnapshotPublisher snapshotPublisher,
-                            Executor publishExecutor) {
+                            Executor publishExecutor,
+                            OrderFillService orderFillService) {
         this.orderBook = orderBook;
         this.orderRepository = orderRepository;
         this.orderFillRepository = orderFillRepository;
@@ -51,9 +56,10 @@ public class OrderProcessorDb implements OrderProcessor {
 
         this.publishExecutor = publishExecutor;
 
+        this.orderFillService = orderFillService;
+
         inflateOrderBook();
     }
-
 
     @Override
     public long submitOrder(double price, Side side, long quantity, String symbol, String clientId, OrderType type) {
@@ -103,11 +109,8 @@ public class OrderProcessorDb implements OrderProcessor {
 
     private void publishResult(MatchedTrades matches, OrderBookSnapshot snapshot) {
 
-        // Write the fills
-        List<OrderFill> fills = matches.getFills();
-        for (OrderFill fill : fills) {
-            orderFillRepository.save(fill);
-        }
+        // Write the fills as a single transaction
+        orderFillService.saveAll(matches.getFills());
 
         // Send out the messages
         privateTradePublisher.publishTrades(matches.getAggressorTrades());

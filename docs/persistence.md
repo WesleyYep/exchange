@@ -68,6 +68,11 @@ The repositories are wired into Spring Boot by adding the following annotation t
 
 They are in the package net.sorted.exchange.orders.repositories
 
+## Services
+
+@Services in front of the respositories are used for transactional boundaries.
+
+SpringBoot JPA seems to need to autowire and crete these classes for the @Transaction to work
 
 ## Design Notes
 
