@@ -6,12 +6,10 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
-import net.sorted.exchange.orders.dao.OrderDao;
-import net.sorted.exchange.orders.domain.Order;
+import net.sorted.exchange.messages.ExchangeMessage;
 import net.sorted.exchange.orders.domain.OrderStatus;
 import net.sorted.exchange.orders.domain.OrderType;
 import net.sorted.exchange.orders.domain.Side;
-import net.sorted.exchange.messages.ExchangeMessage;
 import net.sorted.exchange.orders.orderprocessor.OrderProcessor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -107,8 +105,6 @@ public class SubmitOrderReceiver {
             return OrderStatus.OPEN;
         case FILLED:
             return OrderStatus.FILLED;
-        case PARTIAL_FILL:
-            return OrderStatus.PARTIAL_FILL;
         case CANCELLED:
             return OrderStatus.CANCELLED;
         case REJECTED:

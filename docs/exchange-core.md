@@ -64,7 +64,7 @@ MatchingOrders is a list of buys and sells that match as a price. Only filled or
 Messages are encoded using protobuf (see https://github.com/google/protobuf)
 
 
-ExchangeOrder
+Order
 | Member         | Description                                                          |
 |----------------|----------------------------------------------------------------------|
 | orderId        | The order. Will be ignored for new orders                            |
@@ -75,7 +75,7 @@ ExchangeOrder
 | buy/sell       | buy or sell                                                          |
 | price          | price to pay                                                         |
 | type           | limit or FillOrKill                                                  |
-| state          | new, submitted, filled, partial, cancelled                           | 
+| state          | new, submitted, filled, cancelled                                    | 
     
     
 PublicTrade

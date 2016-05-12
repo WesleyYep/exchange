@@ -2,7 +2,6 @@ package net.sorted.exchange.orders.orderbook;
 
 import java.util.*;
 import net.sorted.exchange.orders.domain.Order;
-import net.sorted.exchange.orders.domain.OrderStatus;
 
 public class OrdersForSide {
     private final TreeMap<Double, OrdersAtPrice> priceToOrderAtPrice;
@@ -47,34 +46,19 @@ public class OrdersForSide {
         }
     }
 
-    /* NB, order is removed and added so that it goes at the end of the list of orders so modified trades trade after unmodified */
-    public Order modifyOrder(Long orderId, long size) {
+    public void partialFill(long orderId, long matchedOrderId, double fillPrice, long fillQuantity) {
+
         Order order = idToOrder.get(orderId);
         if (order != null) {
             Double price = new Double(order.getPrice());
-            OrdersAtPrice orders = priceToOrderAtPrice.get(price);
-            orders.removeOrder(order);
-            Order n = new Order(order.getId(), order.getPrice(), order.getSide(), size, order.getSymbol(), order.getClientId(), order.getType(), order.getStatus());
-            orders.addOrder(n);
+            OrdersAtPrice ordersAtPrice = priceToOrderAtPrice.get(price);
+
+            long totalUnfilled = order.getUnfilledQuantity() - fillQuantity;
+            Order n = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), totalUnfilled, order.getInstrumentId(), order.getClientId(), order.getType(), order.getStatus());
+            ordersAtPrice.updateOrder(n);
             idToOrder.put(orderId, n);
             order = n;
         }
-
-        return order;
-    }
-
-    public Order partialFill(Long orderId, long size) {
-        Order order = idToOrder.get(orderId);
-        if (order != null) {
-            Double price = new Double(order.getPrice());
-            OrdersAtPrice orders = priceToOrderAtPrice.get(price);
-            Order n = new Order(order.getId(), order.getPrice(), order.getSide(), size, order.getSymbol(), order.getClientId(), order.getType(), OrderStatus.PARTIAL_FILL);
-            orders.updateOrder(n);
-            idToOrder.put(orderId, n);
-            order = n;
-        }
-
-        return order;
     }
 
     public List<Order> getOrdersAtLevel(int level) {
@@ -141,6 +125,7 @@ public class OrdersForSide {
         if (l >= ordersAtPrice.size()) {
             return 0;
         } else {
+            OrdersAtPrice p = ordersAtPrice.get(l);
             return ordersAtPrice.get(l).getQuantity();
         }
     }

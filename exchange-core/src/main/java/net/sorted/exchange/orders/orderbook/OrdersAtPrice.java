@@ -11,12 +11,12 @@ public class OrdersAtPrice {
 
     public void addOrder(Order order) {
         orders.add(order);
-        quantityAtPrice += order.getQuantity();
+        quantityAtPrice += order.getUnfilledQuantity();
     }
 
     public void removeOrder(Order order) {
         orders.remove(order);
-        quantityAtPrice -= order.getQuantity();
+        quantityAtPrice -= order.getUnfilledQuantity();
     }
 
     public void updateOrder(Order updatedOrder) {
@@ -24,9 +24,10 @@ public class OrdersAtPrice {
             Order o = orders.get(i);
             if (o.getId() == updatedOrder.getId() ) {
                 orders.set(i, updatedOrder);
-                long oldQty = o.getQuantity();
-                long newQty = updatedOrder.getQuantity();
-                long delta = newQty - oldQty;
+
+                long oldUnfilled = o.getUnfilledQuantity();
+                long newUnfilled = updatedOrder.getUnfilledQuantity();
+                long delta = newUnfilled - oldUnfilled;
 
                 quantityAtPrice += delta;
                 break;
@@ -42,4 +43,6 @@ public class OrdersAtPrice {
     public long getQuantity() {
         return quantityAtPrice;
     }
+
+
 }

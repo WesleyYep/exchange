@@ -44,6 +44,13 @@ public class OrderSnapshotPublisherRabbit implements OrderSnapshotPublisher {
             msg.addBuys(l.build());
         }
 
+        for (OrderBookLevelSnapshot level : snapshot.getSellLevels()) {
+            ExchangeMessage.OrderBookLevel.Builder l = ExchangeMessage.OrderBookLevel.newBuilder();
+            l.setPrice(level.getPrice());
+            l.setQuantity(level.getQuantity());
+            msg.addSells(l.build());
+        }
+
         return msg.build();
     }
 }

@@ -19,10 +19,9 @@ message Order {
     enum State {
         UNSUBMITTED = 0;
         OPEN = 1;
-        PARTIAL_FILL = 2;
-        FILLED = 3;
-        CANCELLED = 4;
-        REJECTED = 5;
+        FILLED = 2;
+        CANCELLED = 3;
+        REJECTED = 4;
     }
 
     optional int64 order_id = 1;

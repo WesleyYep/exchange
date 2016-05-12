@@ -1,8 +1,10 @@
 package net.sorted.exchange.orders.orderprocessor;
 
 
+import java.util.List;
 import java.util.concurrent.Executor;
 import net.sorted.exchange.orders.domain.Order;
+import net.sorted.exchange.orders.domain.OrderFill;
 import net.sorted.exchange.orders.domain.OrderStatus;
 import net.sorted.exchange.orders.domain.OrderType;
 import net.sorted.exchange.orders.domain.Side;
@@ -12,6 +14,7 @@ import net.sorted.exchange.orders.orderbook.OrderBookSnapshot;
 import net.sorted.exchange.orders.publishers.OrderSnapshotPublisher;
 import net.sorted.exchange.orders.publishers.PrivateTradePublisher;
 import net.sorted.exchange.orders.publishers.PublicTradePublisher;
+import net.sorted.exchange.orders.repository.OrderFillRepository;
 import net.sorted.exchange.orders.repository.OrderRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +25,7 @@ public class OrderProcessorDb implements OrderProcessor {
 
     private final OrderBook orderBook;
     private final OrderRepository orderRepository;
+    private final OrderFillRepository orderFillRepository;
     private final PrivateTradePublisher privateTradePublisher;
     private final PublicTradePublisher publicTradePublisher;
     private final OrderSnapshotPublisher snapshotPublisher;
@@ -33,17 +37,21 @@ public class OrderProcessorDb implements OrderProcessor {
 
     public OrderProcessorDb(OrderBook orderBook,
                             OrderRepository orderRepository,
+                            OrderFillRepository orderFillRepository,
                             PrivateTradePublisher privateTradePublisher,
                             PublicTradePublisher publicTradePublisher,
                             OrderSnapshotPublisher snapshotPublisher,
                             Executor publishExecutor) {
         this.orderBook = orderBook;
         this.orderRepository = orderRepository;
+        this.orderFillRepository = orderFillRepository;
         this.privateTradePublisher = privateTradePublisher;
         this.publicTradePublisher = publicTradePublisher;
         this.snapshotPublisher = snapshotPublisher;
 
         this.publishExecutor = publishExecutor;
+
+        inflateOrderBook();
     }
 
 
@@ -51,6 +59,7 @@ public class OrderProcessorDb implements OrderProcessor {
     public long submitOrder(double price, Side side, long quantity, String symbol, String clientId, OrderType type) {
 
         Order order = orderRepository.save(new Order(-1, price, side, quantity, symbol, clientId, type, OrderStatus.OPEN));
+        order.setUnfilledQuantity(quantity);
 
         MatchedTrades matches;
         OrderBookSnapshot snapshot;
@@ -74,7 +83,7 @@ public class OrderProcessorDb implements OrderProcessor {
             snapshot = orderBook.getSnapshot();
         }
 
-        Order cancelled = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), order.getSymbol(), order.getClientId(), order.getType(), OrderStatus.CANCELLED);
+        Order cancelled = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), order.getUnfilledQuantity(), order.getInstrumentId(), order.getClientId(), order.getType(), OrderStatus.CANCELLED);
         orderRepository.save(cancelled);
 
         snapshotPublisher.publishSnapshot(snapshot);
@@ -93,11 +102,29 @@ public class OrderProcessorDb implements OrderProcessor {
     }
 
     private void publishResult(MatchedTrades matches, OrderBookSnapshot snapshot) {
+
+        // Write the fills
+        List<OrderFill> fills = matches.getFills();
+        for (OrderFill fill : fills) {
+            orderFillRepository.save(fill);
+        }
+
+        // Send out the messages
         privateTradePublisher.publishTrades(matches.getAggressorTrades());
         privateTradePublisher.publishTrades(matches.getPassiveTrades());
         publicTradePublisher.publishTrades(matches.getPublicTrades());
         snapshotPublisher.publishSnapshot(snapshot);
 
         log.debug("Published matched trades {}", matches);
+    }
+
+    private void inflateOrderBook() {
+        List<Order> orders = orderRepository.findByInstrumentId(orderBook.getInstrumentId());
+        for (Order order : orders) {
+            List<OrderFill> fills = orderFillRepository.findByOrderId(order.getId());
+            long filled = fills.stream().mapToLong(f -> f.getQuantity()).sum();
+            order.setUnfilledQuantity(order.getQuantity() - filled);
+            orderBook.addOrder(order);
+        }
     }
 }

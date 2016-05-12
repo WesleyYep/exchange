@@ -2,10 +2,6 @@
 
 # Core
 
-* Persist Orders once they have been put in the orderbook and matched (partial or full)
-
-* Add OrderFill objects that link an order and a trade. The presence of OrderFill objects and their combined value will indicate the status of an Order (Open, Partial, filled)
-
 * Add order status to the Order object and update the status as part of its life cycle
 
 * Order status update - order status to update and be published to clients.

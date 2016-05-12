@@ -180,34 +180,16 @@ public class OrderBookTest {
     }
 
     @Test
-    public void testModifyOrder() {
-        orderBook.addOrder(new Order(0l, (double) 100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(10l, (double) 200.0, BUY, 2000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(20l, (double) 50.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-
-        orderBook.modifyOrder(10l, 3000);
-        List<Order> bids = orderBook.getAllOrdersForSide(BUY);
-        assertNotNull(bids);
-        assertEquals(3, bids.size());
-        assertEquals(10l, bids.get(0).getId());
-        assertEquals(0l, bids.get(1).getId());
-        assertEquals(20l, bids.get(2).getId());
-
-        assertEquals(3000, orderBook.getSizeAtLevel(BUY, 1));
-        assertEquals(1000, orderBook.getSizeAtLevel(BUY, 2));
-
-        assertEquals(200.0, orderBook.getPriceAtLevel(BUY, 1), 0.0001);
-        assertEquals(100.0, orderBook.getPriceAtLevel(BUY, 2), 0.0001);
-    }
-
-    @Test
-    public void testMatchesSingleTradeBothFilled() {
+    public void testMatchesSingleOrderBothFilled() {
         MatchedTrades match = orderBook.addOrder(new Order(0l, (double) 100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
         assertFalse("Should be no matches", match.hasMatches());
 
         match = orderBook.addOrder(new Order(1l, (double) 100.0, SELL, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
         assertNotNull(match);
         assertTrue(match.hasMatches());
+
+        assertEquals(2, match.getFills().size());
+
         assertNotNull(match.getPassiveTrades());
         assertEquals(1, match.getPassiveTrades().size());
         assertEquals(0l, match.getPassiveTrades().get(0).getOrderId());
@@ -234,6 +216,9 @@ public class OrderBookTest {
         match = orderBook.addOrder(new Order(1l, (double) 100.0, SELL, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
         assertNotNull(match);
         assertTrue(match.hasMatches());
+
+        assertEquals(2, match.getFills().size());
+
         assertNotNull(match.getPassiveTrades());
         assertEquals(1, match.getPassiveTrades().size());
         assertEquals(0l, match.getPassiveTrades().get(0).getOrderId());
@@ -253,7 +238,7 @@ public class OrderBookTest {
         assertEquals(100.0, publicTrade.getPrice(), 0.01);
 
         assertEquals(1, orderBook.getAllOrdersForSide(BUY).size());
-        assertEquals(9000, orderBook.getOrder(0l).getQuantity());
+        assertEquals(9000, orderBook.getOrder(0l).getUnfilledQuantity());
         assertEquals(0, orderBook.getAllOrdersForSide(SELL).size());
     }
 
@@ -266,6 +251,18 @@ public class OrderBookTest {
 
         MatchedTrades match = orderBook.addOrder(new Order(40l, (double) 97.0, BUY, 600, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
         assertNotNull(match);
+        assertTrue(match.hasMatches());
+
+        assertEquals("2 fills for each match", 6, match.getFills().size());
+
+        assertEquals(600, match.getFills().stream().filter(f -> f.getOrderId() == 40l).mapToLong(f -> f.getQuantity()).sum());
+        assertEquals("Should be 3 fills for the BUY", 3, match.getFills().stream().filter(f -> f.getOrderId() == 40l).count());
+
+        assertEquals(150, match.getFills().stream().filter(f -> f.getOrderId() == 30l).mapToLong(f -> f.getQuantity()).sum());
+        assertEquals(100, match.getFills().stream().filter(f -> f.getOrderId() == 20l).mapToLong(f -> f.getQuantity()).sum());
+        assertEquals(350, match.getFills().stream().filter(f -> f.getOrderId() == 10l).mapToLong(f -> f.getQuantity()).sum());
+
+
         List<Trade> passive = match.getPassiveTrades();
         assertNotNull(passive);
         assertEquals(3, passive.size());
