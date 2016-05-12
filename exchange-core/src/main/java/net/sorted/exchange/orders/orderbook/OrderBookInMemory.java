@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sorted.exchange.orders.domain.Order;
+import net.sorted.exchange.orders.domain.OrderFill;
 import net.sorted.exchange.orders.domain.Side;
 import net.sorted.exchange.orders.dao.TradeIdDao;
 import net.sorted.exchange.orders.domain.Trade;
@@ -46,14 +47,6 @@ public class OrderBookInMemory implements OrderBook {
     }
 
     @Override
-    public MatchedTrades modifyOrder(Long orderId, long size) {
-        OrdersForSide orders = orderIdToOrdersForSide.get(orderId);
-        orders.modifyOrder(orderId, size);
-
-        return getTradesMatching(orders.getOrder(orderId));
-    }
-
-    @Override
     public double getPriceAtLevel(Side side, int level) {
         OrdersForSide orders = getOrdersForSide(side);
         return orders.getPriceAtLevel(level);
@@ -85,6 +78,11 @@ public class OrderBookInMemory implements OrderBook {
         return new OrderBookSnapshot(instrumentId, buys, sells);
     }
 
+    @Override
+    public String getInstrumentId() {
+        return instrumentId;
+    }
+
     private List<OrderBookLevelSnapshot> getSnapshotForSide(OrdersForSide orders) {
         int level = 1;
         List<OrderBookLevelSnapshot> snapshots = new ArrayList<>();
@@ -100,12 +98,11 @@ public class OrderBookInMemory implements OrderBook {
     private MatchedTrades getTradesMatching(Order newOrder) {
         List<Trade> passiveTrades = new ArrayList<>();
         List<Trade> aggressorTrades = new ArrayList<>();
-        List<Order> filledPassive = new ArrayList<>();
-        List<Order> partialFills = new ArrayList<>();
-        List<Order> fills = new ArrayList<>();
         List<Trade> publicTrades = new ArrayList<>();
+        List<Order> filledPassive = new ArrayList<>();
+        List<OrderFill> fills = new ArrayList<>();
 
-        long qtyToMatch = newOrder.getQuantity();
+        long qtyLeftToMatch = newOrder.getUnfilledQuantity();
         boolean stillTradesToMatch = true;
 
         OrdersForSide ordersForOtherSide = getOrdersForSide(newOrder.getSide().other());
@@ -115,52 +112,57 @@ public class OrderBookInMemory implements OrderBook {
         // create a trade for each fill
         // create a public trade for each price level
         int level = 1;
-        while (qtyToMatch > 0 && stillTradesToMatch) {
+        while (qtyLeftToMatch > 0 && stillTradesToMatch) {
             List<Order> ordersAtLevel = ordersForOtherSide.getOrdersAtLevel(level++);
             if (ordersAtLevel.size() == 0) {
                 stillTradesToMatch = false;
                 break;
             }
 
-            long qtyAtLevel = 0; // keep track of this for the public feed
+            long qtyTradedAtLevel = 0; // keep track of this for the public feed
             double levelPrice = 0.0;
-            for (Order o : ordersAtLevel) {
-                levelPrice = o.getPrice();
+            for (Order matching : ordersAtLevel) {
+                levelPrice = matching.getPrice();
                 if (areWeTrading(newOrder, levelPrice) == false) {
                     stillTradesToMatch = false;
                     break;
                 }
 
-                long qty = o.getQuantity();
-                if (qty <= qtyToMatch) {
+                long otherOrderQty = matching.getUnfilledQuantity();
+                if (otherOrderQty <= qtyLeftToMatch) {
                     // Order can be fully utilised
-                    Trade passiveForOrder = getTradeForOrder(o, qty, levelPrice);
-                    passiveTrades.add(passiveForOrder);
+                    Trade passiveTradeForOrder = getTradeForOrder(matching, otherOrderQty, levelPrice);
+                    passiveTrades.add(passiveTradeForOrder);
 
-                    filledPassive.add(o); // to remove later
+                    filledPassive.add(matching); // to remove later
 
-                    qtyAtLevel += qty;
-                    qtyToMatch -= qty;
+                    recordFills(fills, otherOrderQty, levelPrice, newOrder.getId(), matching.getId());
 
-                    if (qtyToMatch <= 0) {
+                    qtyTradedAtLevel += otherOrderQty;
+                    qtyLeftToMatch -= otherOrderQty;
+
+                    if (qtyLeftToMatch <= 0) {
                         break;
                     }
                 } else {
-                    // order can be partially utilised
-                    Trade passiveForOrder = getTradeForOrder(o, qtyToMatch, levelPrice);
+                    // matching order can be partially utilised
+                    Trade passiveForOrder = getTradeForOrder(matching, qtyLeftToMatch, levelPrice);
                     passiveTrades.add(passiveForOrder);
 
-                    OrdersForSide orders = orderIdToOrdersForSide.get(o.getId());
-                    partialFills.add(orders.partialFill(o.getId(), o.getQuantity() - qtyToMatch));
-                    qtyAtLevel += qtyToMatch;
-                    qtyToMatch = 0;
+                    OrdersForSide orders = orderIdToOrdersForSide.get(matching.getId());
+                    orders.partialFill(matching.getId(), newOrder.getId(), levelPrice, qtyLeftToMatch);
+
+                    recordFills(fills, qtyLeftToMatch, levelPrice, newOrder.getId(), matching.getId());
+
+                    qtyTradedAtLevel += qtyLeftToMatch;
+                    qtyLeftToMatch = 0;
                     break; // once we get to a partial fill, no more matching to be done.
                 }
             }
 
-            if (qtyAtLevel > 0) {
-                Trade publicTrade = new Trade(-1, -1, null, newOrder.getSymbol(), qtyAtLevel, levelPrice, newOrder.getSide(), new DateTime());
-                Trade aggressorForOrder = getTradeForOrder(newOrder, qtyAtLevel, levelPrice);
+            if (qtyTradedAtLevel > 0) {
+                Trade publicTrade = new Trade(-1, -1, null, newOrder.getInstrumentId(), qtyTradedAtLevel, levelPrice, newOrder.getSide(), new DateTime());
+                Trade aggressorForOrder = getTradeForOrder(newOrder, qtyTradedAtLevel, levelPrice);
                 aggressorTrades.add(aggressorForOrder);
                 publicTrades.add(publicTrade);
             }
@@ -173,13 +175,22 @@ public class OrderBookInMemory implements OrderBook {
         }
 
         // Remove aggressor order if it is filled
-        if (qtyToMatch == 0) {
+        if (qtyLeftToMatch == 0) {
             getOrdersForSide(newOrder.getSide()).removeOrder(newOrder.getId());
-            fills.add(newOrder);
         }
 
-        return new MatchedTrades(aggressorTrades, passiveTrades, publicTrades, partialFills, fills);
+        return new MatchedTrades(aggressorTrades, passiveTrades, publicTrades, fills);
     }
+
+    // When there is a mathc, there isa fill for the aggressor and a matching one for the passive order.
+    // They are the same except they are are related to their respective orders with a reference to the other order.
+    private void recordFills(List<OrderFill> fills, long qty, double price, long aggressorOrderId, long passiveOrderId) {
+        OrderFill passiveFill = new OrderFill(-1, qty, price, passiveOrderId, aggressorOrderId);
+        OrderFill aggressorFill = new OrderFill(-1, qty, price, aggressorOrderId, passiveOrderId);
+        fills.add(passiveFill);
+        fills.add(aggressorFill);
+    }
+
 
     private boolean areWeTrading(Order newOrder, double levelPrice) {
         if (newOrder.getSide() == BUY) {
@@ -195,9 +206,8 @@ public class OrderBookInMemory implements OrderBook {
     }
 
     private Trade getTradeForOrder(Order o, long qty, double price ) {
-        return new Trade(tradeIdDao.getNextTradeId(), o.getId(), o.getClientId(), o.getSymbol(), qty, price, o.getSide(), new DateTime());
+        return new Trade(tradeIdDao.getNextTradeId(), o.getId(), o.getClientId(), o.getInstrumentId(), qty, price, o.getSide(), new DateTime());
     }
-
 
 
     private OrdersForSide getOrdersForSide(Side side) {
@@ -207,7 +217,4 @@ public class OrderBookInMemory implements OrderBook {
             return sellOrders;
         }
     }
-
-
-
 }

@@ -10,7 +10,7 @@ public interface OrderBook {
 
     void removeOrder(Long orderId);
 
-    MatchedTrades modifyOrder(Long orderId, long size);
+//    MatchedTrades modifyOrder(Long orderId, long size);
 
     double getPriceAtLevel(Side side, int level);
 
@@ -21,4 +21,6 @@ public interface OrderBook {
     Order getOrder(Long orderId);
 
     OrderBookSnapshot getSnapshot();
+
+    String getInstrumentId();
 }

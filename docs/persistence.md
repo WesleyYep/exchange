@@ -68,5 +68,15 @@ The repositories are wired into Spring Boot by adding the following annotation t
 
 They are in the package net.sorted.exchange.orders.repositories
 
+
+## Design Notes
+
+For the Orders and OrderFills, speed is of the essence. JPA is used but not the full object graph. Instead, JPA is simply used for row mapping to a table. Orders and 
+OrderFills are only inserted by the OrderBook during normal operation. This helps with concurrency considerations. 
+
+The OrderBook is constructed at startup from the Orders & OrderFills in the DB. The transient field 'Order.unfilledQuantity' is calculated from the sum of the 
+fills for the order and the order quantity.   
+
+
 ## Testing
 
