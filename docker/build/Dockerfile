@@ -1,4 +1,4 @@
-FROM 192.168.160.235:5000/base
+FROM ubuntu:wily-20160316
 
 # Install JDK
 RUN apt-get update

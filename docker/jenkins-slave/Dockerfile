@@ -1,4 +1,6 @@
-FROM 192.168.160.235:5000/exchangebuild
+FROM exchangebuild
+
+ADD ssh /.ssh
 
 # Setup so this can be used as a Jenkins slave
 ## Add ssh and jenkins user

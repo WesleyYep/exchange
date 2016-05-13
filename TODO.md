@@ -27,8 +27,6 @@ connections for that instrument. Old websockets should be closed when components
 * Local dev build should not require the swarm (no local maven, npm, docker registry). It should not push any artifacts, just use the locally built 
 or downloaded ones.
 
-   bin/build.sh                             - uses exchange build from local registry
-   docker/build/build-image.sh              - pushes and tags to local registry
    docker/build/Dockerfile                  - relies on base image in local registry
    docker/db/build-image.sh                 - tag and push to local registry
    docker/jenkins-slave/build-image.sh      - tag and push to local registry
