@@ -40,7 +40,7 @@ public class OrderBookTest {
 
     @Test
     public void testAddSingleBuyOrder() {
-        MatchedTrades matching = orderBook.addOrder(new Order(0l, (double) 100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        MatchedTrades matching = orderBook.addOrder(new Order(0l, (double) 100.0, BUY, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
         assertNotNull(matching);
         assertTrue(matching.hasMatches() == false);
@@ -54,9 +54,9 @@ public class OrderBookTest {
     @Test
     public void testAddManyBuyOrdersSamePrice() {
 
-        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(10l, (double) 100.0, BUY, 2000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(20l, (double) 100.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(10l, (double) 100.0, BUY, 2000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(20l, (double) 100.0, BUY, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
         List<Order> bids = orderBook.getAllOrdersForSide(BUY);
         assertNotNull(bids);
@@ -70,9 +70,9 @@ public class OrderBookTest {
     @Test
     public void testAddManyBuyOrdersDifferentPrice() {
 
-        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(10l, (double) 200.0, BUY, 2000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(20l, (double) 50.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(10l, (double) 200.0, BUY, 2000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(20l, (double) 50.0, BUY, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
         List<Order> bids = orderBook.getAllOrdersForSide(BUY);
         assertNotNull(bids);
@@ -85,14 +85,14 @@ public class OrderBookTest {
     @Test
     public void testAddManyBuyAndSellOrdersDifferentPrice() {
 
-        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(10l, (double)200.0, BUY, 2000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(20l, (double) 50.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(10l, (double)200.0, BUY, 2000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(20l, (double) 50.0, BUY, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
-        orderBook.addOrder(new Order(100l, (double) 2000.0, SELL, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(101l, (double) 3000.0, SELL, 2000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(102l, (double) 4000.0, SELL, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(103l, (double) 5000.0, SELL, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(100l, (double) 2000.0, SELL, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(101l, (double) 3000.0, SELL, 2000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(102l, (double) 4000.0, SELL, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(103l, (double) 5000.0, SELL, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
         List<Order> bids = orderBook.getAllOrdersForSide(BUY);
         assertNotNull(bids);
@@ -112,14 +112,14 @@ public class OrderBookTest {
 
     @Test
     public void testPriceAtLevel() {
-        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(10l, (double)200.0, BUY, 2000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(20l, (double)50.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(10l, (double)200.0, BUY, 2000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(20l, (double)50.0, BUY, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
-        orderBook.addOrder(new Order(100l, (double)300.0, SELL, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(101l, (double)400.0, SELL, 2000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(102l, (double) 500.0, SELL, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(103l, (double) 600.0, SELL, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(100l, (double)300.0, SELL, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(101l, (double)400.0, SELL, 2000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(102l, (double) 500.0, SELL, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(103l, (double) 600.0, SELL, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
         assertEquals(200.0, orderBook.getPriceAtLevel(BUY, 1), 0.0001);
         assertEquals(100.0, orderBook.getPriceAtLevel(BUY, 2), 0.0001);
@@ -137,14 +137,14 @@ public class OrderBookTest {
 
     @Test
     public void testSizeAtLevel() {
-        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(10l, (double)200.0, BUY, 2000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(20l, (double)50.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(10l, (double)200.0, BUY, 2000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(20l, (double)50.0, BUY, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
-        orderBook.addOrder(new Order(100l, (double)2000.0, SELL, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(101l, (double)3000.0, SELL, 2000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(102l, (double) 3000.0, SELL, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(103l, (double) 3000.0, SELL, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(100l, (double)2000.0, SELL, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(101l, (double)3000.0, SELL, 2000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(102l, (double) 3000.0, SELL, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(103l, (double) 3000.0, SELL, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
         assertEquals(2000, orderBook.getSizeAtLevel(BUY, 1));
         assertEquals(1000, orderBook.getSizeAtLevel(BUY, 2));
@@ -161,9 +161,9 @@ public class OrderBookTest {
 
     @Test
     public void testRemoveOrder() {
-        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(10l, (double) 200.0, BUY, 2000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(20l, (double) 50.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(0l, (double)100.0, BUY, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(10l, (double) 200.0, BUY, 2000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(20l, (double) 50.0, BUY, 500, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
         orderBook.removeOrder(10l);
         List<Order> bids = orderBook.getAllOrdersForSide(BUY);
@@ -181,10 +181,10 @@ public class OrderBookTest {
 
     @Test
     public void testMatchesSingleOrderBothFilled() {
-        MatchedTrades match = orderBook.addOrder(new Order(0l, (double) 100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        MatchedTrades match = orderBook.addOrder(new Order(0l, (double) 100.0, BUY, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
         assertFalse("Should be no matches", match.hasMatches());
 
-        match = orderBook.addOrder(new Order(1l, (double) 100.0, SELL, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        match = orderBook.addOrder(new Order(1l, (double) 100.0, SELL, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
         assertNotNull(match);
         assertTrue(match.hasMatches());
 
@@ -210,10 +210,10 @@ public class OrderBookTest {
 
     @Test
     public void testMatchesSingleTradeAggressorFilledPassivePartial() {
-        MatchedTrades match = orderBook.addOrder(new Order(0l, (double) 100.0, BUY, 10000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        MatchedTrades match = orderBook.addOrder(new Order(0l, (double) 100.0, BUY, 10000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
         assertFalse("Should be no matches", match.hasMatches());
 
-        match = orderBook.addOrder(new Order(1l, (double) 100.0, SELL, 1000, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        match = orderBook.addOrder(new Order(1l, (double) 100.0, SELL, 1000, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
         assertNotNull(match);
         assertTrue(match.hasMatches());
 
@@ -243,13 +243,30 @@ public class OrderBookTest {
     }
 
     @Test
-    public void testMultiBuyAndSellTradesFromOrder() {
-        orderBook.addOrder(new Order(0l, 98.0, SELL, 490, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(10l, 97.0, SELL, 375, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(20l, 96.0, SELL, 100, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
-        orderBook.addOrder(new Order(30l, 96.0, SELL, 150, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+    public void testAggressorPartialFill() {
+        orderBook.addOrder(new Order(0l, 98.0, SELL, 100, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        MatchedTrades match = orderBook.addOrder(new Order(10l, 98.0, BUY, 1000, "AMZN", "client2", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
 
-        MatchedTrades match = orderBook.addOrder(new Order(40l, (double) 97.0, BUY, 600, "USDAUD", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        assertNotNull(match);
+        assertTrue(match.hasMatches());
+        assertEquals("2 fills for each match", 2, match.getFills().size());
+
+        List<Order> sellOrders = orderBook.getAllOrdersForSide(SELL);
+        assertEquals(0, sellOrders.size());
+
+        List<Order> buyOrders = orderBook.getAllOrdersForSide(BUY);
+        assertEquals(1, buyOrders.size());
+        assertEquals(900, buyOrders.get(0).getUnfilledQuantity());
+    }
+
+    @Test
+    public void testMultiBuyAndSellTradesFromOrder() {
+        orderBook.addOrder(new Order(0l, 98.0, SELL, 490, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(10l, 97.0, SELL, 375, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(20l, 96.0, SELL, 100, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+        orderBook.addOrder(new Order(30l, 96.0, SELL, 150, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
+
+        MatchedTrades match = orderBook.addOrder(new Order(40l, (double) 97.0, BUY, 600, "AMZN", "client1", OrderType.LIMIT, OrderStatus.UNSUBMITTED));
         assertNotNull(match);
         assertTrue(match.hasMatches());
 

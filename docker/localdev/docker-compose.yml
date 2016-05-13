@@ -21,14 +21,14 @@ services:
       - rabbit
       - exchangeDB
 
-  exchangeNode2:
-    image: exchange-node
-    environment:
-      RABBIT_HOSTNAME: rabbit
-      INSTRUMENTS: WBC,CBA
-    links:
-      - rabbit
-      - exchangeDB
+#  exchangeNode2:
+#    image: exchange-node
+#    environment:
+#      RABBIT_HOSTNAME: rabbit
+#      INSTRUMENTS: WBC,CBA
+#    links:
+#      - rabbit
+#      - exchangeDB
 
 
   exchangeweb:

@@ -138,6 +138,9 @@ public class OrderBookInMemory implements OrderBook {
 
                     recordFills(fills, otherOrderQty, levelPrice, newOrder.getId(), matching.getId());
 
+                    OrdersForSide orders = orderIdToOrdersForSide.get(newOrder.getId());
+                    orders.partialFill(newOrder.getId(), matching.getId(), levelPrice, otherOrderQty);
+
                     qtyTradedAtLevel += otherOrderQty;
                     qtyLeftToMatch -= otherOrderQty;
 
