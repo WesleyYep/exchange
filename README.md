@@ -9,7 +9,10 @@ This is a "Dev Ops" project with each of the elements wrapped in a docker image 
 
 ## Quickstart
 
-Install docker
+    Install docker
+    
+    Mac and Windows: https://www.docker.com/products/docker-toolbox
+    Linux: https://docs.docker.com/engine/installation/
 
 ### Build
 

@@ -1,9 +1,10 @@
 # General Design
-       [ RabbitMQ ]
-  ==ExchangeMessage.Order===> SubmitOrderReceiver --Order---> OrderProcessor ---> OrderBook                     [ RabbitMQ ]
-       (protobuf)                                                            ---> privateTradePublisher  ===ExchangeMessage.Trade===>              
-                                                                             ---> publicTradePublisher   ===ExchangeMessage.Trade===> 
-                                                                             ---> snapshotPublisher      ===ExchangeMessage.Snapshot===> 
+
+         [ RabbitMQ ]
+      ==ExchangeMessage.Order===> SubmitOrderReceiver --Order---> OrderProcessor ---> OrderBook                     [ RabbitMQ ]
+           (protobuf)                                                            ---> privateTradePublisher  ===ExchangeMessage.Trade===>              
+                                                                                 ---> publicTradePublisher   ===ExchangeMessage.Trade===> 
+                                                                                 ---> snapshotPublisher      ===ExchangeMessage.Snapshot===> 
                                                                                                                  ( protobuf )
 
 # Components
