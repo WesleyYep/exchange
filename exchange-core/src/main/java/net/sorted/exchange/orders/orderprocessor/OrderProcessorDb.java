@@ -109,8 +109,12 @@ public class OrderProcessorDb implements OrderProcessor {
 
     private void publishResult(MatchedTrades matches, OrderBookSnapshot snapshot) {
 
-        // Write the fills as a single transaction
-        orderFillService.saveAll(matches.getFills());
+        List<OrderFill> fills = matches.getFills();
+
+        if (fills.isEmpty() == false) {
+            // Write the fills as a single transaction
+            orderFillService.saveAll(matches.getFills());
+        }
 
         // Send out the messages
         privateTradePublisher.publishTrades(matches.getAggressorTrades());
