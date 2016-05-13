@@ -27,13 +27,16 @@ connections for that instrument. Old websockets should be closed when components
 * Local dev build should not require the swarm (no local maven, npm, docker registry). It should not push any artifacts, just use the locally built 
 or downloaded ones.
 
-   docker/build/Dockerfile                  - relies on base image in local registry
-   docker/db/build-image.sh                 - tag and push to local registry
-   docker/jenkins-slave/build-image.sh      - tag and push to local registry
-   docker/jenkins-slave/Dockerfile          - depends on image in local registry
-   docker/jenkins-slave/settings.xml        - points to local maven repo
-   docker/nocluster/docker-compose.xml      - points to images in local registry
-   exchange-core/pom.xml                    - flyway.url points to local swarm address for DB
+| File                                     | Why                                                 | Resolution                                                 |
+|==========================================|=====================================================|============================================================|                
+|  docker/jenkins-slave/Dockerfile         | depends on image in local registry                  | This is not needed by local dev so can remain              |                   
+|  docker/jenkins-slave/settings.xml       | points to local maven repo                          | This is not needed by local dev so can remain. Need to     |
+|                                          |                                                     | add notes for local dev to use local repo.                 |
+|  docker/nocluster/docker-compose.xml     | points to images in local registry                  | Leave for now. Could change to local copies and pull first |
+|                                          |                                                     | but no need for now                                        |
+|  exchange-core/pom.xml                   |flyway.url points to local swarm address for DB      | This can be overridden using -D. This can change from      |
+|                                          |                                                     | machine to machine so note should be made to override this |
+|                                          |                                                     | somewhere else                                             |
    
    
 Registry address

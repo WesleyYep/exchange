@@ -17,8 +17,8 @@ Install docker
 ### Build
 
     cd to project root dir
-    cd bin
-    ./build-image.sh
+    cd docker
+    ./create-dev-images.sh  # This may take a while depending on your internet speed
     cd ..
     bin/build.sh
 
