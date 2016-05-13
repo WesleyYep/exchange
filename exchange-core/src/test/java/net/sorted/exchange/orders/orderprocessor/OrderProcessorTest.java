@@ -141,11 +141,11 @@ public class OrderProcessorTest {
         long buyOrderId = orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT);
         long sellOrderId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", "client2", OrderType.LIMIT);
 
-        ArgumentCaptor<OrderFill> fillCaptor = ArgumentCaptor.forClass(OrderFill.class);
-        verify(orderFillRepository, times(2)).save(fillCaptor.capture());
+        ArgumentCaptor<List> fillCaptor = ArgumentCaptor.forClass(List.class);
+        verify(orderFillRepository, times(1)).save(fillCaptor.capture());
 
         // Should be 2 fills, each for qty 1000 and price 100.0. one fill for buyId/sellId and the other for sellId/buyId
-        List<OrderFill> fills = fillCaptor.getAllValues();
+        List<OrderFill> fills = fillCaptor.getValue();
         assertEquals(1000, fills.get(0).getQuantity());
         assertEquals(1000, fills.get(1).getQuantity());
 
@@ -161,10 +161,10 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitWithMatches() {
-        orderProcessor.submitOrder(90.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT);
-        orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", "client2", OrderType.LIMIT);
-        orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", "client3", OrderType.LIMIT);
-        orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", "client4", OrderType.LIMIT);
+        long buy1Id = orderProcessor.submitOrder(90.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT);
+        long buy2Id = orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", "client2", OrderType.LIMIT);
+        long buy3Id = orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", "client3", OrderType.LIMIT);
+        long sellId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", "client4", OrderType.LIMIT);
 
         // 2 BUYs match the aggressor SELL
 
@@ -187,6 +187,21 @@ public class OrderProcessorTest {
         assertEquals(1, snapshot.getBuyLevels().size());
         assertEquals(500, snapshot.getBuyLevels().get(0).getQuantity());
         assertEquals(0, snapshot.getSellLevels().size());
+
+
+        // In total 4 fills (sellId -> buy3Id and sellId -> buyId2)
+        ArgumentCaptor<List> fillCaptor = ArgumentCaptor.forClass(List.class);
+        verify(orderFillRepository, times(1)).save(fillCaptor.capture());  // 1 saves as all fills for a match are saved as a single transaction
+
+        List<OrderFill> fills = fillCaptor.getValue();
+        assertEquals(4, fills.size());
+
+        // One pair of fills should be sellId -> buy3Id
+        assertEquals(sellId, fills.stream().filter(f -> f.getOrderId() == buy3Id).mapToLong(f -> f.getMatchedOrderId()).sum());
+
+        // One pair of fills should be sellId -> buy2Id
+        assertEquals(sellId, fills.stream().filter(f -> f.getOrderId() == buy2Id).mapToLong(f -> f.getMatchedOrderId()).sum());
+
 
     }
 
