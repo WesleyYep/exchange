@@ -95,7 +95,7 @@ The program arguments are
    
 
 ## DB
-The database is a postgres DB running on linux. The database is called exchange and has a user witll all privileges; exchange_app/exchange_app
+The database is a postgres DB running on linux. The database is called exchange and has a user with all privileges; exchange_app/exchange_app
 
 ### starting
 
@@ -117,7 +117,15 @@ The JDBC url is:
     
 ## RabbitMq
     
+    
 ### starting
+
+    docker-compose up rabbit
 
 ### management console
 
+The RabbitMQ manager is available on
+    
+    IP:9393
+    
+Where IP is the ip of the docker machine (localhost on linux, $DOCKER_HOST on mac and windows)     
