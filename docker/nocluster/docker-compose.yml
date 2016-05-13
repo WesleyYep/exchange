@@ -9,6 +9,13 @@ services:
       - exchange
 
 
+  exchangeDB:
+    image: exchangedb
+    ports:
+      - "5432:5432"
+    networks:
+      - exchange
+
   exchangeNode1:
     image: 192.168.160.235:5000/exchange-node
     environment:
