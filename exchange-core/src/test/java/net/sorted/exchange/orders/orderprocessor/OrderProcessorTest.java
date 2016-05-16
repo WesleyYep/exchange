@@ -33,6 +33,11 @@ import static org.mockito.Mockito.when;
 
 public class OrderProcessorTest {
 
+    private final static long CLIENT1 = 0;
+    private final static long CLIENT2 = 1;
+    private final static long CLIENT3 = 2;
+    private final static long CLIENT4 = 3;
+
     private OrderProcessor orderProcessor;
     private OrderBook orderBook;
     private PrivateTradePublisher privateTradePublisher;
@@ -86,7 +91,7 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitBuyToEmptyOrderBook() {
-        orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT);
+        orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", CLIENT1, OrderType.LIMIT);
 
         // No matches with only 1 order in the book ...
 
@@ -112,7 +117,7 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitSellToEmptyOrderBook() {
-        orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", "client1", OrderType.LIMIT);
+        orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", CLIENT1, OrderType.LIMIT);
 
         // No matches with only 1 order in the book ...
 
@@ -138,8 +143,8 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitWithOneMatch() {
-        long buyOrderId = orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", "client1", OrderType.LIMIT);
-        long sellOrderId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", "client2", OrderType.LIMIT);
+        long buyOrderId = orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", CLIENT1, OrderType.LIMIT);
+        long sellOrderId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", CLIENT2, OrderType.LIMIT);
 
         ArgumentCaptor<List> fillCaptor = ArgumentCaptor.forClass(List.class);
         verify(orderFillRepository, times(1)).save(fillCaptor.capture());
@@ -161,10 +166,10 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitWithMatches() {
-        long buy1Id = orderProcessor.submitOrder(90.0, BUY, 500, "USDAUD", "client1", OrderType.LIMIT);
-        long buy2Id = orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", "client2", OrderType.LIMIT);
-        long buy3Id = orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", "client3", OrderType.LIMIT);
-        long sellId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", "client4", OrderType.LIMIT);
+        long buy1Id = orderProcessor.submitOrder(90.0, BUY, 500, "USDAUD", CLIENT1, OrderType.LIMIT);
+        long buy2Id = orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", CLIENT2, OrderType.LIMIT);
+        long buy3Id = orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", CLIENT3, OrderType.LIMIT);
+        long sellId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", CLIENT4, OrderType.LIMIT);
 
         // 2 BUYs match the aggressor SELL
 

@@ -6,14 +6,14 @@ import org.joda.time.DateTime;
 public class Trade {
     private final long tradeId;
     private final long orderId;
-    private final String clientId;
+    private final long clientId;
     private final String instrumentId;
     private final long quantity;
     private final double price;
     private final Side side;
     private final DateTime tradeDate;
 
-    public Trade(long tradeId, long orderId, String clientId, String instrumentId, long quantity, double price, Side side, DateTime tradeDate) {
+    public Trade(long tradeId, long orderId, long clientId, String instrumentId, long quantity, double price, Side side, DateTime tradeDate) {
         this.tradeId = tradeId;
         this.orderId = orderId;
         this.clientId = clientId;
@@ -32,7 +32,7 @@ public class Trade {
         return orderId;
     }
 
-    public String getClientId() {
+    public long getClientId() {
         return clientId;
     }
 

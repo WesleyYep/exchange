@@ -31,7 +31,7 @@ public class Order {
     private String instrumentId;
 
     @Column(name="client_id")
-    private String clientId;
+    private long clientId;
 
     @Column(name="order_type")
     private OrderType type;
@@ -46,11 +46,11 @@ public class Order {
     @Transient
     private long unfilledQuantity;
 
-    public Order(long id, double price, Side side, long quantity, String instrumentId, String clientId, OrderType type, OrderStatus status) {
+    public Order(long id, double price, Side side, long quantity, String instrumentId, long clientId, OrderType type, OrderStatus status) {
         this(id, price, side, quantity, quantity, instrumentId, clientId, type, status);
     }
 
-    public Order(long id, double price, Side side, long quantity, long unfilledQuantity, String instrumentId, String clientId, OrderType type, OrderStatus status) {
+    public Order(long id, double price, Side side, long quantity, long unfilledQuantity, String instrumentId, long clientId, OrderType type, OrderStatus status) {
         this.id = id;
         this.price = price;
         this.quantity = quantity;
@@ -86,7 +86,7 @@ public class Order {
         return side;
     }
 
-    public String getClientId() {
+    public long getClientId() {
         return clientId;
     }
 

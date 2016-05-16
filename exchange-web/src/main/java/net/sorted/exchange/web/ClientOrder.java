@@ -11,7 +11,7 @@ public class ClientOrder {
 
 
     private long orderId;
-    private String clientId;
+    private long clientId;
     private String correlationId;
     private String instrument;
     private long quantity;
@@ -24,7 +24,7 @@ public class ClientOrder {
 
     }
 
-    public ClientOrder(long orderId, String clientId, String correlationId, String instrument, long quantity,
+    public ClientOrder(long orderId, long clientId, String correlationId, String instrument, long quantity,
                        String price, ClientSide side, ClientOrderType type, State state) {
         this.orderId = orderId;
         this.clientId = clientId;
@@ -41,7 +41,7 @@ public class ClientOrder {
         return orderId;
     }
 
-    public String getClientId() {
+    public long getClientId() {
         return clientId;
     }
 
@@ -74,7 +74,7 @@ public class ClientOrder {
     }
 
 
-    public void setClientId(String clientId) {
+    public void setClientId(long clientId) {
         this.clientId = clientId;
     }
 

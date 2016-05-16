@@ -18,9 +18,6 @@ import net.sorted.exchange.orders.repository.OrderFillRepository;
 import net.sorted.exchange.orders.repository.OrderRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 public class OrderProcessorDb implements OrderProcessor {
 
@@ -62,7 +59,7 @@ public class OrderProcessorDb implements OrderProcessor {
     }
 
     @Override
-    public long submitOrder(double price, Side side, long quantity, String symbol, String clientId, OrderType type) {
+    public long submitOrder(double price, Side side, long quantity, String symbol, long clientId, OrderType type) {
 
         Order order = orderRepository.save(new Order(-1, price, side, quantity, symbol, clientId, type, OrderStatus.OPEN));
         order.setUnfilledQuantity(quantity);

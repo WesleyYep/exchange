@@ -4,7 +4,7 @@ create table orders (
   quantity            INTEGER,
   price               NUMERIC(12, 4),
   side                CHAR(1),
-  client_id           VARCHAR(64),
+  client_id           INTEGER,
   order_type          CHAR(1),
   status              CHAR(1)
 );

@@ -164,7 +164,7 @@ public class OrderBookInMemory implements OrderBook {
             }
 
             if (qtyTradedAtLevel > 0) {
-                Trade publicTrade = new Trade(-1, -1, null, newOrder.getInstrumentId(), qtyTradedAtLevel, levelPrice, newOrder.getSide(), new DateTime());
+                Trade publicTrade = new Trade(-1, -1, -1, newOrder.getInstrumentId(), qtyTradedAtLevel, levelPrice, newOrder.getSide(), new DateTime());
                 Trade aggressorForOrder = getTradeForOrder(newOrder, qtyTradedAtLevel, levelPrice);
                 aggressorTrades.add(aggressorForOrder);
                 publicTrades.add(publicTrade);

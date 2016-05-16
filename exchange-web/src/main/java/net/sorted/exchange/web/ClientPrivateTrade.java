@@ -8,7 +8,7 @@ public class ClientPrivateTrade {
     private double price;
     private Side side;
     private long tradeDateMillisSinceEpoch;
-    private String clientId;
+    private long clientId;
     private long orderId;
 
     public enum Side {
@@ -72,11 +72,11 @@ public class ClientPrivateTrade {
         this.tradeDateMillisSinceEpoch = tradeDateMillisSinceEpoch;
     }
 
-    public String getClientId() {
+    public long getClientId() {
         return clientId;
     }
 
-    public void setClientId(String clientId) {
+    public void setClientId(long clientId) {
         this.clientId = clientId;
     }
 }

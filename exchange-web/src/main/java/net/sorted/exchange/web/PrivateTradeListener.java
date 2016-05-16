@@ -63,8 +63,7 @@ public class PrivateTradeListener {
         t.setClientId(trade.getClientId());
         t.setOrderId(trade.getOrderId());
 
-
-        webSocketSender.sendMessageToUser("/queue/private.trade/" + trade.getInstrumentId(), trade.getClientId(), t);
+        webSocketSender.sendMessageToUser("/queue/private.trade/" + trade.getInstrumentId(), trade.getClientId()+"", t);
     }
 
 }

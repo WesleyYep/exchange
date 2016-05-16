@@ -45,7 +45,7 @@ public class OrderSubmission {
         }
 
         exchangeOrder.setOrderId(order.getOrderId());
-        exchangeOrder.setClientId(principal.getName());  // PUT CLIENT_ID BACK TO STRING !!!!!
+        exchangeOrder.setClientId(order.getClientId());
         exchangeOrder.setInstrument(order.getInstrument());
         exchangeOrder.setOrderType(ExchangeMessage.Order.OrderType.LIMIT);
         exchangeOrder.setPrice(order.getPrice());
