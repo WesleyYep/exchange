@@ -9,15 +9,52 @@ class PublicTrades extends React.Component {
         this.state = { trades: [] };
     }
 
-    componentWillMount() {
+    //componentWillMount() {
+    //    StompClient.then((client) => {
+    //        client.subscribe(`/topic/public.trade/${this.props.instrument}`, (data) => {
+    //            var trade = JSON.parse(data.body);
+    //            var trades = this.state.trades;
+    //            trades.push(trade);
+    //            this.setState({trades});
+    //        });
+    //    });
+    //}
+
+    receivePublicTrade(trade){
+        var trades = this.state.trades;
+        trades.push(trade);
+        this.setState({trades});
+    }
+
+    subscribeTradesForInstrument(instrument) {
+        console.log("Subscribing to public trades for "+instrument);
         StompClient.then((client) => {
-            client.subscribe(`/topic/public.trade/${this.props.instrument}`, (data) => {
-                var trade = JSON.parse(data.body);
-                var trades = this.state.trades;
-                trades.push(trade);
-                this.setState({trades});
+            this.subscription = client.subscribe(`/topic/public.trade/${this.props.instrument}`, (data) => {
+                this.receivePublicTrade(JSON.parse(data.body));
             });
         });
+    }
+
+    unsubscribeCurrent() {
+        if (this.subscription != null) {
+            this.subscription.unsubscribe();
+            this.subscription = null;
+            console.log("Unsubscribed from public trades")
+        }
+    }
+
+    componentWillMount() {
+        this.subscribeTradesForInstrument(this.props.instrument);
+    }
+
+    componentWillUnmount() {
+        this.unsubscribeCurrent();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log("getting public trade props. Current Instrument: "+this.props.instrument+" New Instrument:"+nextProps.instrument);
+        this.unsubscribeCurrent();
+        this.subscribeTradesForInstrument(nextProps.instrument);
     }
 
     render() {

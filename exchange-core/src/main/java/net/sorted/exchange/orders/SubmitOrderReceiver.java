@@ -81,7 +81,8 @@ public class SubmitOrderReceiver {
                 order.getQuantity(),
                 order.getInstrument(),
                 order.getClientId(),
-                getOrderTypeFromMessage(order.getOrderType()));
+                getOrderTypeFromMessage(order.getOrderType()),
+                order.getSubmitter());
     }
 
     private OrderType getOrderTypeFromMessage(ExchangeMessage.Order.OrderType type) {

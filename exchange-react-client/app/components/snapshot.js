@@ -8,17 +8,44 @@ class Snapshot extends React.Component {
     constructor(props) {
         super(props);
         this.state = {  buy: [], sell: [] };
+        this.subscription = null;
+    }
+
+    receiveSnapshot(snapshot){
+        var buy = _.sortBy(snapshot.buy, "price");
+        var sell = _.sortBy(snapshot.sell, "price");
+        this.setState({buy, sell});
+    }
+
+    subscribeInstrument(instrument) {
+        console.log("Subscribing to "+instrument);
+        StompClient.then((client) => {
+            this.subscription = client.subscribe(`/topic/snapshot/${instrument}`, (data) => {
+                this.receiveSnapshot(JSON.parse(data.body));
+            });
+        });
+    }
+
+    unsubscribeCurrent() {
+        if (this.subscription != null) {
+            this.subscription.unsubscribe();
+            this.subscription = null;
+            console.log("Unsubscribed")
+        }
     }
 
     componentWillMount() {
-        StompClient.then((client) => {
-            client.subscribe(`/topic/snapshot/${this.props.instrument}`, (data) => {
-                var snapshot = JSON.parse(data.body);
-                var buy = _.sortBy(snapshot.buy, "price");
-                var sell = _.sortBy(snapshot.sell, "price");
-                this.setState({buy, sell});
-            });
-        });
+        this.subscribeInstrument(this.props.instrument);
+    }
+
+    componentWillUnmount() {
+        this.unsubscribeCurrent();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log("getting props. Current Instrument: "+this.props.instrument+" New Instrument:"+nextProps.instrument);
+        this.unsubscribeCurrent();
+        this.subscribeInstrument(nextProps.instrument);
     }
 
     render() {

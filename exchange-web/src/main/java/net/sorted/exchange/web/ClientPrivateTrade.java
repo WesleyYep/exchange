@@ -10,6 +10,7 @@ public class ClientPrivateTrade {
     private long tradeDateMillisSinceEpoch;
     private long clientId;
     private long orderId;
+    private String orderSubmitter;
 
     public enum Side {
         BUY, SELL
@@ -78,5 +79,13 @@ public class ClientPrivateTrade {
 
     public void setClientId(long clientId) {
         this.clientId = clientId;
+    }
+
+    public String getOrderSubmitter() {
+        return orderSubmitter;
+    }
+
+    public void setOrderSubmitter(String orderSubmitter) {
+        this.orderSubmitter = orderSubmitter;
     }
 }

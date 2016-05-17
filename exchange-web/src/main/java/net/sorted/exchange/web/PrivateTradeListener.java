@@ -62,8 +62,9 @@ public class PrivateTradeListener {
         t.setTradeDateMillisSinceEpoch(trade.getTradeDateMillisSinceEpoch());
         t.setClientId(trade.getClientId());
         t.setOrderId(trade.getOrderId());
+        t.setOrderSubmitter(trade.getOrderSubmitter());
 
-        webSocketSender.sendMessageToUser("/queue/private.trade/" + trade.getInstrumentId(), trade.getClientId()+"", t);
+        webSocketSender.sendMessageToUser("/queue/private.trade/" + trade.getInstrumentId(), trade.getOrderSubmitter()+"", t);
     }
 
 }

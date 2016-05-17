@@ -52,6 +52,7 @@ public class OrderSubmission {
         exchangeOrder.setQuantity(order.getQuantity());
         exchangeOrder.setSide((order.getSide() == ClientSide.BUY) ? ExchangeMessage.Side.BUY : ExchangeMessage.Side.SELL);
         exchangeOrder.setState(ExchangeMessage.Order.State.UNSUBMITTED);
+        exchangeOrder.setSubmitter(principal.getName());
 
         ExchangeMessage.Order o = exchangeOrder.build();
         try {
