@@ -1,4 +1,4 @@
-package net.sorted.exchange.orders;
+package net.sorted.exchange.orders.msghandler;
 
 import java.io.IOException;
 import com.rabbitmq.client.AMQP;
@@ -14,7 +14,7 @@ import net.sorted.exchange.orders.orderprocessor.OrderProcessor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class SubmitOrderReceiver {
+public class SubmitOrderReceiver implements MessageReceiver {
     private final Channel orderChannel;
     private final String queueName;
     private final OrderProcessor orderProcessor;
@@ -38,6 +38,7 @@ public class SubmitOrderReceiver {
         log.info("Ready to process orders");
     }
 
+    @Override
     public void startReceiving() {
 
         try {
@@ -50,6 +51,7 @@ public class SubmitOrderReceiver {
 
     }
 
+    @Override
     public void stopReceiving() {
         try {
             orderChannel.basicCancel(queueName);
