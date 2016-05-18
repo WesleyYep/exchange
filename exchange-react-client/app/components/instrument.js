@@ -20,7 +20,7 @@ class Instrument extends React.Component {
                 <div ><OrderForm  instrument={this.props.instrument}/></div>
                 <div className="row">
                     <div className="col-md-1">&nbsp;</div>
-                    <div className="col-md-10"><Snapshot instrument={this.props.instrument}/></div>
+                    <div className="col-md-10"><Snapshot instrument={this.props.instrument} snapshot_url={this.props.snapshot_url}/></div>
                     <div className="col-md-1">&nbsp;</div>
                 </div>
                 <div className="row">
@@ -31,5 +31,8 @@ class Instrument extends React.Component {
         );
     }
 }
+
+Instrument.propTypes = { instrument : React.PropTypes.string.isRequired }
+Instrument.propTypes = { snapshot_url : React.PropTypes.string.isRequired }
 
 export default Instrument

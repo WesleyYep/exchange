@@ -11,9 +11,34 @@ class Snapshot extends React.Component {
         this.subscription = null;
     }
 
+    getSnapshot(instrument) {
+
+        console.log("Getting order snapshot for "+instrument);
+        var snapshotRequest = new Request(this.props.snapshot_url+"?instrument="+instrument, {
+            method: 'GET',
+            credentials: 'same-origin',
+            headers: new Headers({
+                'Content-Type': 'application/json'
+            })
+        })
+
+
+        fetch(snapshotRequest).then((response) => {
+            console.log("got snapshot");
+            return response.json();
+        }).then((snapshot) => {
+            console.log("Got snapshot data "+snapshot);
+            this.receiveSnapshot(snapshot);
+        }),
+        (error) => {
+            console.log('failed to get snapshot');
+        };
+    }
+
     receiveSnapshot(snapshot){
         var buy = _.sortBy(snapshot.buy, "price");
         var sell = _.sortBy(snapshot.sell, "price");
+        console.log("Snapshot with buys: "+buy+" sells: "+sell);
         this.setState({buy, sell});
     }
 
@@ -35,6 +60,7 @@ class Snapshot extends React.Component {
     }
 
     componentWillMount() {
+        this.getSnapshot(this.props.instrument);
         this.subscribeInstrument(this.props.instrument);
     }
 
@@ -43,12 +69,14 @@ class Snapshot extends React.Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log("getting props. Current Instrument: "+this.props.instrument+" New Instrument:"+nextProps.instrument);
+        console.log("getting snapshot props. Current Instrument: "+this.props.instrument+" New Instrument:"+nextProps.instrument);
         this.unsubscribeCurrent();
+        this.getSnapshot(nextProps.instrument);
         this.subscribeInstrument(nextProps.instrument);
     }
 
     render() {
+        console.log("Rendering snapshot");
         return (
             <table className="table table-bordered">
                 <thead><tr><th>Sell</th><th>Price</th><th>Buy</th></tr></thead>
@@ -73,5 +101,6 @@ class Snapshot extends React.Component {
 
 // Make sure that the instrument string is supplied
 Snapshot.propTypes = { instrument : React.PropTypes.string.isRequired }
+Snapshot.propTypes = { snapshot_url : React.PropTypes.string.isRequired }
 
 export default Snapshot;
