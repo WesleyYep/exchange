@@ -24,12 +24,15 @@ public class SnapshotListener {
     private final Channel snapshotChannel;
     private final Consumer consumer;
 
+    private final OrderSnapshotCache snapshotCache;
+
     private Logger log = LogManager.getLogger(SnapshotListener.class);
 
     @Autowired
-    public SnapshotListener(WebSocketSender webSocketSender, @Qualifier("snapshotChannel") Channel snapshotChannel) throws IOException {
+    public SnapshotListener(WebSocketSender webSocketSender, @Qualifier("snapshotChannel") Channel snapshotChannel, OrderSnapshotCache snapshotCache) throws IOException {
         this.webSocketSender = webSocketSender;
         this.snapshotChannel = snapshotChannel;
+        this.snapshotCache = snapshotCache;
 
         String queueName = snapshotChannel.queueDeclare().getQueue();
         snapshotChannel.queueBind(queueName, RabbitMqConfig.SNAPSHOT_EXCHANGE_NAME, "");
@@ -47,22 +50,11 @@ public class SnapshotListener {
     }
 
     private void sendSnapshotToAll(ExchangeMessage.OrderBookSnapshot message) {
+
+        ClientOrderSnapshot s = SnapshotConverter.messageToClient(message);
         String instrumentId = message.getInstrumentId();
 
-        ClientOrderSnapshot s = new ClientOrderSnapshot();
-        s.setInstrumentId(instrumentId);
-        List<ClientSnapshotLevel> buy = new ArrayList<>();
-        for (ExchangeMessage.OrderBookLevel l : message.getBuysList()) {
-            buy.add(new ClientSnapshotLevel(l.getPrice(), l.getQuantity()));
-        }
-
-        List<ClientSnapshotLevel> sell = new ArrayList<>();
-        for (ExchangeMessage.OrderBookLevel l : message.getSellsList()) {
-            sell.add(new ClientSnapshotLevel(l.getPrice(), l.getQuantity()));
-        }
-
-        s.setBuy(buy);
-        s.setSell(sell);
+        snapshotCache.setSnapshot(instrumentId, s);
 
         webSocketSender.sendMessage("/topic/snapshot/"+instrumentId, s);
         log.debug("Sent snapshot for instrument {} message= {}", instrumentId, s);

@@ -1,9 +1,8 @@
 
 
 # Core
-      
-   
-* Add order status to the Order object and update the status as part of its life cycle
+         
+* Add order status to the Order object and update the status as part of its life cycle (sending order update messages)
 
 * Order status update - order status to update and be published to clients.
 
@@ -12,6 +11,8 @@
 # Web
 
 * OrderBookSnapshot REST endpoint. Get the snapshot of an orderbook for the instrument and return as a JSON object.
+
+* Order update publisher
 
 * Order search - REST endpoint to get all orders. Search on time span with default of today.
 
@@ -24,6 +25,11 @@ connections for that instrument. Old websockets should be closed when components
 
 * When Snapshot REST endpoint is available, use it to initialise the Snapshot component
 
+# Ops
+
+* Encrypted connection to Rabbit
+
+* Rabbit high availability.
 
 # Build
 

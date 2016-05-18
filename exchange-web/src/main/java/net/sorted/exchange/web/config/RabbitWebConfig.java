@@ -59,8 +59,18 @@ public class RabbitWebConfig {
     @Bean
     @Qualifier("snapshotChannel")
     public Channel snapshotChannel() throws IOException {
-        return rabbitMqConfig().getSnapshotChannel();
+        return rabbitMqConfig().getSnapshotPublishChannel();
     }
 
+    @Bean
+    @Qualifier("orderSnapshotRequestChannel")
+    public Channel snapshotRequestChannel() {
+        return rabbitMqConfig().getSnapshotRequestChannel();
+    }
 
+    @Bean
+    @Qualifier("orderSnapshotRequestQueueName")
+    public String orderSnapshotRequestQueueName() {
+        return RabbitMqConfig.SNAPSHOT_REQUEST_QUEUE_NAME;
+    }
 }

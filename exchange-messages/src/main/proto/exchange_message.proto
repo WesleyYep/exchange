@@ -69,5 +69,9 @@ message OrderBookSnapshot {
 
     repeated OrderBookLevel buys = 2;
     repeated OrderBookLevel sells = 3;
+}
 
+message OrderBookSnapshotRequest {
+    required string instrumentId = 1;
+    optional string requester = 2;
 }

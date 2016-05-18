@@ -19,7 +19,7 @@ public class ExchangeNode  {
     public static void main(String[] args) {
 
         ApplicationContext ctx = SpringApplication.run(ExchangeNode.class, args);
-        OrderMqReceivers receivers = ctx.getBean(OrderMqReceivers.class);
+        MessageReceivers receivers = ctx.getBean(MessageReceivers.class);
         receivers.startAll();
 
 
