@@ -1,11 +1,23 @@
 package net.sorted.exchange.web;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClientOrderSnapshot {
     private String instrumentId;
     private List<ClientSnapshotLevel> buy;
     private List<ClientSnapshotLevel> sell;
+
+
+    public ClientOrderSnapshot() {
+
+    }
+
+    public ClientOrderSnapshot(String instrumentId) {
+        this.instrumentId = instrumentId;
+        buy = new ArrayList<>();
+        sell = new ArrayList<>();
+    }
 
     public String getInstrumentId() {
         return instrumentId;

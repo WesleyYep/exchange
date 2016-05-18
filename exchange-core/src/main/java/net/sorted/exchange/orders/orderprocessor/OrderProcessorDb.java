@@ -59,9 +59,9 @@ public class OrderProcessorDb implements OrderProcessor {
     }
 
     @Override
-    public long submitOrder(double price, Side side, long quantity, String symbol, long clientId, OrderType type) {
+    public long submitOrder(double price, Side side, long quantity, String symbol, long clientId, OrderType type, String orderSubmitter) {
 
-        Order order = orderRepository.save(new Order(-1, price, side, quantity, symbol, clientId, type, OrderStatus.OPEN));
+        Order order = orderRepository.save(new Order(-1, price, side, quantity, symbol, clientId, type, OrderStatus.OPEN, orderSubmitter));
         order.setUnfilledQuantity(quantity);
 
         MatchedTrades matches;
@@ -86,7 +86,8 @@ public class OrderProcessorDb implements OrderProcessor {
             snapshot = orderBook.getSnapshot();
         }
 
-        Order cancelled = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), order.getUnfilledQuantity(), order.getInstrumentId(), order.getClientId(), order.getType(), OrderStatus.CANCELLED);
+        Order cancelled = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), order.getUnfilledQuantity(), order.getInstrumentId(),
+                                    order.getClientId(), order.getType(), OrderStatus.CANCELLED, order.getOrderSubmitter());
         orderRepository.save(cancelled);
 
         snapshotPublisher.publishSnapshot(snapshot);

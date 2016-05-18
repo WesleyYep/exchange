@@ -33,6 +33,7 @@ message Order {
     optional Side side = 7;
     optional OrderType order_type = 8;
     optional State state = 9;
+    optional string submitter = 10;
 
 }
 
@@ -46,6 +47,8 @@ message PrivateTrade {
 
     optional int64 clientId = 7;
     optional int64 orderId = 8;
+
+    optional string orderSubmitter = 9;
 }
 
 message PublicTrade {
@@ -66,5 +69,9 @@ message OrderBookSnapshot {
 
     repeated OrderBookLevel buys = 2;
     repeated OrderBookLevel sells = 3;
+}
 
+message OrderBookSnapshotRequest {
+    required string instrumentId = 1;
+    optional string requester = 2;
 }

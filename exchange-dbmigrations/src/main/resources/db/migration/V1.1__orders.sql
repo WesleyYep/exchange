@@ -6,7 +6,8 @@ create table orders (
   side                CHAR(1),
   client_id           INTEGER,
   order_type          CHAR(1),
-  status              CHAR(1)
+  status              CHAR(1),
+  order_submitter     VARCHAR(64)
 );
 
 create table order_fill (

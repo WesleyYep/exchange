@@ -15,6 +15,9 @@ public class RabbitMqConfig {
     public static final String ORDER_SUBMIT_DEAD_CHANNEL_NAME = "submit.order.dead";
     public static final String ORDER_SUBMIT_DEAD_EXCHANGE = "submit.order.dead.exchange";
 
+    public static final String SNAPSHOT_REQUEST_QUEUE_NAME = "snapshot.request";
+
+
     public static final String PUBLIC_TRADE_EXCHANGE_NAME = "public.trade.exchange";
     public static final String PRIVATE_TRADE_EXCHANGE_NAME = "private.trade.exchange";
 
@@ -27,7 +30,8 @@ public class RabbitMqConfig {
     private final Channel orderChannel;
     private final Channel publicTradeChannel;
     private final Channel privateTradeChannel;
-    private final Channel snapshotChannel;
+    private final Channel snapshotPublishChannel;
+    private final Channel snapshotRequestChannel;
 
     private final int connectionAttempts = 12;
     private final long connectionAttemptIntervalMillis = 5000;
@@ -75,8 +79,14 @@ public class RabbitMqConfig {
             privateTradeChannel.exchangeDeclare(PRIVATE_TRADE_EXCHANGE_NAME, "fanout");
 
             // Setup snapshot topic
-            snapshotChannel = connection.createChannel();
-            snapshotChannel.exchangeDeclare(SNAPSHOT_EXCHANGE_NAME, "fanout");
+            snapshotPublishChannel = connection.createChannel();
+            snapshotPublishChannel.exchangeDeclare(SNAPSHOT_EXCHANGE_NAME, "fanout");
+
+            // Setup snapshot request queue
+            snapshotRequestChannel = connection.createChannel();
+            snapshotRequestChannel.queueDeclare(SNAPSHOT_REQUEST_QUEUE_NAME, false, false, false, null);
+            snapshotRequestChannel.basicQos(1);
+
 
         } catch (Exception e) {
             throw new RuntimeException("Cannot configure rabbit mq", e);
@@ -112,7 +122,9 @@ public class RabbitMqConfig {
         return privateTradeChannel;
     }
 
-    public Channel getSnapshotChannel() {
-        return snapshotChannel;
+    public Channel getSnapshotPublishChannel() {
+        return snapshotPublishChannel;
     }
+
+    public Channel getSnapshotRequestChannel() { return snapshotRequestChannel; }
 }

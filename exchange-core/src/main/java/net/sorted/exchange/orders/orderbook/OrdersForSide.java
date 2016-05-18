@@ -54,7 +54,8 @@ public class OrdersForSide {
             OrdersAtPrice ordersAtPrice = priceToOrderAtPrice.get(price);
 
             long totalUnfilled = order.getUnfilledQuantity() - fillQuantity;
-            Order n = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), totalUnfilled, order.getInstrumentId(), order.getClientId(), order.getType(), order.getStatus());
+            Order n = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), totalUnfilled, order.getInstrumentId(),
+                                order.getClientId(), order.getType(), order.getStatus(), order.getOrderSubmitter());
             ordersAtPrice.updateOrder(n);
             idToOrder.put(orderId, n);
             order = n;

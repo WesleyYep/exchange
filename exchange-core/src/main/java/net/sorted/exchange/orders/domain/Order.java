@@ -39,6 +39,10 @@ public class Order {
     @Column(name="status")
     private OrderStatus status;
 
+
+    @Column(name="order_submitter")
+    private String orderSubmitter;
+
 //    @OneToMany(cascade = {CascadeType.ALL})
 //    @JoinColumn(name="order_id")
 //    private Set<OrderFill> fills;
@@ -46,11 +50,11 @@ public class Order {
     @Transient
     private long unfilledQuantity;
 
-    public Order(long id, double price, Side side, long quantity, String instrumentId, long clientId, OrderType type, OrderStatus status) {
-        this(id, price, side, quantity, quantity, instrumentId, clientId, type, status);
+    public Order(long id, double price, Side side, long quantity, String instrumentId, long clientId, OrderType type, OrderStatus status, String orderSubmitter) {
+        this(id, price, side, quantity, quantity, instrumentId, clientId, type, status, orderSubmitter);
     }
 
-    public Order(long id, double price, Side side, long quantity, long unfilledQuantity, String instrumentId, long clientId, OrderType type, OrderStatus status) {
+    public Order(long id, double price, Side side, long quantity, long unfilledQuantity, String instrumentId, long clientId, OrderType type, OrderStatus status, String orderSubmitter) {
         this.id = id;
         this.price = price;
         this.quantity = quantity;
@@ -60,6 +64,7 @@ public class Order {
         this.clientId = clientId;
         this.type = type;
         this.status = status;
+        this.orderSubmitter = orderSubmitter;
     }
 
     protected Order() {
@@ -96,6 +101,10 @@ public class Order {
 
     public OrderStatus getStatus() {
         return status;
+    }
+
+    public String getOrderSubmitter() {
+        return orderSubmitter;
     }
 
     public long getUnfilledQuantity() { return unfilledQuantity; }

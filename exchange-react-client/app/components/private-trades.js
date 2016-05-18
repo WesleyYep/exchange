@@ -9,15 +9,41 @@ class PrivateTrades extends React.Component {
         this.state = { trades: [] };
     }
 
-    componentWillMount() {
+    receivePrivateTrade(trade){
+        var trades = this.state.trades;
+        trades.push(trade);
+        this.setState({trades});
+    }
+
+    subscribeTradesForInstrument(instrument) {
+        console.log("Subscribing to private trades for "+instrument);
         StompClient.then((client) => {
-            client.subscribe(`/user/queue/private.trade/${this.props.instrument}`, (data) => {
-                var trade = JSON.parse(data.body);
-                var trades = this.state.trades;
-                trades.push(trade);
-                this.setState({trades});
+            this.subscription = client.subscribe(`/user/queue/private.trade/${this.props.instrument}`, (data) => {
+                this.receivePrivateTrade(JSON.parse(data.body));
             });
         });
+    }
+
+    unsubscribeCurrent() {
+        if (this.subscription != null) {
+            this.subscription.unsubscribe();
+            this.subscription = null;
+            console.log("Unsubscribed from private trades")
+        }
+    }
+
+    componentWillMount() {
+        this.subscribeTradesForInstrument(this.props.instrument);
+    }
+
+    componentWillUnmount() {
+        this.unsubscribeCurrent();
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log("getting private trade props. Current Instrument: "+this.props.instrument+" New Instrument:"+nextProps.instrument);
+        this.unsubscribeCurrent();
+        this.subscribeTradesForInstrument(nextProps.instrument);
     }
 
     render() {

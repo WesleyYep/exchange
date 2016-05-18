@@ -24,33 +24,12 @@ public class OrderSnapshotPublisherRabbit implements OrderSnapshotPublisher {
     @Override
     public void publishSnapshot(OrderBookSnapshot snapshot) {
         try {
-            ExchangeMessage.OrderBookSnapshot message = domainSnapshotToProtobufMessage(snapshot);
+            ExchangeMessage.OrderBookSnapshot message = OrderBookSnapshotConverter.domainSnapshotToProtobufMessage(snapshot);
             channel.basicPublish(exchangeName, snapshot.getInstrumentId(), null, message.toByteArray());
             log.debug("Published snapshot " + message + " to exchange " + exchangeName + " with routingKey " + snapshot.getInstrumentId());
         } catch (IOException e) {
             log.error("Cannot publish snapshot message", e);
             throw new RuntimeException("Error publishing snapshot message to exchange " + exchangeName, e);
         }
-    }
-
-    private ExchangeMessage.OrderBookSnapshot domainSnapshotToProtobufMessage(OrderBookSnapshot snapshot) {
-        ExchangeMessage.OrderBookSnapshot.Builder msg = ExchangeMessage.OrderBookSnapshot.newBuilder();
-
-        msg.setInstrumentId(snapshot.getInstrumentId());
-        for (OrderBookLevelSnapshot level : snapshot.getBuyLevels()) {
-            ExchangeMessage.OrderBookLevel.Builder l = ExchangeMessage.OrderBookLevel.newBuilder();
-            l.setPrice(level.getPrice());
-            l.setQuantity(level.getQuantity());
-            msg.addBuys(l.build());
-        }
-
-        for (OrderBookLevelSnapshot level : snapshot.getSellLevels()) {
-            ExchangeMessage.OrderBookLevel.Builder l = ExchangeMessage.OrderBookLevel.newBuilder();
-            l.setPrice(level.getPrice());
-            l.setQuantity(level.getQuantity());
-            msg.addSells(l.build());
-        }
-
-        return msg.build();
     }
 }

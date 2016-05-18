@@ -12,8 +12,9 @@ public class Trade {
     private final double price;
     private final Side side;
     private final DateTime tradeDate;
+    private final String orderSubmitter;
 
-    public Trade(long tradeId, long orderId, long clientId, String instrumentId, long quantity, double price, Side side, DateTime tradeDate) {
+    public Trade(long tradeId, long orderId, long clientId, String instrumentId, long quantity, double price, Side side, DateTime tradeDate, String orderSubmitter) {
         this.tradeId = tradeId;
         this.orderId = orderId;
         this.clientId = clientId;
@@ -22,6 +23,7 @@ public class Trade {
         this.price = price;
         this.side = side;
         this.tradeDate = tradeDate;
+        this.orderSubmitter = orderSubmitter;
     }
 
     public long getTradeId() {
@@ -56,17 +58,22 @@ public class Trade {
         return tradeDate;
     }
 
+    public String getOrderSubmitter() {
+        return orderSubmitter;
+    }
+
     @Override
     public String toString() {
         return "Trade{" +
-                "tradeId='" + tradeId + '\'' +
-                ", orderId='" + orderId + '\'' +
-                ", clientId='" + clientId + '\'' +
+                "tradeId=" + tradeId +
+                ", orderId=" + orderId +
+                ", clientId=" + clientId +
                 ", instrumentId='" + instrumentId + '\'' +
                 ", quantity=" + quantity +
                 ", price=" + price +
                 ", side=" + side +
                 ", tradeDate=" + tradeDate +
+                ", orderSubmitter='" + orderSubmitter + '\'' +
                 '}';
     }
 }
