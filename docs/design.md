@@ -6,13 +6,13 @@ An example trading exchange to be used as part of a test trading system
 
 ## Modules
 
-### exchange-core
-This has the core code for the exchange. The main components are 
+### exchange-order-matcher
+This has the  code for the orderbooks and order matching. The main components are 
 OrderBook
 OrderProcessor
-ExchangeNode
+OrderMatcher
 
-[Full docs](exchange-core.md)
+[Full docs](exchange-order-matcher.md)
 
 ### exchange-web
 This has the web layer or the system. This comprises of

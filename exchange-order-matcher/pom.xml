@@ -9,7 +9,7 @@
         <version>0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>exchange-core</artifactId>
+    <artifactId>exchange-order-matcher</artifactId>
     <packaging>jar</packaging>
 
     <properties>
@@ -117,7 +117,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>net.sorted.exchange.orders.ExchangeNode</mainClass>
+                    <mainClass>net.sorted.exchange.orders.OrderMatcher</mainClass>
                     <!--<layout>ZIP</layout>-->
                 </configuration>
                 <executions>
@@ -142,10 +142,10 @@
                         <configuration>
                             <!--<imageName>${docker.registry}/exchange-node</imageName>-->
                             <!--<baseImage>${docker.registry}/java:8</baseImage>-->
-                            <imageName>exchange-node</imageName>
+                            <imageName>exchange-order-matcher</imageName>
                             <baseImage>java:8</baseImage>
                             <workdir>/</workdir>
-                            <cmd>["/start-exchange-node.sh"]</cmd>
+                            <cmd>["/start-order-matcher.sh"]</cmd>
                             <resources>
                                 <resource> <!-- Copy the spring boot jar to Image -->
                                     <targetPath>/</targetPath>
@@ -155,12 +155,12 @@
                                 <resource> <!-- Copy the start script to Image - NB classes used in case we need ot filter this later -->
                                     <targetPath>/</targetPath>
                                     <directory>${project.build.directory}/classes</directory>
-                                    <include>start-exchange-node.sh</include>
+                                    <include>start-order-matcher.sh</include>
                                 </resource>
                             </resources>
                             <runs>
-                                <run>chmod +x /start-exchange-node.sh</run>
-                                <run>ln -s ${project.build.finalName}.jar exchange-core.jar</run>
+                                <run>chmod +x /start-order-matcher.sh</run>
+                                <run>ln -s ${project.build.finalName}.jar exchange-order-matcher.jar</run>
                             </runs>
                             <!--<pushImage>true</pushImage>-->
                             <!--<forceTags>true</forceTags>-->
@@ -177,7 +177,7 @@
                             <goal>push</goal>
                         </goals>
                         <configuration>
-                            <imageName>${docker.registry}/exchange-node</imageName>
+                            <imageName>${docker.registry}/exchange-order-matcher</imageName>
                         </configuration>
                     </execution>
                 </executions>

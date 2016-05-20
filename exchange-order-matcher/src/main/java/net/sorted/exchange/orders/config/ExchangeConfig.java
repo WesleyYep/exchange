@@ -36,7 +36,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 
 @Configuration
-@PropertySource("classpath:exchange.properties")
+@PropertySource("classpath:order-matcher.properties")
 public class ExchangeConfig {
 
     private Logger log = LogManager.getLogger(ExchangeConfig.class);

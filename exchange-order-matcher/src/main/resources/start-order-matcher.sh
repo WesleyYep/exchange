@@ -13,4 +13,4 @@ if [[ ! -z $INSTRUMENTS ]]; then
 fi
 
 echo "PARAMS=$PARAMS"
-java $PARAMS -jar exchange-core.jar
+java $PARAMS -jar exchange-order-matcher.jar

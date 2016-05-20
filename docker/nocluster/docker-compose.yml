@@ -16,7 +16,7 @@ services:
     networks:
       - exchange
 
-  exchangeNode1:
+  orderMatcher1:
     image: 192.168.160.235:5000/exchange-node
     environment:
       RABBIT_HOSTNAME: rabbit
@@ -25,7 +25,7 @@ services:
       - exchange
 
 
-  exchangeNode2:
+  orderMatcher2:
     image: 192.168.160.235:5000/exchange-node
     environment:
       RABBIT_HOSTNAME: rabbit

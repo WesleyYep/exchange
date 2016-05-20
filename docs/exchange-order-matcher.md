@@ -9,12 +9,12 @@
 
 # Components
 
-## ExchangeNode
+## OrderMatcher
 
 This component is multi-threaded and has a RabbitMQ messaging API.
 This is a Spring main class. It loads the application context and starts the message receivers.  
 
-There may be multiple ExchangeNodes setup to shard the processing by instrument.
+There may be multiple OrderMatchers setup to shard the processing by instrument.
 
 ## SubmitOrderReceiver
 This handles the RabbitMQ side and delegates the business logic out to an OrderProcessor
@@ -58,7 +58,7 @@ MatchingOrders is a list of buys and sells that match as a price. Only filled or
 
 
 
-# ExchangeNode API
+# OrderMatcher API
 
 ## Messages
 
@@ -177,7 +177,7 @@ OrderSnapshot
 
 # Configuration
 
-The instruments that an ExchangeNode keeps an OrderBook for are configured in using the System property 'instrumentCSL' which is setup in exchange.properties
+The instruments that an OrderMatcher keeps an OrderBook for are configured in using the System property 'instrumentCSL' which is setup in exchange.properties
  
 The hostname of the rabbit s 
 

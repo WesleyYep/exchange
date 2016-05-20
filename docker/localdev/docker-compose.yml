@@ -12,8 +12,8 @@ services:
     ports:
       - "5432:5432"
 
-  exchangeNode1:
-    image: exchange-node
+  orderMatcher1:
+    image: exchange-order-matcher
     environment:
       RABBIT_HOSTNAME: rabbit
       INSTRUMENTS: AMZN,GOOG
@@ -21,8 +21,8 @@ services:
       - rabbit
       - exchangeDB
 
-  exchangeNode2:
-    image: exchange-node
+  orderMatcher2:
+    image: exchange-order-matcher
     environment:
       RABBIT_HOSTNAME: rabbit
       INSTRUMENTS: WBC,CBA

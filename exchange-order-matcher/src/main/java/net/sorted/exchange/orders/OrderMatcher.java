@@ -13,12 +13,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableJpaRepositories(basePackages = {"net.sorted.exchange.orders.repository"})
 @EnableTransactionManagement
 @SpringBootApplication
-public class ExchangeNode  {
+public class OrderMatcher {
 
 
     public static void main(String[] args) {
 
-        ApplicationContext ctx = SpringApplication.run(ExchangeNode.class, args);
+        ApplicationContext ctx = SpringApplication.run(OrderMatcher.class, args);
         MessageReceivers receivers = ctx.getBean(MessageReceivers.class);
         receivers.startAll();
 
@@ -31,20 +31,4 @@ public class ExchangeNode  {
             System.out.println(beanName);
         }
     }
-
 }
-
-
-//public class ExchangeNode {
-//
-//    public static void main(String[] args) {
-//
-//        ApplicationContext ctx = new AnnotationConfigApplicationContext(ExchangeConfig.class);
-//
-//        OrderMqReceivers receivers = ctx.getBean(OrderMqReceivers.class);
-//        receivers.startAll();
-//
-//        System.out.println("Listening for orders");
-//
-//    }
-//}

@@ -41,15 +41,11 @@ The authentication needs to
 
 # Interprocess comms
 
-* Kill json on the server side.
-   Use protoc or some other messaging. No json in messages going into ExchangeNodes - only use for web submissions (and get rid there too if possible)
-
 
 # Clustered system
 
 ## Clustered back end
 
-* ExchangeNode - shard on instruments.
 * Can look at how to have multiple nodes for a single orderbook (eg using in memory DB).  
  
 ## Clustered web

@@ -106,7 +106,7 @@
     <modules>
         <module>exchange-messages</module>
         <module>exchange-dbmigrations</module>
-        <module>exchange-core</module>
+        <module>exchange-order-matcher</module>
         <module>exchange-react-client</module>
         <module>exchange-web</module>
     </modules>
