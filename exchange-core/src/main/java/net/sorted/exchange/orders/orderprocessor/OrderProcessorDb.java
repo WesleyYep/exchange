@@ -1,7 +1,9 @@
 package net.sorted.exchange.orders.orderprocessor;
 
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import net.sorted.exchange.orders.domain.Order;
 import net.sorted.exchange.orders.domain.OrderFill;
@@ -130,7 +132,8 @@ public class OrderProcessorDb implements OrderProcessor {
     }
 
     private void inflateOrderBook() {
-        List<Order> orders = orderRepository.findByInstrumentId(orderBook.getInstrumentId());
+
+        List<Order> orders = orderRepository.findOpenByInstrumentId(orderBook.getInstrumentId());
         for (Order order : orders) {
             List<OrderFill> fills = orderFillRepository.findByOrderId(order.getId());
             long filled = fills.stream().mapToLong(f -> f.getQuantity()).sum();
