@@ -8,9 +8,16 @@
 
 * Order search - REST endpoint to get all orders. Search on time span with default of today.
 
-# Web
+# Order Cleanup
 
-* OrderBookSnapshot REST endpoint. Get the snapshot of an orderbook for the instrument and return as a JSON object.
+* Create module (spring boot) or shell and psql
+
+* Implement cron job that will find all filled orders and update the order status to filled. This means a query to sum all the OrderFills and if equal to 
+the order quantity then set the status to FILLED. Only OPEN orders need to be processed.
+
+* Create docker image and add to docker-compose file(s)
+
+# Web
 
 * Order update publisher
 

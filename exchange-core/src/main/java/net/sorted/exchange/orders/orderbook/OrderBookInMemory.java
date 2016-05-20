@@ -7,6 +7,7 @@ import java.util.Map;
 
 import net.sorted.exchange.orders.domain.Order;
 import net.sorted.exchange.orders.domain.OrderFill;
+import net.sorted.exchange.orders.domain.OrderStatus;
 import net.sorted.exchange.orders.domain.Side;
 import net.sorted.exchange.orders.dao.TradeIdDao;
 import net.sorted.exchange.orders.domain.Trade;
@@ -37,7 +38,14 @@ public class OrderBookInMemory implements OrderBook {
         orders.addOrder(order);
         orderIdToOrdersForSide.put(order.getId(), orders);
 
-        return getTradesMatching(order);
+        MatchedTrades matches =  getTradesMatching(order);
+
+        // Of nothing mathced, then still update the order as it has gone from UNASSIGNED to OPEN
+        if (matches.hasMatches() == false) {
+            matches.getUpdatedOrders().add(order);
+        }
+
+        return matches;
     }
 
     @Override
@@ -101,6 +109,7 @@ public class OrderBookInMemory implements OrderBook {
         List<Trade> publicTrades = new ArrayList<>();
         List<Order> filledPassive = new ArrayList<>();
         List<OrderFill> fills = new ArrayList<>();
+        List<Order> updatedOrders = new ArrayList<>();
 
         long qtyLeftToMatch = newOrder.getUnfilledQuantity();
         boolean stillTradesToMatch = true;
@@ -130,7 +139,7 @@ public class OrderBookInMemory implements OrderBook {
 
                 long otherOrderQty = matching.getUnfilledQuantity();
                 if (otherOrderQty <= qtyLeftToMatch) {
-                    // Order can be fully utilised
+                    // matching order can be fully utilised
                     Trade passiveTradeForOrder = getTradeForOrder(matching, otherOrderQty, levelPrice);
                     passiveTrades.add(passiveTradeForOrder);
 
@@ -139,7 +148,10 @@ public class OrderBookInMemory implements OrderBook {
                     recordFills(fills, otherOrderQty, levelPrice, newOrder.getId(), matching.getId());
 
                     OrdersForSide orders = orderIdToOrdersForSide.get(newOrder.getId());
-                    orders.partialFill(newOrder.getId(), matching.getId(), levelPrice, otherOrderQty);
+                    updatedOrders.add(orders.partialFill(newOrder.getId(), otherOrderQty));
+
+                    matching.setStatus(OrderStatus.FILLED);
+                    updatedOrders.add(matching);
 
                     qtyTradedAtLevel += otherOrderQty;
                     qtyLeftToMatch -= otherOrderQty;
@@ -153,7 +165,12 @@ public class OrderBookInMemory implements OrderBook {
                     passiveTrades.add(passiveForOrder);
 
                     OrdersForSide orders = orderIdToOrdersForSide.get(matching.getId());
-                    orders.partialFill(matching.getId(), newOrder.getId(), levelPrice, qtyLeftToMatch);
+                    updatedOrders.add(orders.partialFill(matching.getId(), qtyLeftToMatch));
+
+                    if (matching.getStatus() != OrderStatus.PARTIAL_FILL) {
+                        matching.setStatus(OrderStatus.PARTIAL_FILL);
+                        updatedOrders.add(matching);
+                    }
 
                     recordFills(fills, qtyLeftToMatch, levelPrice, newOrder.getId(), matching.getId());
 
@@ -182,7 +199,7 @@ public class OrderBookInMemory implements OrderBook {
             getOrdersForSide(newOrder.getSide()).removeOrder(newOrder.getId());
         }
 
-        return new MatchedTrades(aggressorTrades, passiveTrades, publicTrades, fills);
+        return new MatchedTrades(aggressorTrades, passiveTrades, publicTrades, fills, updatedOrders);
     }
 
     // When there is a mathc, there isa fill for the aggressor and a matching one for the passive order.

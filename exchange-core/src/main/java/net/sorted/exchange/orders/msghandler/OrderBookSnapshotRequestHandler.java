@@ -11,7 +11,7 @@ import com.rabbitmq.client.Envelope;
 import net.sorted.exchange.messages.ExchangeMessage;
 import net.sorted.exchange.orders.orderbook.OrderBook;
 import net.sorted.exchange.orders.orderbook.OrderBookSnapshot;
-import net.sorted.exchange.orders.publishers.OrderBookSnapshotConverter;
+import net.sorted.exchange.orders.publishers.DomainWithMessageConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -78,7 +78,7 @@ public class OrderBookSnapshotRequestHandler implements MessageReceiver {
                         .correlationId(correlationId)
                         .build();
 
-                ExchangeMessage.OrderBookSnapshot message = OrderBookSnapshotConverter.domainSnapshotToProtobufMessage(snapshotOptional.get());
+                ExchangeMessage.OrderBookSnapshot message = DomainWithMessageConverter.domainSnapshotToProtobufMessage(snapshotOptional.get());
                 channel.basicPublish("", properties.getReplyTo(), replyProps, message.toByteArray());
             }
             channel.basicAck(envelope.getDeliveryTag(), false);

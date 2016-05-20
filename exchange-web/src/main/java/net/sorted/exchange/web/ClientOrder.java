@@ -12,7 +12,6 @@ public class ClientOrder {
 
     private long orderId;
     private long clientId;
-    private String correlationId;
     private String instrument;
     private long quantity;
     private String price;
@@ -24,11 +23,10 @@ public class ClientOrder {
 
     }
 
-    public ClientOrder(long orderId, long clientId, String correlationId, String instrument, long quantity,
+    public ClientOrder(long orderId, long clientId, String instrument, long quantity,
                        String price, ClientSide side, ClientOrderType type, State state) {
         this.orderId = orderId;
         this.clientId = clientId;
-        this.correlationId = correlationId;
         this.instrument = instrument;
         this.quantity = quantity;
         this.price = price;
@@ -43,10 +41,6 @@ public class ClientOrder {
 
     public long getClientId() {
         return clientId;
-    }
-
-    public String getCorrelationId() {
-        return correlationId;
     }
 
     public String getInstrument() {
@@ -99,7 +93,6 @@ public class ClientOrder {
         return "ExchangeOrderOld{" +
                 "orderId='" + orderId + '\'' +
                 ", clientId='" + clientId + '\'' +
-                ", correlationId='" + correlationId + '\'' +
                 ", instrument='" + instrument + '\'' +
                 ", quantity=" + quantity +
                 ", price='" + price + '\'' +

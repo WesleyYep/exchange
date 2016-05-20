@@ -6,11 +6,13 @@ import java.util.concurrent.Executor;
 import net.sorted.exchange.orders.dao.TradeIdDaoInMemory;
 import net.sorted.exchange.orders.domain.Order;
 import net.sorted.exchange.orders.domain.OrderFill;
+import net.sorted.exchange.orders.domain.OrderStatus;
 import net.sorted.exchange.orders.domain.OrderType;
 import net.sorted.exchange.orders.orderbook.OrderBook;
 import net.sorted.exchange.orders.orderbook.OrderBookInMemory;
 import net.sorted.exchange.orders.orderbook.OrderBookSnapshot;
 import net.sorted.exchange.orders.publishers.OrderSnapshotPublisher;
+import net.sorted.exchange.orders.publishers.OrderUpdatePublisher;
 import net.sorted.exchange.orders.publishers.PrivateTradePublisher;
 import net.sorted.exchange.orders.publishers.PublicTradePublisher;
 import net.sorted.exchange.orders.repository.OrderFillRepository;
@@ -24,6 +26,7 @@ import org.mockito.stubbing.Answer;
 import static net.sorted.exchange.orders.domain.Side.BUY;
 import static net.sorted.exchange.orders.domain.Side.SELL;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -43,6 +46,7 @@ public class OrderProcessorTest {
     private PrivateTradePublisher privateTradePublisher;
     private PublicTradePublisher publicTradePublisher;
     private OrderSnapshotPublisher snapshotPublisher;
+    private OrderUpdatePublisher orderUpdatePublisher;
     private OrderRepository orderRepository;
     private OrderFillRepository orderFillRepository;
 
@@ -59,6 +63,7 @@ public class OrderProcessorTest {
         privateTradePublisher = mock(PrivateTradePublisher.class);
         publicTradePublisher = mock(PublicTradePublisher.class);
         snapshotPublisher = mock(OrderSnapshotPublisher.class);
+        orderUpdatePublisher = mock(OrderUpdatePublisher.class);
 
         orderRepository = mock(OrderRepository.class);
         when(orderRepository.save(any(Order.class))).thenAnswer(new Answer<Order>() {
@@ -85,7 +90,7 @@ public class OrderProcessorTest {
 
         orderFillService = new OrderFillService(orderFillRepository);
 
-        orderProcessor = new OrderProcessorDb(orderBook, orderRepository, orderFillRepository, privateTradePublisher, publicTradePublisher, snapshotPublisher, new DirectExecutor(), orderFillService);
+        orderProcessor = new OrderProcessorDb(orderBook, orderRepository, orderFillRepository, privateTradePublisher, publicTradePublisher, snapshotPublisher, orderUpdatePublisher, new DirectExecutor(), orderFillService);
 
     }
 
@@ -113,6 +118,11 @@ public class OrderProcessorTest {
         assertEquals(1000, snapshotCaptor.getValue().getBuyLevels().get(0).getQuantity());
         assertEquals(0, snapshotCaptor.getValue().getSellLevels().size());
 
+        // One order will be updated (going from UNSUBMITTED to OPEN)
+        ArgumentCaptor<List> orderCaptor = ArgumentCaptor.forClass(List.class);
+        verify(orderUpdatePublisher, times(1)).publishUpdates(orderCaptor.capture());
+        List<Order> updated = orderCaptor.getValue();
+        assertEquals(OrderStatus.OPEN, updated.get(0).getStatus());
     }
 
     @Test
@@ -139,10 +149,15 @@ public class OrderProcessorTest {
         assertEquals(1000, snapshotCaptor.getValue().getSellLevels().get(0).getQuantity());
         assertEquals(0, snapshotCaptor.getValue().getBuyLevels().size());
 
+        // One order will be updated (going from UNSUBMITTED to OPEN)
+        ArgumentCaptor<List> orderCaptor = ArgumentCaptor.forClass(List.class);
+        verify(orderUpdatePublisher, times(1)).publishUpdates(orderCaptor.capture());
+        List<Order> updated = orderCaptor.getValue();
+        assertEquals(OrderStatus.OPEN, updated.get(0).getStatus());
     }
 
     @Test
-    public void testOrderSubmitWithOneMatch() {
+    public void testOrderSubmitWithOneFullMatch() {
         long buyOrderId = orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", CLIENT1, OrderType.LIMIT, "username");
         long sellOrderId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", CLIENT2, OrderType.LIMIT, "username");
 
@@ -162,6 +177,46 @@ public class OrderProcessorTest {
 
         // when the fills order id is the buy order id, the matched order should be the sell order id
         assertEquals(sellOrderId, fills.stream().filter(f -> f.getOrderId() == buyOrderId).mapToLong(f -> f.getMatchedOrderId()).sum());
+
+        // One call on the orderPublisher for the initial BUY order
+        // Second call for the SELL - Two orders will be updated (going from UNSUBMITTED to FILLED)
+        ArgumentCaptor<List> orderCaptor = ArgumentCaptor.forClass(List.class);
+        verify(orderUpdatePublisher, times(2)).publishUpdates(orderCaptor.capture());
+        List<Order> publishedOrders = orderCaptor.getAllValues().get(1);
+        assertEquals(OrderStatus.FILLED, publishedOrders.get(0).getStatus());
+        assertEquals(OrderStatus.FILLED, publishedOrders.get(1).getStatus());
+    }
+
+    @Test
+    public void testOrderSubmitWithOnePartialMatch() {
+        long buyOrderId = orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", CLIENT1, OrderType.LIMIT, "username");
+        long sellOrderId = orderProcessor.submitOrder(100.0, SELL, 500, "USDAUD", CLIENT2, OrderType.LIMIT, "username");
+
+        ArgumentCaptor<List> fillCaptor = ArgumentCaptor.forClass(List.class);
+        verify(orderFillRepository, times(1)).save(fillCaptor.capture());
+
+        // Should be 2 fills, one for qty 1000 and one for 500 and price 100.0. one fill for buyId/sellId and the other for sellId/buyId
+        List<OrderFill> fills = fillCaptor.getValue();
+        assertEquals( 500, fills.stream().filter( f -> f.getOrderId() == sellOrderId).mapToLong(f -> f.getQuantity()).sum());
+        assertEquals( 500, fills.stream().filter( f -> f.getOrderId() ==  buyOrderId).mapToLong(f -> f.getQuantity()).sum());
+
+        assertEquals(100.0, fills.get(0).getPrice(), 0.01);
+        assertEquals(100.0, fills.get(1).getPrice(), 0.01);
+
+        // when the fills order id is the sell order id, the matched order should be the buy order id
+        assertEquals(buyOrderId, fills.stream().filter(f -> f.getOrderId() == sellOrderId).mapToLong(f -> f.getMatchedOrderId()).sum());
+
+        // when the fills order id is the buy order id, the matched order should be the sell order id
+        assertEquals(sellOrderId, fills.stream().filter(f -> f.getOrderId() == buyOrderId).mapToLong(f -> f.getMatchedOrderId()).sum());
+
+        // One call on the orderPublisher for the initial BUY order
+        // Second call for the SELL - Two orders will be updated (going from UNSUBMITTED to FILLED or PARTIAL_FILL)
+        ArgumentCaptor<List> orderCaptor = ArgumentCaptor.forClass(List.class);
+        verify(orderUpdatePublisher, times(2)).publishUpdates(orderCaptor.capture());
+        List<Order> publishedOrders = orderCaptor.getAllValues().get(1);
+
+        assertTrue(publishedOrders.stream().filter(o -> o.getId() == sellOrderId).map(o -> o.getStatus()).allMatch(s -> s == OrderStatus.FILLED));
+        assertTrue(publishedOrders.stream().filter(o -> o.getId() == buyOrderId).map(o -> o.getStatus()).allMatch(s -> s == OrderStatus.PARTIAL_FILL));
     }
 
     @Test
@@ -207,6 +262,15 @@ public class OrderProcessorTest {
         // One pair of fills should be sellId -> buy2Id
         assertEquals(sellId, fills.stream().filter(f -> f.getOrderId() == buy2Id).mapToLong(f -> f.getMatchedOrderId()).sum());
 
+        // One call on the orderPublisher for the initial BUY order
+        // Second call for the SELL - Two orders will be updated (going from UNSUBMITTED to FILLED)
+        ArgumentCaptor<List> orderCaptor = ArgumentCaptor.forClass(List.class);
+        verify(orderUpdatePublisher, times(4)).publishUpdates(orderCaptor.capture()); // Once for each order submitted
+        List<Order> publishedOrders = orderCaptor.getAllValues().get(3); // the SELL that will cause the fills
+
+        assertTrue(publishedOrders.stream().filter(f -> f.getId() == sellId).map(f -> f.getStatus()).anyMatch(s -> s == OrderStatus.FILLED));
+        assertTrue(publishedOrders.stream().filter(f -> f.getId() == buy3Id).map(f -> f.getStatus()).anyMatch(s -> s == OrderStatus.FILLED));
+        assertTrue(publishedOrders.stream().filter(f -> f.getId() == buy2Id).map(f -> f.getStatus()).anyMatch(s -> s == OrderStatus.FILLED));
 
     }
 

@@ -18,6 +18,8 @@ import net.sorted.exchange.orders.orderprocessor.OrderProcessor;
 import net.sorted.exchange.orders.orderprocessor.OrderProcessorDb;
 import net.sorted.exchange.orders.publishers.OrderSnapshotPublisher;
 import net.sorted.exchange.orders.publishers.OrderSnapshotPublisherRabbit;
+import net.sorted.exchange.orders.publishers.OrderUpdatePublisher;
+import net.sorted.exchange.orders.publishers.OrderUpdatePublisherRabbit;
 import net.sorted.exchange.orders.publishers.PrivateTradePublisher;
 import net.sorted.exchange.orders.publishers.PrivateTradePublisherRabbit;
 import net.sorted.exchange.orders.publishers.PublicTradePublisher;
@@ -97,7 +99,7 @@ public class ExchangeConfig {
             OrderBook orderBook = instrumentIdToOrderBook.get(instrument);
 
             OrderProcessor orderProcessor = new OrderProcessorDb(orderBook, orderRepository, orderFillRepository, privateTradePublisher(),
-                    publicTradePublisher(), orderSnapshotPublisher(), publisherExecutor, orderFillService);
+                    publicTradePublisher(), orderSnapshotPublisher(), orderUpdatePublisher(), publisherExecutor, orderFillService);
 
             String instrumentQueueName = rabbitMqConfig().getSubmitOrderChannel(instrument);
             Channel orderChannel = rabbitMqConfig().getOrderChannel();
@@ -130,4 +132,11 @@ public class ExchangeConfig {
     public OrderSnapshotPublisher orderSnapshotPublisher() {
         return new OrderSnapshotPublisherRabbit(rabbitMqConfig().getSnapshotPublishChannel(), RabbitMqConfig.SNAPSHOT_EXCHANGE_NAME);
     }
+
+    @Bean
+    public OrderUpdatePublisher orderUpdatePublisher() {
+        return new OrderUpdatePublisherRabbit(rabbitMqConfig().getOrderUpdateChannel(), RabbitMqConfig.ORDER_UPDATE_EXCHANGE_NAME);
+    }
+
+
 }

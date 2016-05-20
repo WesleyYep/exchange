@@ -32,7 +32,7 @@ public class PrivateTradePublisherRabbit implements PrivateTradePublisher {
 
     @Override
     public void publishTrade(Trade trade) {
-        ExchangeMessage.PrivateTrade message = domainTradeToProtobufMessage(trade);
+        ExchangeMessage.PrivateTrade message = DomainWithMessageConverter.domainTradeToProtobufMessage(trade);
         try {
             channel.basicPublish(exchangeName, "", null, message.toByteArray());
             log.debug("Published private trade " + message);
@@ -40,34 +40,5 @@ public class PrivateTradePublisherRabbit implements PrivateTradePublisher {
             log.error("Cannot publish private trade message", e);
             throw new RuntimeException("Error publishing private trade message to exchange " + exchangeName, e);
         }
-    }
-
-    private ExchangeMessage.PrivateTrade domainTradeToProtobufMessage(Trade trade) {
-
-        ExchangeMessage.PrivateTrade.Builder msg = ExchangeMessage.PrivateTrade.newBuilder();
-
-        msg.setTradeId(trade.getTradeId());
-        msg.setInstrumentId(trade.getInstrumentId().trim());
-        msg.setQuantity(trade.getQuantity());
-        msg.setPrice(trade.getPrice());
-        msg.setSide((trade.getSide() == Side.BUY) ? ExchangeMessage.Side.BUY : ExchangeMessage.Side.SELL);
-        msg.setClientId(trade.getClientId());
-        msg.setOrderSubmitter(trade.getOrderSubmitter());
-
-        DateTime tradeDate = trade.getTradeDate();
-        if (tradeDate != null) {
-            msg.setTradeDateMillisSinceEpoch(tradeDate.getMillis());
-        } else {
-            msg.clearTradeDateMillisSinceEpoch();
-        }
-
-        Long orderId = trade.getOrderId();
-        if (orderId != null) {
-            msg.setOrderId(orderId);
-        } else {
-            msg.clearOrderId();
-        }
-
-        return msg.build();
     }
 }

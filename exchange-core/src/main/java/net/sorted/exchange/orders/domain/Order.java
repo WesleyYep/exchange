@@ -115,4 +115,24 @@ public class Order {
             status = OrderStatus.FILLED;
         }
     }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", price=" + price +
+                ", side=" + side +
+                ", quantity=" + quantity +
+                ", instrumentId='" + instrumentId + '\'' +
+                ", clientId=" + clientId +
+                ", type=" + type +
+                ", status=" + status +
+                ", orderSubmitter='" + orderSubmitter + '\'' +
+                ", unfilledQuantity=" + unfilledQuantity +
+                '}';
+    }
 }

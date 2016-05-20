@@ -2,6 +2,7 @@ package net.sorted.exchange.orders.orderbook;
 
 import java.util.*;
 import net.sorted.exchange.orders.domain.Order;
+import net.sorted.exchange.orders.domain.OrderStatus;
 
 public class OrdersForSide {
     private final TreeMap<Double, OrdersAtPrice> priceToOrderAtPrice;
@@ -46,7 +47,7 @@ public class OrdersForSide {
         }
     }
 
-    public void partialFill(long orderId, long matchedOrderId, double fillPrice, long fillQuantity) {
+    public Order partialFill(long orderId, long fillQuantity) {
 
         Order order = idToOrder.get(orderId);
         if (order != null) {
@@ -54,12 +55,15 @@ public class OrdersForSide {
             OrdersAtPrice ordersAtPrice = priceToOrderAtPrice.get(price);
 
             long totalUnfilled = order.getUnfilledQuantity() - fillQuantity;
+            OrderStatus newStatus = (totalUnfilled == 0) ? OrderStatus.FILLED : OrderStatus.PARTIAL_FILL;
             Order n = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), totalUnfilled, order.getInstrumentId(),
-                                order.getClientId(), order.getType(), order.getStatus(), order.getOrderSubmitter());
+                                order.getClientId(), order.getType(), newStatus, order.getOrderSubmitter());
             ordersAtPrice.updateOrder(n);
             idToOrder.put(orderId, n);
             order = n;
         }
+
+        return order;
     }
 
     public List<Order> getOrdersAtLevel(int level) {

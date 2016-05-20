@@ -12,6 +12,7 @@ import net.sorted.exchange.orders.orderbook.MatchedTrades;
 import net.sorted.exchange.orders.orderbook.OrderBook;
 import net.sorted.exchange.orders.orderbook.OrderBookSnapshot;
 import net.sorted.exchange.orders.publishers.OrderSnapshotPublisher;
+import net.sorted.exchange.orders.publishers.OrderUpdatePublisher;
 import net.sorted.exchange.orders.publishers.PrivateTradePublisher;
 import net.sorted.exchange.orders.publishers.PublicTradePublisher;
 import net.sorted.exchange.orders.repository.OrderFillRepository;
@@ -29,6 +30,7 @@ public class OrderProcessorDb implements OrderProcessor {
     private final PrivateTradePublisher privateTradePublisher;
     private final PublicTradePublisher publicTradePublisher;
     private final OrderSnapshotPublisher snapshotPublisher;
+    private final OrderUpdatePublisher orderUpdatePublisher;
 
     private final Executor publishExecutor;
     private final OrderFillService orderFillService;
@@ -42,6 +44,7 @@ public class OrderProcessorDb implements OrderProcessor {
                             PrivateTradePublisher privateTradePublisher,
                             PublicTradePublisher publicTradePublisher,
                             OrderSnapshotPublisher snapshotPublisher,
+                            OrderUpdatePublisher orderUpdatePublisher,
                             Executor publishExecutor,
                             OrderFillService orderFillService) {
         this.orderBook = orderBook;
@@ -50,7 +53,7 @@ public class OrderProcessorDb implements OrderProcessor {
         this.privateTradePublisher = privateTradePublisher;
         this.publicTradePublisher = publicTradePublisher;
         this.snapshotPublisher = snapshotPublisher;
-
+        this.orderUpdatePublisher = orderUpdatePublisher;
         this.publishExecutor = publishExecutor;
 
         this.orderFillService = orderFillService;
@@ -72,10 +75,10 @@ public class OrderProcessorDb implements OrderProcessor {
         }
 
         publishResultInBackground(matches, snapshot);
+        publishOrderUpdateInBackground(matches.getUpdatedOrders());
 
         return order.getId();
     }
-
 
     @Override
     public void cancelOrder(Order order) {
@@ -89,7 +92,7 @@ public class OrderProcessorDb implements OrderProcessor {
         Order cancelled = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), order.getUnfilledQuantity(), order.getInstrumentId(),
                                     order.getClientId(), order.getType(), OrderStatus.CANCELLED, order.getOrderSubmitter());
         orderRepository.save(cancelled);
-
+        orderUpdatePublisher.publishUpdate(cancelled);
         snapshotPublisher.publishSnapshot(snapshot);
     }
 
@@ -100,9 +103,12 @@ public class OrderProcessorDb implements OrderProcessor {
         }
     }
 
-    // Publish the results on a different thread
     private void publishResultInBackground(final MatchedTrades matches, final OrderBookSnapshot snapshot) {
         publishExecutor.execute(() -> publishResult(matches, snapshot));
+    }
+
+    private void publishOrderUpdateInBackground(final List<Order> orders) {
+        publishExecutor.execute(() -> orderUpdatePublisher.publishUpdates(orders));
     }
 
     private void publishResult(MatchedTrades matches, OrderBookSnapshot snapshot) {

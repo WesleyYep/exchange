@@ -22,18 +22,18 @@ message Order {
         FILLED = 2;
         CANCELLED = 3;
         REJECTED = 4;
+        PARTIAL_FILL = 5;
     }
 
     optional int64 order_id = 1;
     optional int64 client_id = 2;
-    optional string correlation_id = 3;
-    optional string instrument = 4;
-    optional int64 quantity = 5;
-    optional string price = 6;
-    optional Side side = 7;
-    optional OrderType order_type = 8;
-    optional State state = 9;
-    optional string submitter = 10;
+    optional string instrument = 3;
+    optional int64 quantity = 4;
+    optional string price = 5;
+    optional Side side = 6;
+    optional OrderType order_type = 7;
+    optional State state = 8;
+    optional string submitter = 9;
 
 }
 

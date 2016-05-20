@@ -16,6 +16,7 @@ public class RabbitMqConfig {
     public static final String ORDER_SUBMIT_DEAD_EXCHANGE = "submit.order.dead.exchange";
 
     public static final String SNAPSHOT_REQUEST_QUEUE_NAME = "snapshot.request";
+    public static final String ORDER_UPDATE_EXCHANGE_NAME = "order.update";
 
 
     public static final String PUBLIC_TRADE_EXCHANGE_NAME = "public.trade.exchange";
@@ -32,6 +33,7 @@ public class RabbitMqConfig {
     private final Channel privateTradeChannel;
     private final Channel snapshotPublishChannel;
     private final Channel snapshotRequestChannel;
+    private final Channel orderUpdateChannel;
 
     private final int connectionAttempts = 12;
     private final long connectionAttemptIntervalMillis = 5000;
@@ -87,6 +89,8 @@ public class RabbitMqConfig {
             snapshotRequestChannel.queueDeclare(SNAPSHOT_REQUEST_QUEUE_NAME, false, false, false, null);
             snapshotRequestChannel.basicQos(1);
 
+            orderUpdateChannel = connection.createChannel();
+            orderUpdateChannel.exchangeDeclare(ORDER_UPDATE_EXCHANGE_NAME, "fanout");
 
         } catch (Exception e) {
             throw new RuntimeException("Cannot configure rabbit mq", e);
@@ -127,4 +131,8 @@ public class RabbitMqConfig {
     }
 
     public Channel getSnapshotRequestChannel() { return snapshotRequestChannel; }
+
+    public Channel getOrderUpdateChannel() {
+        return orderUpdateChannel;
+    }
 }

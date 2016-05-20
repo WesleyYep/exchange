@@ -3,7 +3,6 @@ package net.sorted.exchange.orders.publishers;
 import java.io.IOException;
 import com.rabbitmq.client.Channel;
 import net.sorted.exchange.messages.ExchangeMessage;
-import net.sorted.exchange.orders.orderbook.OrderBookLevelSnapshot;
 import net.sorted.exchange.orders.orderbook.OrderBookSnapshot;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,7 +23,7 @@ public class OrderSnapshotPublisherRabbit implements OrderSnapshotPublisher {
     @Override
     public void publishSnapshot(OrderBookSnapshot snapshot) {
         try {
-            ExchangeMessage.OrderBookSnapshot message = OrderBookSnapshotConverter.domainSnapshotToProtobufMessage(snapshot);
+            ExchangeMessage.OrderBookSnapshot message = DomainWithMessageConverter.domainSnapshotToProtobufMessage(snapshot);
             channel.basicPublish(exchangeName, snapshot.getInstrumentId(), null, message.toByteArray());
             log.debug("Published snapshot " + message + " to exchange " + exchangeName + " with routingKey " + snapshot.getInstrumentId());
         } catch (IOException e) {

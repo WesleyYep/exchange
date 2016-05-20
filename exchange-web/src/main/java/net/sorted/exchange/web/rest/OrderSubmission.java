@@ -37,13 +37,6 @@ public class OrderSubmission {
 
         ExchangeMessage.Order.Builder exchangeOrder = ExchangeMessage.Order.newBuilder();
 
-        String correlationId = order.getCorrelationId();
-        if (correlationId == null) {
-            exchangeOrder.clearCorrelationId();
-        } else {
-            exchangeOrder.setCorrelationId(correlationId);
-        }
-
         exchangeOrder.setOrderId(order.getOrderId());
         exchangeOrder.setClientId(order.getClientId());
         exchangeOrder.setInstrument(order.getInstrument());
