@@ -1,6 +1,8 @@
 package net.sorted.exchange.orders.msghandler;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import com.rabbitmq.client.AMQP;
@@ -9,32 +11,32 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import net.sorted.exchange.messages.ExchangeMessage;
+import net.sorted.exchange.orders.domain.Order;
 import net.sorted.exchange.orders.orderbook.OrderBook;
 import net.sorted.exchange.orders.orderbook.OrderBookSnapshot;
-import net.sorted.exchange.orders.orderprocessor.OrderProcessor;
 import net.sorted.exchange.orders.publishers.DomainWithMessageConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class OrderBookSnapshotRequestHandler implements MessageReceiver {
+public class OrderSearchHandler implements MessageReceiver {
 
     private final Channel channel;
     private final String queueName;
     private final Consumer consumer;
-    private final OrderProcessor orderProcessor;
+    private final Map<String, OrderBook> instrumentIdToOrderBook;
 
-    private Logger log = LogManager.getLogger(OrderBookSnapshotRequestHandler.class);
+    private Logger log = LogManager.getLogger(OrderSearchHandler.class);
 
 
-    public OrderBookSnapshotRequestHandler(Channel channel, String queueName, OrderProcessor orderProcessor) {
+    public OrderSearchHandler(Channel channel, String queueName, Map<String, OrderBook> instrumentIdToOrderBook) {
         this.channel = channel;
         this.queueName = queueName;
-        this.orderProcessor = orderProcessor;
+        this.instrumentIdToOrderBook = instrumentIdToOrderBook;
 
         consumer = new DefaultConsumer(channel) {
             @Override
             public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
-                handleOrderBookSnapshotRequestMessage(consumerTag, envelope, properties, body);
+                handleOrderSearchMessage(consumerTag, envelope, properties, body);
             }
         };
 
@@ -46,10 +48,10 @@ public class OrderBookSnapshotRequestHandler implements MessageReceiver {
 
         try {
             channel.basicConsume(queueName, false, consumer);
-            log.info("Started consuming snapshot request messages from {} ", queueName);
+            log.info("Started consuming order search messages from {} ", queueName);
         } catch (IOException e) {
-            log.info("Error receiving snapshot request messages. Listener stopping.", e);
-            throw new RuntimeException("Error consuming snapshot request message ", e);
+            log.info("Error receiving order search messages. Listener stopping.", e);
+            throw new RuntimeException("Error consuming message ", e);
         }
 
     }
@@ -58,27 +60,27 @@ public class OrderBookSnapshotRequestHandler implements MessageReceiver {
     public void stopReceiving() {
         try {
             channel.basicCancel(queueName);
-            log.info("Stopped consuming snapshot request messages from {} ", queueName);
+            log.info("Stopped consuming messages from {} ", queueName);
         } catch (IOException e) {
-            throw new RuntimeException("Error stopping listening for snapshot request  messages", e);
+            throw new RuntimeException("Error stopping listening for order messages", e);
         }
     }
 
-    private void handleOrderBookSnapshotRequestMessage(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+    private void handleOrderSearchMessage(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
 
         String correlationId = properties.getCorrelationId();
 
-        ExchangeMessage.OrderBookSnapshotRequest request = ExchangeMessage.OrderBookSnapshotRequest.parseFrom(body);
+        ExchangeMessage.OrderSearch request = ExchangeMessage.OrderSearch.parseFrom(body);
 
         try {
-            OrderBookSnapshot snapshot = processOrderBookSnapshotRequest();
+            List<Order> orders = processOrderSearch(request);
 
             AMQP.BasicProperties replyProps = new AMQP.BasicProperties
                     .Builder()
                     .correlationId(correlationId)
                     .build();
 
-            ExchangeMessage.OrderBookSnapshot message = DomainWithMessageConverter.domainSnapshotToProtobufMessage(snapshot);
+            ExchangeMessage.OrderSearchResults message = DomainWithMessageConverter.domainOrderListToProtobufMessage(orders);
             channel.basicPublish("", properties.getReplyTo(), replyProps, message.toByteArray());
 
             channel.basicAck(envelope.getDeliveryTag(), false);
@@ -90,7 +92,11 @@ public class OrderBookSnapshotRequestHandler implements MessageReceiver {
         }
     }
 
-    private OrderBookSnapshot processOrderBookSnapshotRequest() {
-        return orderProcessor.getSnapshot();
+    private List<Order> processOrderSearch(ExchangeMessage.OrderSearch request) {
+
+        log.debug("Processing order search search");
+
+        return new ArrayList<>();
     }
+
 }

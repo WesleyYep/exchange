@@ -1,5 +1,6 @@
 package net.sorted.exchange.orders.publishers;
 
+import java.util.List;
 import net.sorted.exchange.messages.ExchangeMessage;
 import net.sorted.exchange.orders.domain.Order;
 import net.sorted.exchange.orders.domain.OrderStatus;
@@ -49,6 +50,16 @@ public class DomainWithMessageConverter {
         return msg.build();
     }
 
+    public static ExchangeMessage.OrderSearchResults domainOrderListToProtobufMessage(List<Order> orders) {
+        ExchangeMessage.OrderSearchResults.Builder msg = ExchangeMessage.OrderSearchResults.newBuilder();
+
+        for (int i=0; i<orders.size(); i++) {
+            msg.setOrders(i, domainOrderToProtobufMessage(orders.get(i)));
+        }
+
+        return msg.build();
+    }
+
     public static ExchangeMessage.PrivateTrade domainTradeToProtobufMessage(Trade trade) {
 
         ExchangeMessage.PrivateTrade.Builder msg = ExchangeMessage.PrivateTrade.newBuilder();
@@ -86,21 +97,21 @@ public class DomainWithMessageConverter {
         }
     }
 
-    private static ExchangeMessage.Order.State domaintOrderStateToProtobuf(OrderStatus state) {
+    private static ExchangeMessage.OrderState domaintOrderStateToProtobuf(OrderStatus state) {
         switch (state) {
         case OPEN:
-            return ExchangeMessage.Order.State.OPEN;
+            return ExchangeMessage.OrderState.OPEN;
         case FILLED:
-            return ExchangeMessage.Order.State.FILLED;
+            return ExchangeMessage.OrderState.FILLED;
         case REJECTED:
-            return ExchangeMessage.Order.State.REJECTED;
+            return ExchangeMessage.OrderState.REJECTED;
         case CANCELLED:
-            return ExchangeMessage.Order.State.CANCELLED;
+            return ExchangeMessage.OrderState.CANCELLED;
         case PARTIAL_FILL:
-            return ExchangeMessage.Order.State.PARTIAL_FILL;
+            return ExchangeMessage.OrderState.PARTIAL_FILL;
         case UNSUBMITTED:
         default:
-            return ExchangeMessage.Order.State.UNSUBMITTED;
+            return ExchangeMessage.OrderState.UNSUBMITTED;
         }
     }
     /*

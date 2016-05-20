@@ -32,7 +32,7 @@ public class SimulatedClient {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(ExchangeConfig.class);
 
         RabbitMqConfig rabbitMqConfig = ctx.getBean(RabbitMqConfig.class);
-        rabbitMqConfig.getSubmitOrderChannel("AMZN");
+        rabbitMqConfig.getSubmitOrderQueue("AMZN");
         SimulatedClient client = new SimulatedClient(rabbitMqConfig.getOrderChannel(), "doug");
 
 

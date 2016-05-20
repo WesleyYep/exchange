@@ -99,7 +99,7 @@ public class SubmitOrderReceiver implements MessageReceiver {
         throw new RuntimeException("Unknown OrderType in message (" + type + ") - cannot process message");
     }
 
-    private OrderStatus getOrderStatusFromMessage(ExchangeMessage.Order.State state) {
+    private OrderStatus getOrderStatusFromMessage(ExchangeMessage.OrderState state) {
 
         switch (state) {
         case UNSUBMITTED:

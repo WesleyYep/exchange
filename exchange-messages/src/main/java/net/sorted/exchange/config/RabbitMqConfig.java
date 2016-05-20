@@ -15,6 +15,7 @@ public class RabbitMqConfig {
     public static final String ORDER_SUBMIT_DEAD_CHANNEL_NAME = "submit.order.dead";
     public static final String ORDER_SUBMIT_DEAD_EXCHANGE = "submit.order.dead.exchange";
 
+    public static final String SNAPSHOT_REQUEST_EXCHANGE_NAME = "snapshot.request.exchange";
     public static final String SNAPSHOT_REQUEST_QUEUE_NAME = "snapshot.request";
     public static final String ORDER_UPDATE_EXCHANGE_NAME = "order.update";
 
@@ -22,7 +23,7 @@ public class RabbitMqConfig {
     public static final String PUBLIC_TRADE_EXCHANGE_NAME = "public.trade.exchange";
     public static final String PRIVATE_TRADE_EXCHANGE_NAME = "private.trade.exchange";
 
-    public static final String SNAPSHOT_EXCHANGE_NAME = "snapshot.exchange";
+    public static final String PUBLISH_SNAPSHOT_EXCHANGE_NAME = "snapshot.exchange";
 
     private Logger log = LogManager.getLogger(RabbitMqConfig.class);
 
@@ -82,12 +83,11 @@ public class RabbitMqConfig {
 
             // Setup snapshot topic
             snapshotPublishChannel = connection.createChannel();
-            snapshotPublishChannel.exchangeDeclare(SNAPSHOT_EXCHANGE_NAME, "fanout");
+            snapshotPublishChannel.exchangeDeclare(PUBLISH_SNAPSHOT_EXCHANGE_NAME, "fanout");
 
             // Setup snapshot request queue
             snapshotRequestChannel = connection.createChannel();
-            snapshotRequestChannel.queueDeclare(SNAPSHOT_REQUEST_QUEUE_NAME, false, false, false, null);
-            snapshotRequestChannel.basicQos(1);
+            snapshotRequestChannel.exchangeDeclare(SNAPSHOT_REQUEST_EXCHANGE_NAME, "direct");
 
             orderUpdateChannel = connection.createChannel();
             orderUpdateChannel.exchangeDeclare(ORDER_UPDATE_EXCHANGE_NAME, "fanout");
@@ -99,16 +99,31 @@ public class RabbitMqConfig {
 
     // Add a queue to the ORDER_SUBMIT exchange for a specific instrument
     // Name of bound queue is returned
-    public String getSubmitOrderChannel(String instrument) {
+    public String getSubmitOrderQueue(String instrument) {
         String instrumentQueueName = ORDER_SUBMIT_QUEUE_NAME + "-" + instrument;
         try {
             // NB - queue per instrument bound to channel
             orderChannel.queueDeclare(instrumentQueueName, false, false, false, submitQueueArgs);
             orderChannel.queueBind(instrumentQueueName, ORDER_SUBMIT_EXCHANGE_NAME, instrument);
             orderChannel.basicQos(1);
-            log.info("bound queue {} to exchange {}", instrumentQueueName, ORDER_SUBMIT_EXCHANGE_NAME);
+            log.info("bound submit order queue {} to exchange {}", instrumentQueueName, ORDER_SUBMIT_EXCHANGE_NAME);
         } catch (Exception e) {
             throw new RuntimeException("Cannot configure rabbit mq with queue for submitting instrument " + instrument, e);
+        }
+
+        return instrumentQueueName;
+    }
+
+    public String getOrderSnapshotRequestQueue(String instrument) {
+        String instrumentQueueName = SNAPSHOT_REQUEST_QUEUE_NAME + "-" + instrument;
+        try {
+            // NB - queue per instrument bound to channel
+            snapshotRequestChannel.queueDeclare(instrumentQueueName, false, false, false, null);
+            snapshotRequestChannel.queueBind(instrumentQueueName, SNAPSHOT_REQUEST_EXCHANGE_NAME, instrument);
+            snapshotRequestChannel.basicQos(1);
+            log.info("bound snapshot request queue {} to exchange {}", instrumentQueueName, SNAPSHOT_REQUEST_EXCHANGE_NAME);
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot configure rabbit mq with queue for submitting snapshot request " + instrument, e);
         }
 
         return instrumentQueueName;

@@ -6,7 +6,6 @@ import java.util.Optional;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
-import net.sorted.exchange.config.RabbitMqConfig;
 import net.sorted.exchange.messages.ExchangeMessage;
 import net.sorted.exchange.web.ClientOrderSnapshot;
 import net.sorted.exchange.web.OrderSnapshotCache;
@@ -23,21 +22,21 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderBookSnapshotService {
     private Logger log = LogManager.getLogger(OrderBookSnapshotService.class);
 
-    private static final long TIMEOUT = 2000l;
+    private static final int MAX_ATTEMPTS_FOR_RESPONSE = 3;
+    private static final long WAIT_FOR_RESPONSE_MS = 2000l;
     private final OrderSnapshotCache snapshotCache;
     private final Channel orderSnapshotRequestChannel;
-    private final String orderSnapshotRequestQueueName;
-
+    private final String orderSnapshotRequestExchangeName;
     private final String replyQueueName;
     private final QueueingConsumer consumer;
 
     @Autowired
     public OrderBookSnapshotService(OrderSnapshotCache snapshotCache,
-                                    @Qualifier("orderSnapshotRequestChannel") Channel orderSnapshotRequestChannel,
-                                    @Qualifier("orderSnapshotRequestQueueName") String orderSnapshotRequestQueueName) throws IOException {
+                                    @Qualifier("orderSnapshotRequestExchangeName") String orderSnapshotRequestExchangeName,
+                                    @Qualifier("orderSnapshotRequestChannel") Channel orderSnapshotRequestChannel) throws IOException {
         this.snapshotCache = snapshotCache;
         this.orderSnapshotRequestChannel = orderSnapshotRequestChannel;
-        this.orderSnapshotRequestQueueName = orderSnapshotRequestQueueName;
+        this.orderSnapshotRequestExchangeName = orderSnapshotRequestExchangeName;
 
         // Setup a queue for responses to the requests made by this service
         replyQueueName = orderSnapshotRequestChannel.queueDeclare().getQueue();
@@ -55,7 +54,12 @@ public class OrderBookSnapshotService {
             snapshot = o.get();
         } else {
             snapshot = getSnapshot(instrument);
-            snapshotCache.setSnapshot(instrument, snapshot);
+            if (snapshot != null) {
+                snapshotCache.setSnapshot(instrument, snapshot);
+            } else {
+                // TODO - make this an error and handle it properly in the client.
+                snapshot = new ClientOrderSnapshot(instrument); // return an empty snapshot for now
+            }
         }
 
         return snapshot;
@@ -73,18 +77,16 @@ public class OrderBookSnapshotService {
         ExchangeMessage.OrderBookSnapshotRequest.Builder request = ExchangeMessage.OrderBookSnapshotRequest.newBuilder();
         request.setInstrumentId(instrument);
 
-        ClientOrderSnapshot snapshot;
+        ClientOrderSnapshot snapshot = null;
 
         try {
-
             // Send the request
-            orderSnapshotRequestChannel.basicPublish("", orderSnapshotRequestQueueName, props, request.build().toByteArray());
+            orderSnapshotRequestChannel.basicPublish(orderSnapshotRequestExchangeName, instrument, props, request.build().toByteArray());
 
             // Wait for the response
-            // TODO dont wait forever !!!!
-            while (true) {
-                QueueingConsumer.Delivery delivery = consumer.nextDelivery(TIMEOUT);
-                if (delivery.getProperties().getCorrelationId().equals(correlationId)) {
+            for (int i=0; i<MAX_ATTEMPTS_FOR_RESPONSE; i++) {
+                QueueingConsumer.Delivery delivery = consumer.nextDelivery(WAIT_FOR_RESPONSE_MS);
+                if (delivery != null && delivery.getProperties().getCorrelationId().equals(correlationId)) {
                     ExchangeMessage.OrderBookSnapshot message = ExchangeMessage.OrderBookSnapshot.parseFrom(delivery.getBody());
                     snapshot = SnapshotConverter.messageToClient(message);
 
@@ -94,7 +96,6 @@ public class OrderBookSnapshotService {
         } catch (Exception e) {
             // TODO handle this better
             log.error("Error getting snapshot for "+instrument+" from the backend", e);
-            snapshot = new ClientOrderSnapshot(instrument);
         }
 
         return snapshot;

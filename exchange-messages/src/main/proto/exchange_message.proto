@@ -8,21 +8,21 @@ enum Side {
     SELL = 1;
 }
 
+enum OrderState {
+    UNSUBMITTED = 0;
+    OPEN = 1;
+    FILLED = 2;
+    CANCELLED = 3;
+    REJECTED = 4;
+    PARTIAL_FILL = 5;
+}
+
 message Order {
 
 
     enum OrderType {
         LIMIT = 0;
         KILL_OR_FILL = 1;
-    }
-
-    enum State {
-        UNSUBMITTED = 0;
-        OPEN = 1;
-        FILLED = 2;
-        CANCELLED = 3;
-        REJECTED = 4;
-        PARTIAL_FILL = 5;
     }
 
     optional int64 order_id = 1;
@@ -32,9 +32,21 @@ message Order {
     optional string price = 5;
     optional Side side = 6;
     optional OrderType order_type = 7;
-    optional State state = 8;
+    optional OrderState state = 8;
     optional string submitter = 9;
 
+}
+
+message OrderSearch {
+    optional OrderState state = 1;
+    optional int64 clientId = 2;
+    optional int64 orderId = 3;
+    optional string submitter = 4;
+    optional string instrument = 5;
+}
+
+message OrderSearchResults {
+    repeated Order orders = 1;
 }
 
 message PrivateTrade {

@@ -101,18 +101,16 @@ public class ExchangeConfig {
             OrderProcessor orderProcessor = new OrderProcessorDb(orderBook, orderRepository, orderFillRepository, privateTradePublisher(),
                     publicTradePublisher(), orderSnapshotPublisher(), orderUpdatePublisher(), publisherExecutor, orderFillService);
 
-            String instrumentQueueName = rabbitMqConfig().getSubmitOrderChannel(instrument);
+            String submitForInstrumentQueueName = rabbitMqConfig().getSubmitOrderQueue(instrument);
             Channel orderChannel = rabbitMqConfig().getOrderChannel();
-            SubmitOrderReceiver receiver = new SubmitOrderReceiver(orderChannel,
-                    instrumentQueueName,
-                    orderProcessor);
+            messageReceivers.addReceiver(new SubmitOrderReceiver(orderChannel, submitForInstrumentQueueName, orderProcessor));
 
-            messageReceivers.addReceiver(receiver);
+            String snapshotForInstrumentQueueName = rabbitMqConfig().getOrderSnapshotRequestQueue(instrument);
+            OrderBookSnapshotRequestHandler orderBookSnapshotRequestHandler =
+                    new OrderBookSnapshotRequestHandler(rabbitMqConfig().getSnapshotRequestChannel(), snapshotForInstrumentQueueName, orderProcessor);
+
+            messageReceivers.addReceiver(orderBookSnapshotRequestHandler);
         }
-
-        OrderBookSnapshotRequestHandler orderBookSnapshotRequestHandler =
-                new OrderBookSnapshotRequestHandler(rabbitMqConfig().getSnapshotRequestChannel(), RabbitMqConfig.SNAPSHOT_REQUEST_QUEUE_NAME, instrumentIdToOrderBook);
-        messageReceivers.addReceiver(orderBookSnapshotRequestHandler);
 
         return messageReceivers;
     }
@@ -130,13 +128,12 @@ public class ExchangeConfig {
 
     @Bean
     public OrderSnapshotPublisher orderSnapshotPublisher() {
-        return new OrderSnapshotPublisherRabbit(rabbitMqConfig().getSnapshotPublishChannel(), RabbitMqConfig.SNAPSHOT_EXCHANGE_NAME);
+        return new OrderSnapshotPublisherRabbit(rabbitMqConfig().getSnapshotPublishChannel(), RabbitMqConfig.PUBLISH_SNAPSHOT_EXCHANGE_NAME);
     }
 
     @Bean
     public OrderUpdatePublisher orderUpdatePublisher() {
         return new OrderUpdatePublisherRabbit(rabbitMqConfig().getOrderUpdateChannel(), RabbitMqConfig.ORDER_UPDATE_EXCHANGE_NAME);
     }
-
 
 }

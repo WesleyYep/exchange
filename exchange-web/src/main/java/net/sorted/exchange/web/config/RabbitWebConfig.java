@@ -73,4 +73,10 @@ public class RabbitWebConfig {
     public String orderSnapshotRequestQueueName() {
         return RabbitMqConfig.SNAPSHOT_REQUEST_QUEUE_NAME;
     }
+
+    @Bean
+    @Qualifier("orderSnapshotRequestExchangeName")
+    public String orderSnapshotRequestExchangeName() {
+        return RabbitMqConfig.SNAPSHOT_REQUEST_EXCHANGE_NAME;
+    }
 }

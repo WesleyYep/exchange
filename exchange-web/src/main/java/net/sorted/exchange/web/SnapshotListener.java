@@ -2,8 +2,6 @@ package net.sorted.exchange.web;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Consumer;
@@ -35,7 +33,7 @@ public class SnapshotListener {
         this.snapshotCache = snapshotCache;
 
         String queueName = snapshotChannel.queueDeclare().getQueue();
-        snapshotChannel.queueBind(queueName, RabbitMqConfig.SNAPSHOT_EXCHANGE_NAME, "");
+        snapshotChannel.queueBind(queueName, RabbitMqConfig.PUBLISH_SNAPSHOT_EXCHANGE_NAME, "");
 
         consumer = new DefaultConsumer(snapshotChannel) {
             @Override
