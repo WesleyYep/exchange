@@ -163,7 +163,7 @@
                                 <run>ln -s ${project.build.finalName}.jar exchange-order-matcher.jar</run>
                             </runs>
                             <!--<pushImage>true</pushImage>-->
-                            <!--<forceTags>true</forceTags>-->
+                            <forceTags>true</forceTags>
                             <imageTags>
                                 <imageTag>${project.version}</imageTag>
                                 <imageTag>latest</imageTag>
