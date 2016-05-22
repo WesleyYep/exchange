@@ -30,7 +30,7 @@ RUN apt-get -y install python-pip ; \
     easy_install --upgrade pip ; \
     pip install docker-compose
 
-# Install protobuf comiler - have to build from source !!!!
+# Install protobuf compiler - have to build from source !!!!
 RUN cd /tmp && \
     apt-get -y install wget && \
     wget https://github.com/google/protobuf/releases/download/v2.6.1/protobuf-2.6.1.tar.gz && \
