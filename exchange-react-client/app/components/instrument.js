@@ -5,6 +5,7 @@ import OrderForm from "./order-form";
 import PublicTrades from "./public-trades";
 import PrivateTrades from "./private-trades";
 import Snapshot from "./snapshot";
+import MyUnfilledOrders from "./my-unfilled-orders";
 //import '../bootstrap/dist/css/bootstrap.css';
 
 class Instrument extends React.Component {
@@ -20,7 +21,8 @@ class Instrument extends React.Component {
                 <div ><OrderForm  instrument={this.props.instrument}/></div>
                 <div className="row">
                     <div className="col-md-1">&nbsp;</div>
-                    <div className="col-md-10"><Snapshot instrument={this.props.instrument} snapshot_url={this.props.snapshot_url}/></div>
+                    <div className="col-md-5"><Snapshot instrument={this.props.instrument} snapshot_url={this.props.snapshot_url}/></div>
+                    <div className="col-md-5"><MyUnfilledOrders instrument={this.props.instrument} order_search_url={this.props.order_search_url}/></div>
                     <div className="col-md-1">&nbsp;</div>
                 </div>
                 <div className="row">
@@ -34,5 +36,6 @@ class Instrument extends React.Component {
 
 Instrument.propTypes = { instrument : React.PropTypes.string.isRequired }
 Instrument.propTypes = { snapshot_url : React.PropTypes.string.isRequired }
+Instrument.propTypes = { order_search_url : React.PropTypes.string.isRequired }
 
 export default Instrument

@@ -73,7 +73,8 @@ public class OrderProcessorTest {
                 Order in = (Order)args[0];
 
                 // NB the unfilled quantity is initialised to 0 as that is what will happen when using JPA
-                return new Order(orderId++, in.getPrice(), in.getSide(), in.getQuantity(), 0, in.getInstrumentId(), in.getClientId(), in.getType(), in.getStatus(), in.getOrderSubmitter());
+                return new Order(orderId++, in.getPrice(), in.getSide(), in.getQuantity(), 0, in.getInstrumentId(),
+                        in.getClientId(), in.getType(), in.getStatus(), in.getOrderSubmitter(), in.getSubmittedMs());
             }
         });
 
@@ -90,13 +91,13 @@ public class OrderProcessorTest {
 
         orderFillService = new OrderFillService(orderFillRepository);
 
-        orderProcessor = new OrderProcessorDb(orderBook, orderRepository, orderFillRepository, privateTradePublisher, publicTradePublisher, snapshotPublisher, orderUpdatePublisher, new DirectExecutor(), orderFillService);
+        orderProcessor = new OrderProcessorDb(orderBook, orderRepository, privateTradePublisher, publicTradePublisher, snapshotPublisher, orderUpdatePublisher, new DirectExecutor(), orderFillService);
 
     }
 
     @Test
     public void testOrderSubmitBuyToEmptyOrderBook() {
-        orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", CLIENT1, OrderType.LIMIT, "username");
+        orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", CLIENT1, OrderType.LIMIT, "username", 0l);
 
         // No matches with only 1 order in the book ...
 
@@ -127,7 +128,7 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitSellToEmptyOrderBook() {
-        orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", CLIENT1, OrderType.LIMIT, "username");
+        orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", CLIENT1, OrderType.LIMIT, "username", 0l);
 
         // No matches with only 1 order in the book ...
 
@@ -158,8 +159,8 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitWithOneFullMatch() {
-        long buyOrderId = orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", CLIENT1, OrderType.LIMIT, "username");
-        long sellOrderId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", CLIENT2, OrderType.LIMIT, "username");
+        long buyOrderId = orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", CLIENT1, OrderType.LIMIT, "username", 0l);
+        long sellOrderId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", CLIENT2, OrderType.LIMIT, "username", 0l);
 
         ArgumentCaptor<List> fillCaptor = ArgumentCaptor.forClass(List.class);
         verify(orderFillRepository, times(1)).save(fillCaptor.capture());
@@ -189,8 +190,8 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitWithOnePartialMatch() {
-        long buyOrderId = orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", CLIENT1, OrderType.LIMIT, "username");
-        long sellOrderId = orderProcessor.submitOrder(100.0, SELL, 500, "USDAUD", CLIENT2, OrderType.LIMIT, "username");
+        long buyOrderId = orderProcessor.submitOrder(100.0, BUY, 1000, "USDAUD", CLIENT1, OrderType.LIMIT, "username", 0l);
+        long sellOrderId = orderProcessor.submitOrder(100.0, SELL, 500, "USDAUD", CLIENT2, OrderType.LIMIT, "username", 0l);
 
         ArgumentCaptor<List> fillCaptor = ArgumentCaptor.forClass(List.class);
         verify(orderFillRepository, times(1)).save(fillCaptor.capture());
@@ -221,10 +222,10 @@ public class OrderProcessorTest {
 
     @Test
     public void testOrderSubmitWithMatches() {
-        long buy1Id = orderProcessor.submitOrder(90.0, BUY, 500, "USDAUD", CLIENT1, OrderType.LIMIT, "username");
-        long buy2Id = orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", CLIENT2, OrderType.LIMIT, "username");
-        long buy3Id = orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", CLIENT3, OrderType.LIMIT, "username");
-        long sellId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", CLIENT4, OrderType.LIMIT, "username");
+        long buy1Id = orderProcessor.submitOrder(90.0, BUY, 500, "USDAUD", CLIENT1, OrderType.LIMIT, "username", 0l);
+        long buy2Id = orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", CLIENT2, OrderType.LIMIT, "username", 0l);
+        long buy3Id = orderProcessor.submitOrder(100.0, BUY, 500, "USDAUD", CLIENT3, OrderType.LIMIT, "username", 0l);
+        long sellId = orderProcessor.submitOrder(100.0, SELL, 1000, "USDAUD", CLIENT4, OrderType.LIMIT, "username", 0l);
 
         // 2 BUYs match the aggressor SELL
 

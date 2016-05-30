@@ -14,10 +14,12 @@ public class RabbitMqConfig {
     public static final String ORDER_SUBMIT_QUEUE_NAME = "submit.order";
     public static final String ORDER_SUBMIT_DEAD_CHANNEL_NAME = "submit.order.dead";
     public static final String ORDER_SUBMIT_DEAD_EXCHANGE = "submit.order.dead.exchange";
-
     public static final String SNAPSHOT_REQUEST_EXCHANGE_NAME = "snapshot.request.exchange";
     public static final String SNAPSHOT_REQUEST_QUEUE_NAME = "snapshot.request";
     public static final String ORDER_UPDATE_EXCHANGE_NAME = "order.update";
+
+    public static final String ORDER_SEARCH_EXCHANGE_NAME = "order.search.exchange";
+    public static final String ORDER_SEARCH_QUEUE_NAME = "order.search";
 
 
     public static final String PUBLIC_TRADE_EXCHANGE_NAME = "public.trade.exchange";
@@ -28,6 +30,7 @@ public class RabbitMqConfig {
     private Logger log = LogManager.getLogger(RabbitMqConfig.class);
 
     private final Map<String, Object> submitQueueArgs = new HashMap<String, Object>();
+    private final Map<String, Object> searchQueueArgs = new HashMap<String, Object>();
 
     private final Channel orderChannel;
     private final Channel publicTradeChannel;
@@ -35,6 +38,7 @@ public class RabbitMqConfig {
     private final Channel snapshotPublishChannel;
     private final Channel snapshotRequestChannel;
     private final Channel orderUpdateChannel;
+    private final Channel orderSearchChannel;
 
     private final int connectionAttempts = 12;
     private final long connectionAttemptIntervalMillis = 5000;
@@ -91,6 +95,12 @@ public class RabbitMqConfig {
 
             orderUpdateChannel = connection.createChannel();
             orderUpdateChannel.exchangeDeclare(ORDER_UPDATE_EXCHANGE_NAME, "fanout");
+
+            // Setup order search request queue
+            orderSearchChannel = connection.createChannel();
+            orderSearchChannel.exchangeDeclare(ORDER_SEARCH_EXCHANGE_NAME, "direct");
+            orderSearchChannel.queueDeclare(ORDER_SEARCH_QUEUE_NAME, false, false, false, searchQueueArgs);
+            orderSearchChannel.queueBind(ORDER_SEARCH_QUEUE_NAME, ORDER_SEARCH_EXCHANGE_NAME, "");
 
         } catch (Exception e) {
             throw new RuntimeException("Cannot configure rabbit mq", e);
@@ -149,5 +159,9 @@ public class RabbitMqConfig {
 
     public Channel getOrderUpdateChannel() {
         return orderUpdateChannel;
+    }
+
+    public Channel getOrderSearchChannel() {
+        return orderSearchChannel;
     }
 }

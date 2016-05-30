@@ -84,7 +84,8 @@ public class SubmitOrderReceiver implements MessageReceiver {
                 order.getInstrument(),
                 order.getClientId(),
                 getOrderTypeFromMessage(order.getOrderType()),
-                order.getSubmitter());
+                order.getSubmitter(),
+                order.getSubmittedMs());
     }
 
     private OrderType getOrderTypeFromMessage(ExchangeMessage.Order.OrderType type) {

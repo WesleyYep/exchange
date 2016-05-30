@@ -1,9 +1,7 @@
 package net.sorted.exchange.orders.orderprocessor;
 
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Executor;
 import net.sorted.exchange.orders.domain.Order;
 import net.sorted.exchange.orders.domain.OrderFill;
@@ -17,7 +15,6 @@ import net.sorted.exchange.orders.publishers.OrderSnapshotPublisher;
 import net.sorted.exchange.orders.publishers.OrderUpdatePublisher;
 import net.sorted.exchange.orders.publishers.PrivateTradePublisher;
 import net.sorted.exchange.orders.publishers.PublicTradePublisher;
-import net.sorted.exchange.orders.repository.OrderFillRepository;
 import net.sorted.exchange.orders.repository.OrderRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +25,6 @@ public class OrderProcessorDb implements OrderProcessor {
 
     private final OrderBook orderBook;
     private final OrderRepository orderRepository;
-    private final OrderFillRepository orderFillRepository;
     private final PrivateTradePublisher privateTradePublisher;
     private final PublicTradePublisher publicTradePublisher;
     private final OrderSnapshotPublisher snapshotPublisher;
@@ -42,7 +38,6 @@ public class OrderProcessorDb implements OrderProcessor {
 
     public OrderProcessorDb(OrderBook orderBook,
                             OrderRepository orderRepository,
-                            OrderFillRepository orderFillRepository,
                             PrivateTradePublisher privateTradePublisher,
                             PublicTradePublisher publicTradePublisher,
                             OrderSnapshotPublisher snapshotPublisher,
@@ -51,7 +46,6 @@ public class OrderProcessorDb implements OrderProcessor {
                             OrderFillService orderFillService) {
         this.orderBook = orderBook;
         this.orderRepository = orderRepository;
-        this.orderFillRepository = orderFillRepository;
         this.privateTradePublisher = privateTradePublisher;
         this.publicTradePublisher = publicTradePublisher;
         this.snapshotPublisher = snapshotPublisher;
@@ -64,9 +58,9 @@ public class OrderProcessorDb implements OrderProcessor {
     }
 
     @Override
-    public long submitOrder(double price, Side side, long quantity, String symbol, long clientId, OrderType type, String orderSubmitter) {
+    public long submitOrder(double price, Side side, long quantity, String symbol, long clientId, OrderType type, String orderSubmitter, long submittedMs) {
 
-        Order order = orderRepository.save(new Order(-1, price, side, quantity, symbol, clientId, type, OrderStatus.OPEN, orderSubmitter));
+        Order order = orderRepository.save(new Order(-1, price, side, quantity, symbol, clientId, type, OrderStatus.OPEN, orderSubmitter, submittedMs));
         order.setUnfilledQuantity(quantity);
 
         MatchedTrades matches;
@@ -92,7 +86,7 @@ public class OrderProcessorDb implements OrderProcessor {
         }
 
         Order cancelled = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), order.getUnfilledQuantity(), order.getInstrumentId(),
-                                    order.getClientId(), order.getType(), OrderStatus.CANCELLED, order.getOrderSubmitter());
+                                    order.getClientId(), order.getType(), OrderStatus.CANCELLED, order.getOrderSubmitter(), order.getSubmittedMs());
         orderRepository.save(cancelled);
         orderUpdatePublisher.publishUpdate(cancelled);
         snapshotPublisher.publishSnapshot(snapshot);
@@ -119,7 +113,7 @@ public class OrderProcessorDb implements OrderProcessor {
 
         if (fills.isEmpty() == false) {
             // Write the fills as a single transaction
-            orderFillService.saveAll(matches.getFills());
+            orderFillService.saveAll(fills);
         }
 
         // Send out the messages
@@ -132,13 +126,12 @@ public class OrderProcessorDb implements OrderProcessor {
     }
 
     private void inflateOrderBook() {
-
-        List<Order> orders = orderRepository.findOpenByInstrumentId(orderBook.getInstrumentId());
+        List<Order> orders = orderRepository.findUnfilledByInstrumentId(orderBook.getInstrumentId());
         for (Order order : orders) {
-            List<OrderFill> fills = orderFillRepository.findByOrderId(order.getId());
-            long filled = fills.stream().mapToLong(f -> f.getQuantity()).sum();
-            order.setUnfilledQuantity(order.getQuantity() - filled);
-            orderBook.addOrder(order);
+            OrderStatus status = order.getStatus();
+            if (status == OrderStatus.OPEN || status == OrderStatus.PARTIAL_FILL) {
+                orderBook.addOrder(order);
+            }
         }
     }
 }

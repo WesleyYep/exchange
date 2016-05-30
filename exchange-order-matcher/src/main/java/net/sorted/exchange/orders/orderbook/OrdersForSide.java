@@ -57,7 +57,7 @@ public class OrdersForSide {
             long totalUnfilled = order.getUnfilledQuantity() - fillQuantity;
             OrderStatus newStatus = (totalUnfilled == 0) ? OrderStatus.FILLED : OrderStatus.PARTIAL_FILL;
             Order n = new Order(order.getId(), order.getPrice(), order.getSide(), order.getQuantity(), totalUnfilled, order.getInstrumentId(),
-                                order.getClientId(), order.getType(), newStatus, order.getOrderSubmitter());
+                                order.getClientId(), order.getType(), newStatus, order.getOrderSubmitter(), order.getSubmittedMs());
             ordersAtPrice.updateOrder(n);
             idToOrder.put(orderId, n);
             order = n;

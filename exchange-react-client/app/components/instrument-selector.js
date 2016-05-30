@@ -55,7 +55,7 @@ class InstrumentSelector extends React.Component {
                 <select value={this.state.instrument} onChange={this.handleInstrumentChange.bind(this)}>
                     {options}
                 </select>
-                <Instrument instrument={this.state.instrument} snapshot_url='/snapshot'/>
+                <Instrument instrument={this.state.instrument} snapshot_url='/snapshot' order_search_url='/orders'/>
             </div>
         )
     }

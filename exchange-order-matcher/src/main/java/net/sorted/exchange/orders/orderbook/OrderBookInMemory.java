@@ -112,7 +112,6 @@ public class OrderBookInMemory implements OrderBook {
         List<Order> updatedOrders = new ArrayList<>();
 
         long qtyLeftToMatch = newOrder.getUnfilledQuantity();
-        boolean stillTradesToMatch = true;
 
         OrdersForSide ordersForOtherSide = getOrdersForSide(newOrder.getSide().other());
 
@@ -121,10 +120,9 @@ public class OrderBookInMemory implements OrderBook {
         // create a trade for each fill
         // create a public trade for each price level
         int level = 1;
-        while (qtyLeftToMatch > 0 && stillTradesToMatch) {
+        while (qtyLeftToMatch > 0 ) {
             List<Order> ordersAtLevel = ordersForOtherSide.getOrdersAtLevel(level++);
             if (ordersAtLevel.size() == 0) {
-                stillTradesToMatch = false;
                 break;
             }
 
@@ -133,7 +131,6 @@ public class OrderBookInMemory implements OrderBook {
             for (Order matching : ordersAtLevel) {
                 levelPrice = matching.getPrice();
                 if (areWeTrading(newOrder, levelPrice) == false) {
-                    stillTradesToMatch = false;
                     break;
                 }
 

@@ -7,7 +7,8 @@ create table orders (
   client_id           INTEGER,
   order_type          CHAR(1),
   status              VARCHAR(48),
-  order_submitter     VARCHAR(64)
+  order_submitter     VARCHAR(64),
+  submitted_timestamp BIGINT
 );
 
 create table order_fill (
