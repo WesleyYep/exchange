@@ -43,6 +43,7 @@ public class DomainWithMessageConverter {
         msg.setOrderType(domainOrderTypeToProtobuf(order.getType()));
         msg.setPrice(order.getPrice() + "");
         msg.setQuantity(order.getQuantity());
+        msg.setUnfilled(order.getUnfilledQuantity());
         msg.setSide((order.getSide() == Side.BUY) ? ExchangeMessage.Side.BUY : ExchangeMessage.Side.SELL);
         msg.setState(domaintOrderStateToProtobuf(order.getStatus()));
         msg.setSubmitter(order.getOrderSubmitter());
@@ -53,8 +54,8 @@ public class DomainWithMessageConverter {
     public static ExchangeMessage.OrderSearchResults domainOrderListToProtobufMessage(List<Order> orders) {
         ExchangeMessage.OrderSearchResults.Builder msg = ExchangeMessage.OrderSearchResults.newBuilder();
 
-        for (int i=0; i<orders.size(); i++) {
-            msg.setOrders(i, domainOrderToProtobufMessage(orders.get(i)));
+        for (Order o : orders) {
+            msg.addOrders(domainOrderToProtobufMessage(o));
         }
 
         return msg.build();
@@ -114,11 +115,5 @@ public class DomainWithMessageConverter {
             return ExchangeMessage.OrderState.UNSUBMITTED;
         }
     }
-    /*
-        UNSUBMITTED,
-    OPEN,
-    FILLED,
-    CANCELLED,
-    REJECTED
-     */
+
 }

@@ -15,6 +15,7 @@ enum OrderState {
     CANCELLED = 3;
     REJECTED = 4;
     PARTIAL_FILL = 5;
+    UNFILLED = 6; // this is OPEM or PARTIAL_FILL
 }
 
 message Order {
@@ -29,20 +30,31 @@ message Order {
     optional int64 client_id = 2;
     optional string instrument = 3;
     optional int64 quantity = 4;
-    optional string price = 5;
-    optional Side side = 6;
-    optional OrderType order_type = 7;
-    optional OrderState state = 8;
-    optional string submitter = 9;
+    optional int64 unfilled = 5;
+    optional string price = 6;
+    optional Side side = 7;
+    optional OrderType order_type = 8;
+    optional OrderState state = 9;
+    optional string submitter = 10;
+    optional int64 submitted_ms = 11;
 
 }
 
 message OrderSearch {
-    optional OrderState state = 1;
-    optional int64 clientId = 2;
+
+    enum Type {
+        UNFILLED_ORDERS = 0;
+        FILLED_ORDERS = 1;
+        ALL_ORDERS = 2;
+    }
+
+    optional Type searchType = 1 [default = ALL_ORDERS];
+    optional OrderState state = 2;
     optional int64 orderId = 3;
     optional string submitter = 4;
     optional string instrument = 5;
+    optional int64 from_timestamp = 6;
+    optional int64 to_timestamp = 7;
 }
 
 message OrderSearchResults {

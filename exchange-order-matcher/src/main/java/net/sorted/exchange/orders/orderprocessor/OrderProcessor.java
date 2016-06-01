@@ -7,7 +7,7 @@ import net.sorted.exchange.orders.domain.Side;
 import net.sorted.exchange.orders.orderbook.OrderBookSnapshot;
 
 public interface OrderProcessor {
-    long submitOrder(double price, Side side, long quantity, String symbol, long clientId, OrderType type, String orderSubmitter);
+    long submitOrder(double price, Side side, long quantity, String symbol, long clientId, OrderType type, String orderSubmitter, long submittedMs);
     void cancelOrder(Order order);
 
     OrderBookSnapshot getSnapshot();

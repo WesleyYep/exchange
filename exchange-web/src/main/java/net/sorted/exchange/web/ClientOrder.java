@@ -6,7 +6,7 @@ package net.sorted.exchange.web;
 public class ClientOrder {
 
     public enum State {
-        unsubmitted, open, filled, partial, cancelled
+        unsubmitted, open, filled, partial, cancelled, rejected
     }
 
 
@@ -14,6 +14,7 @@ public class ClientOrder {
     private long clientId;
     private String instrument;
     private long quantity;
+    private long unfilled;
     private String price;
     private ClientSide side = ClientSide.BUY;
     private ClientOrderType type;
@@ -23,12 +24,13 @@ public class ClientOrder {
 
     }
 
-    public ClientOrder(long orderId, long clientId, String instrument, long quantity,
+    public ClientOrder(long orderId, long clientId, String instrument, long quantity, long unfilled,
                        String price, ClientSide side, ClientOrderType type, State state) {
         this.orderId = orderId;
         this.clientId = clientId;
         this.instrument = instrument;
         this.quantity = quantity;
+        this.unfilled = unfilled;
         this.price = price;
         this.side = side;
         this.type = type;
@@ -67,6 +69,13 @@ public class ClientOrder {
         return state;
     }
 
+    public long getUnfilled() {
+        return unfilled;
+    }
+
+    public void setUnfilled(long unfilled) {
+        this.unfilled = unfilled;
+    }
 
     public void setClientId(long clientId) {
         this.clientId = clientId;
@@ -90,11 +99,12 @@ public class ClientOrder {
 
     @Override
     public String toString() {
-        return "ExchangeOrderOld{" +
-                "orderId='" + orderId + '\'' +
-                ", clientId='" + clientId + '\'' +
+        return "ClientOrder{" +
+                "orderId=" + orderId +
+                ", clientId=" + clientId +
                 ", instrument='" + instrument + '\'' +
                 ", quantity=" + quantity +
+                ", unfilled=" + unfilled +
                 ", price='" + price + '\'' +
                 ", side=" + side +
                 ", type=" + type +

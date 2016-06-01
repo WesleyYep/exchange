@@ -1,13 +1,14 @@
 create table orders (
   id                  SERIAL PRIMARY KEY,
-  instrument_id       CHAR(8),
+  instrument_id       VARCHAR(8),
   quantity            INTEGER,
   price               NUMERIC(12, 4),
   side                CHAR(1),
   client_id           INTEGER,
   order_type          CHAR(1),
   status              VARCHAR(48),
-  order_submitter     VARCHAR(64)
+  order_submitter     VARCHAR(64),
+  submitted_timestamp BIGINT
 );
 
 create table order_fill (

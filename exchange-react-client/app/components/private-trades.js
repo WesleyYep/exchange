@@ -32,10 +32,6 @@ class PrivateTrades extends React.Component {
         }
     }
 
-    componentWillMount() {
-        this.subscribeTradesForInstrument(this.props.instrument);
-    }
-
     componentWillUnmount() {
         this.unsubscribeCurrent();
     }

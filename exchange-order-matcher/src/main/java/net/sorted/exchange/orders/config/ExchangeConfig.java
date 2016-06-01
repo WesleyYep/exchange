@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import com.rabbitmq.client.Channel;
 import net.sorted.exchange.orders.MessageReceivers;
 import net.sorted.exchange.orders.msghandler.OrderBookSnapshotRequestHandler;
+import net.sorted.exchange.orders.msghandler.OrderSearchHandler;
 import net.sorted.exchange.orders.msghandler.SubmitOrderReceiver;
 import net.sorted.exchange.orders.dao.TradeIdDao;
 import net.sorted.exchange.orders.dao.TradeIdDaoInMemory;
@@ -98,7 +99,7 @@ public class ExchangeConfig {
         for (String instrument : instruments) {
             OrderBook orderBook = instrumentIdToOrderBook.get(instrument);
 
-            OrderProcessor orderProcessor = new OrderProcessorDb(orderBook, orderRepository, orderFillRepository, privateTradePublisher(),
+            OrderProcessor orderProcessor = new OrderProcessorDb(orderBook, orderRepository, privateTradePublisher(),
                     publicTradePublisher(), orderSnapshotPublisher(), orderUpdatePublisher(), publisherExecutor, orderFillService);
 
             String submitForInstrumentQueueName = rabbitMqConfig().getSubmitOrderQueue(instrument);
@@ -111,6 +112,8 @@ public class ExchangeConfig {
 
             messageReceivers.addReceiver(orderBookSnapshotRequestHandler);
         }
+
+        messageReceivers.addReceiver(new OrderSearchHandler(rabbitMqConfig().getOrderSearchChannel(), RabbitMqConfig.ORDER_SEARCH_QUEUE_NAME, orderRepository));
 
         return messageReceivers;
     }

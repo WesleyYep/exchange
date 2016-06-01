@@ -9,6 +9,7 @@ import net.sorted.exchange.web.ClientOrder;
 import net.sorted.exchange.web.ClientSide;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +47,7 @@ public class OrderSubmission {
         exchangeOrder.setSide((order.getSide() == ClientSide.BUY) ? ExchangeMessage.Side.BUY : ExchangeMessage.Side.SELL);
         exchangeOrder.setState(ExchangeMessage.OrderState.UNSUBMITTED);
         exchangeOrder.setSubmitter(principal.getName());
+        exchangeOrder.setSubmittedMs(DateTime.now().getMillis());
 
         ExchangeMessage.Order o = exchangeOrder.build();
         try {
