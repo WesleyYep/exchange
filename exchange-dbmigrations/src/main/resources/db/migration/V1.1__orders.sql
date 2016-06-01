@@ -1,6 +1,6 @@
 create table orders (
   id                  SERIAL PRIMARY KEY,
-  instrument_id       CHAR(8),
+  instrument_id       VARCHAR(8),
   quantity            INTEGER,
   price               NUMERIC(12, 4),
   side                CHAR(1),

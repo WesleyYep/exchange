@@ -105,15 +105,14 @@ public class OrderSearchHandler implements MessageReceiver {
             }
         } else {
             long fromTimestamp = request.getFromTimestamp();
-            if (fromTimestamp < 0) {
+            if (fromTimestamp <= 0) {
                 fromTimestamp = 0;
             }
+
             long toTimestamp = request.getToTimestamp();
-            if (toTimestamp < 0) {
+            if (toTimestamp <= 0) {
                 toTimestamp = Long.MAX_VALUE;
             }
-
-
 
             switch (request.getSearchType()) {
             case UNFILLED_ORDERS:
@@ -123,7 +122,7 @@ public class OrderSearchHandler implements MessageReceiver {
                 // TODO - implement this
                 break;
             case ALL_ORDERS:
-                // TODO - implement this
+                results = allOrderSearch(request.getSubmitter(), request.getInstrument(), fromTimestamp, toTimestamp);
                 break;
             }
 
@@ -132,12 +131,25 @@ public class OrderSearchHandler implements MessageReceiver {
         return results;
     }
 
-    private List<Order> unfilledSearch(String submitter, String instrument, long from, long to) {
+    private List<Order> allOrderSearch(String submitter, String instrument, long fromTimestamp, long toTimestamp) {
 
+        if (submitter != null && submitter.isEmpty() == false) {
 
-        if (instrument != null) {
-            System.out.println("isEmpty: "+instrument.isEmpty());
+            if (instrument != null && instrument.isEmpty() == false) {
+                return orderRepository.findBySubmitterAndInstrumentIdInTimeRange(submitter, instrument, fromTimestamp, toTimestamp);
+            } else {
+                return orderRepository.findBySubmitterInTimeRange(submitter, fromTimestamp, toTimestamp);
+            }
+        } else {
+            if (instrument != null && instrument.isEmpty() == false) {
+                return orderRepository.findByInstrumentIdInTimeRange(instrument, fromTimestamp, toTimestamp);
+            }
         }
+
+        return new ArrayList<>();
+    }
+
+    private List<Order> unfilledSearch(String submitter, String instrument, long from, long to) {
 
         if (submitter != null && submitter.isEmpty() == false) {
             if (instrument != null && instrument.isEmpty() == false) {

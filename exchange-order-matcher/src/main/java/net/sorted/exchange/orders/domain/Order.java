@@ -62,7 +62,8 @@ public class Order {
 
     @PostLoad
     private void onLoad() {
-        setUnfilledQuantity(fills.stream().mapToLong(f -> f.getQuantity()).sum());
+        long filled = fills.stream().mapToLong(f -> f.getQuantity()).sum();
+        setUnfilledQuantity(quantity - filled);
     }
 
     public Order(long id, double price, Side side, long quantity, String instrumentId, long clientId, OrderType type, OrderStatus status, String orderSubmitter, long submittedMs) {
@@ -73,7 +74,6 @@ public class Order {
         this.id = id;
         this.price = price;
         this.quantity = quantity;
-        this.unfilledQuantity = unfilledQuantity;
         this.side = side;
         this.instrumentId = instrumentId;
         this.clientId = clientId;
@@ -81,6 +81,7 @@ public class Order {
         this.status = status;
         this.orderSubmitter = orderSubmitter;
         this.submittedMs = submittedMs;
+        this.unfilledQuantity = unfilledQuantity;
     }
 
     protected Order() {
@@ -142,6 +143,26 @@ public class Order {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Order order = (Order) o;
+
+        return id == order.id;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
     }
 
     @Override

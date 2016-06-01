@@ -2,7 +2,6 @@ package net.sorted.exchange.web.rest;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.rabbitmq.client.AMQP;
@@ -11,10 +10,9 @@ import com.rabbitmq.client.QueueingConsumer;
 import net.sorted.exchange.messages.ExchangeMessage;
 import net.sorted.exchange.web.ClientOrder;
 import net.sorted.exchange.web.ClientOrderSearch;
-import net.sorted.exchange.web.ClientOrderSnapshot;
 import net.sorted.exchange.web.ClientOrderType;
 import net.sorted.exchange.web.ClientSide;
-import net.sorted.exchange.web.SnapshotConverter;
+import net.sorted.exchange.web.ProtoToClientConverter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +77,7 @@ public class OrderSearchService {
         request.setFromTimestamp(searchParams.getFromTimestampMillis());
         request.setToTimestamp(searchParams.getToTimestampMillis());
         request.setOrderId(searchParams.getOrderId());
-        request.setSearchType(ExchangeMessage.OrderSearch.Type.UNFILLED_ORDERS); // TODO - either have different REST URL or add this field to ClientOrderSearch
+        request.setSearchType(ExchangeMessage.OrderSearch.Type.ALL_ORDERS); // TODO - either have different REST URL or add this field to ClientOrderSearch
 
         List<ClientOrder> results = null;
 
@@ -108,47 +106,8 @@ public class OrderSearchService {
     private List<ClientOrder> searchResultsToClient(ExchangeMessage.OrderSearchResults message) {
 
         List<ExchangeMessage.Order> orders = message.getOrdersList();
-        return orders.stream().map(o -> clientOrderFromProto(o)).collect(Collectors.toList());
+        return orders.stream().map(o -> ProtoToClientConverter.orderMessageToClientOrder(o)).collect(Collectors.toList());
     }
 
-    private ClientOrder clientOrderFromProto(ExchangeMessage.Order o) {
 
-        ClientOrder.State state;
-        switch (o.getState()) {
-        case UNSUBMITTED:
-            state = ClientOrder.State.unsubmitted;
-            break;
-        case OPEN:
-            state = ClientOrder.State.open;
-            break;
-        case FILLED:
-            state = ClientOrder.State.filled;
-            break;
-        case PARTIAL_FILL:
-            state = ClientOrder.State.partial;
-            break;
-        case CANCELLED:
-            state = ClientOrder.State.cancelled;
-            break;
-        case REJECTED:
-        default:
-            state = ClientOrder.State.rejected;
-            break;
-        }
-
-        String instr = null;
-        if (o.getInstrument() != null) {
-            instr = o.getInstrument().trim();
-        }
-
-        return new ClientOrder(o.getOrderId(),
-                o.getClientId(),
-                instr,
-                o.getQuantity(),
-                o.getUnfilled(),
-                o.getPrice(),
-                (o.getSide() == ExchangeMessage.Side.BUY) ? ClientSide.BUY : ClientSide.SELL,
-                (o.getOrderType() == ExchangeMessage.Order.OrderType.LIMIT) ? ClientOrderType.LIMIT : ClientOrderType.KILL_OR_FILL,
-                state);
-    }
 }

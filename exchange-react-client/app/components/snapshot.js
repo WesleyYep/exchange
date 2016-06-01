@@ -59,11 +59,6 @@ class Snapshot extends React.Component {
         }
     }
 
-    componentWillMount() {
-        this.getSnapshot(this.props.instrument);
-        this.subscribeInstrument(this.props.instrument);
-    }
-
     componentWillUnmount() {
         this.unsubscribeCurrent();
     }

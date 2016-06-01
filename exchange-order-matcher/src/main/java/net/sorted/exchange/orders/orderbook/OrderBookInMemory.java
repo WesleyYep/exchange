@@ -2,18 +2,18 @@ package net.sorted.exchange.orders.orderbook;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
+import net.sorted.exchange.orders.dao.TradeIdDao;
 import net.sorted.exchange.orders.domain.Order;
 import net.sorted.exchange.orders.domain.OrderFill;
-import net.sorted.exchange.orders.domain.OrderStatus;
 import net.sorted.exchange.orders.domain.Side;
-import net.sorted.exchange.orders.dao.TradeIdDao;
 import net.sorted.exchange.orders.domain.Trade;
 import org.joda.time.DateTime;
 
-import static net.sorted.exchange.orders.domain.Side.*;
+import static net.sorted.exchange.orders.domain.Side.BUY;
 
 public class OrderBookInMemory implements OrderBook {
 
@@ -109,7 +109,7 @@ public class OrderBookInMemory implements OrderBook {
         List<Trade> publicTrades = new ArrayList<>();
         List<Order> filledPassive = new ArrayList<>();
         List<OrderFill> fills = new ArrayList<>();
-        List<Order> updatedOrders = new ArrayList<>();
+        Set<Order> updatedOrders = new HashSet<>();
 
         long qtyLeftToMatch = newOrder.getUnfilledQuantity();
 
@@ -145,10 +145,12 @@ public class OrderBookInMemory implements OrderBook {
                     recordFills(fills, otherOrderQty, levelPrice, newOrder.getId(), matching.getId());
 
                     OrdersForSide orders = orderIdToOrdersForSide.get(newOrder.getId());
-                    updatedOrders.add(orders.partialFill(newOrder.getId(), otherOrderQty));
+                    newOrder = orders.partialFill(newOrder.getId(), otherOrderQty);
+                    updatedOrders.remove(newOrder); // so only the latest is in the set
+                    updatedOrders.add(newOrder);
 
-                    matching.setStatus(OrderStatus.FILLED);
-                    updatedOrders.add(matching);
+                    OrdersForSide otherOrders = orderIdToOrdersForSide.get(matching.getId());
+                    updatedOrders.add(otherOrders.partialFill(matching.getId(), otherOrderQty));
 
                     qtyTradedAtLevel += otherOrderQty;
                     qtyLeftToMatch -= otherOrderQty;
@@ -161,13 +163,13 @@ public class OrderBookInMemory implements OrderBook {
                     Trade passiveForOrder = getTradeForOrder(matching, qtyLeftToMatch, levelPrice);
                     passiveTrades.add(passiveForOrder);
 
-                    OrdersForSide orders = orderIdToOrdersForSide.get(matching.getId());
-                    updatedOrders.add(orders.partialFill(matching.getId(), qtyLeftToMatch));
+                    OrdersForSide orders = orderIdToOrdersForSide.get(newOrder.getId());
+                    newOrder = orders.partialFill(newOrder.getId(), qtyLeftToMatch);
+                    updatedOrders.remove(newOrder);// so only the latest is in the set
+                    updatedOrders.add(newOrder);
 
-                    if (matching.getStatus() != OrderStatus.PARTIAL_FILL) {
-                        matching.setStatus(OrderStatus.PARTIAL_FILL);
-                        updatedOrders.add(matching);
-                    }
+                    OrdersForSide otherOrders = orderIdToOrdersForSide.get(matching.getId());
+                    updatedOrders.add(otherOrders.partialFill(matching.getId(), qtyLeftToMatch));
 
                     recordFills(fills, qtyLeftToMatch, levelPrice, newOrder.getId(), matching.getId());
 
@@ -195,6 +197,7 @@ public class OrderBookInMemory implements OrderBook {
         if (qtyLeftToMatch == 0) {
             getOrdersForSide(newOrder.getSide()).removeOrder(newOrder.getId());
         }
+
 
         return new MatchedTrades(aggressorTrades, passiveTrades, publicTrades, fills, updatedOrders);
     }

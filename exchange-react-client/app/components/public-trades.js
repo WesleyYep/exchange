@@ -9,17 +9,6 @@ class PublicTrades extends React.Component {
         this.state = { trades: [] };
     }
 
-    //componentWillMount() {
-    //    StompClient.then((client) => {
-    //        client.subscribe(`/topic/public.trade/${this.props.instrument}`, (data) => {
-    //            var trade = JSON.parse(data.body);
-    //            var trades = this.state.trades;
-    //            trades.push(trade);
-    //            this.setState({trades});
-    //        });
-    //    });
-    //}
-
     receivePublicTrade(trade){
         var trades = this.state.trades;
         trades.push(trade);
@@ -41,10 +30,6 @@ class PublicTrades extends React.Component {
             this.subscription = null;
             console.log("Unsubscribed from public trades")
         }
-    }
-
-    componentWillMount() {
-        this.subscribeTradesForInstrument(this.props.instrument);
     }
 
     componentWillUnmount() {

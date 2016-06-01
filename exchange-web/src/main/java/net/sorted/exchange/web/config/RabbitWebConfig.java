@@ -91,4 +91,16 @@ public class RabbitWebConfig {
     public String orderSearchExchangeName() {
         return RabbitMqConfig.ORDER_SEARCH_EXCHANGE_NAME;
     }
+
+    @Bean
+    @Qualifier("orderUpdateChannel")
+    public Channel orderUpdateChannel() { return rabbitMqConfig().getOrderUpdateChannel(); }
+
+    @Bean
+    @Qualifier("orderUpdateExchangeName")
+    public String orderUpdateExchangeName() {
+        return RabbitMqConfig.ORDER_UPDATE_EXCHANGE_NAME;
+    }
+
+
 }

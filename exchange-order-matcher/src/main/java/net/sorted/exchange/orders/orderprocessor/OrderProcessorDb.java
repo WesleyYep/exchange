@@ -71,7 +71,6 @@ public class OrderProcessorDb implements OrderProcessor {
         }
 
         publishResultInBackground(matches, snapshot);
-        publishOrderUpdateInBackground(matches.getUpdatedOrders());
 
         return order.getId();
     }
@@ -103,10 +102,6 @@ public class OrderProcessorDb implements OrderProcessor {
         publishExecutor.execute(() -> publishResult(matches, snapshot));
     }
 
-    private void publishOrderUpdateInBackground(final List<Order> orders) {
-        publishExecutor.execute(() -> orderUpdatePublisher.publishUpdates(orders));
-    }
-
     private void publishResult(MatchedTrades matches, OrderBookSnapshot snapshot) {
 
         List<OrderFill> fills = matches.getFills();
@@ -121,6 +116,7 @@ public class OrderProcessorDb implements OrderProcessor {
         privateTradePublisher.publishTrades(matches.getPassiveTrades());
         publicTradePublisher.publishTrades(matches.getPublicTrades());
         snapshotPublisher.publishSnapshot(snapshot);
+        orderUpdatePublisher.publishUpdates(matches.getUpdatedOrders());
 
         log.debug("Published matched trades {}", matches);
     }

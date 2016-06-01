@@ -35,33 +35,52 @@ class MyUnfilledOrders extends React.Component {
         };
     }
 
-    receiveOrderUpdate(order){
+    receiveOrderUpdate(update){
         // Order status has changed.
         // Go through the openOrders and find a match
-        // If match and new state is not OPEN or PARTIAL then remove from list
-        // If no match, and new stat is OPEN or PARTIAL then add to the list
+        // If match, use the new one (instead of the old version)
+        // If no match, just add the updated order to the list
+        console.log("Received order update "+JSON.stringify(update));
+        var updatedOrders = [];
+        var matched = false;
+        for(var i = 0; i < this.state.openOrders.length ; i++) {
+            var order = this.state.openOrders[i];
+            if (order.orderId == update.orderId) {
+                matched = true;
+                updatedOrders.push(update);
+                console.log("> "+JSON.stringify(update));
+            } else {
+                updatedOrders.push(order);
+                console.log("+ "+JSON.stringify(order));
+            }
+        }
+
+        if (matched == false) {
+            console.log("Add order");
+            updatedOrders.push(update);
+            console.log("+ "+JSON.stringify(update));
+        }
+
+        this.setState( { openOrders: updatedOrders });
     }
 
     subscribeInstrument(instrument) {
-        console.log("Subscribing to order updates for "+instrument);
-        //StompClient.then((client) => {
-        //    this.subscription = client.subscribe(`/topic/snapshot/${instrument}`, (data) => {
-        //        this.receiveSnapshot(JSON.parse(data.body));
-        //    });
-        //});
+        if (this.subscription == null) {
+            console.log("Subscribing to order updates for " + instrument);
+            StompClient.then((client) => {
+                this.subscription = client.subscribe(`/user/queue/order.updates/${this.props.instrument}`, (data) => {
+                    this.receiveOrderUpdate(JSON.parse(data.body));
+                });
+            });
+        }
     }
 
     unsubscribeCurrent() {
         if (this.subscription != null) {
             this.subscription.unsubscribe();
             this.subscription = null;
-            console.log("Unsubscribed")
+            console.log(`Unsubscribed from /user/queue/order.updates/${this.props.instrument}`);
         }
-    }
-
-    componentWillMount() {
-        this.getOpenOrders(this.props.instrument);
-        this.subscribeInstrument(this.props.instrument);
     }
 
     componentWillUnmount() {
@@ -79,12 +98,12 @@ class MyUnfilledOrders extends React.Component {
         console.log("Rendering open orders");
         return (
             <table className="table table-bordered">
-                <thead><tr><th>Id</th><th>Price</th><th>Side</th><th>Unfilled</th><th> </th></tr></thead>
+                <thead><tr><th>Id</th><th>Price</th><th>Side</th><th>Quantity</th><th>Unfilled</th><th>Status</th><th> </th></tr></thead>
                 <tbody>
 
                 {this.state.openOrders.map((order, index) => {
                     return (
-                        <tr key={index}><td>{order.orderId}</td><td>{order.price}</td><td>{order.side}</td><td>{order.unfilled}</td><td> </td></tr>
+                        <tr key={index}><td>{order.orderId}</td><td>{order.price}</td><td>{order.side}</td><td>{order.quantity}</td><td>{order.unfilled}</td><td>{order.state}</td><td> </td></tr>
                     )
                 })}
 

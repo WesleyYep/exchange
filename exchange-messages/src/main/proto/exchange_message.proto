@@ -48,7 +48,7 @@ message OrderSearch {
         ALL_ORDERS = 2;
     }
 
-    optional Type searchType = 1 [default = UNFILLED_ORDERS];
+    optional Type searchType = 1 [default = ALL_ORDERS];
     optional OrderState state = 2;
     optional int64 orderId = 3;
     optional string submitter = 4;

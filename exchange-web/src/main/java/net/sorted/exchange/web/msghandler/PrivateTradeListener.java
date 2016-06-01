@@ -1,4 +1,4 @@
-package net.sorted.exchange.web;
+package net.sorted.exchange.web.msghandler;
 
 
 import java.io.IOException;
@@ -8,6 +8,8 @@ import com.rabbitmq.client.Consumer;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 import net.sorted.exchange.messages.ExchangeMessage;
+import net.sorted.exchange.web.ClientPrivateTrade;
+import net.sorted.exchange.web.WebSocketSender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
