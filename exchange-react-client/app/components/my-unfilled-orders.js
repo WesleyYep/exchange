@@ -1,6 +1,6 @@
 
 import React from "react";
-import StompClient from "../services/connection-service";
+import stompConnectTo from "../services/connection-service";
 import _ from "lodash";
 
 class MyUnfilledOrders extends React.Component {
@@ -64,10 +64,10 @@ class MyUnfilledOrders extends React.Component {
         this.setState( { openOrders: updatedOrders });
     }
 
-    subscribeInstrument(instrument) {
+    subscribeForUpdates(instrument) {
         if (this.subscription == null) {
             console.log("Subscribing to order updates for " + instrument);
-            StompClient.then((client) => {
+            stompConnectTo(this.props.updates_url).then((client) => {
                 this.subscription = client.subscribe(`/user/queue/order.updates/${this.props.instrument}`, (data) => {
                     this.receiveOrderUpdate(JSON.parse(data.body));
                 });
@@ -91,7 +91,7 @@ class MyUnfilledOrders extends React.Component {
         console.log("getting open order props. Current Instrument: "+this.props.instrument+" New Instrument:"+nextProps.instrument);
         this.unsubscribeCurrent();
         this.getOpenOrders(nextProps.instrument);
-        this.subscribeInstrument(nextProps.instrument);
+        this.subscribeForUpdates(nextProps.instrument);
     }
 
     render() {
@@ -117,5 +117,6 @@ class MyUnfilledOrders extends React.Component {
 // Make sure that the instrument string and order search URL is supplied
 MyUnfilledOrders.propTypes = { instrument : React.PropTypes.string.isRequired }
 MyUnfilledOrders.propTypes = { order_search_url : React.PropTypes.string.isRequired }
+MyUnfilledOrders.propTypes = { updates_url : React.PropTypes.string.isRequired }
 
 export default MyUnfilledOrders;

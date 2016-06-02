@@ -12,7 +12,7 @@ class InstrumentSelector extends React.Component {
 
     componentWillMount() {
 
-        var instrumentRequest = new Request(this.props.instruments_url, {
+        var instrumentRequest = new Request(this.props.instrument_list_url, {
             method: 'GET',
             credentials: 'same-origin',
             headers: new Headers({
@@ -55,12 +55,30 @@ class InstrumentSelector extends React.Component {
                 <select value={this.state.instrument} onChange={this.handleInstrumentChange.bind(this)}>
                     {options}
                 </select>
-                <Instrument instrument={this.state.instrument} snapshot_url='/snapshot' order_search_url='/orders'/>
+                <Instrument instrument={this.state.instrument}
+                            order_submit_url={this.props.order_submit_url}
+                            snapshot_url={this.props.snapshot_url}
+                            order_search_url={this.props.order_search_url}
+                            snapshot_updates_url={this.props.snapshot_updates_url}
+                            order_updates_url={this.props.snapshot_updates_url}
+                            private_trade_updates_url={this.props.snapshot_updates_url}
+                            public_trade_updates_url={this.props.snapshot_updates_url}
+                    />
             </div>
         )
     }
 }
 
-InstrumentSelector.propTypes = { instruments_url : React.PropTypes.string.isRequired }
+InstrumentSelector.propTypes = { instrument_list_url : React.PropTypes.string.isRequired }
+InstrumentSelector.propTypes = { order_submit_url : React.PropTypes.string.isRequired }
+InstrumentSelector.propTypes = { order_search_url : React.PropTypes.string.isRequired }
+InstrumentSelector.propTypes = { snapshot_url : React.PropTypes.string.isRequired }
+
+InstrumentSelector.propTypes = { snapshot_updates_url : React.PropTypes.string.isRequired }
+InstrumentSelector.propTypes = { order_updates_url : React.PropTypes.string.isRequired }
+InstrumentSelector.propTypes = { private_trade_updates_url : React.PropTypes.string.isRequired }
+InstrumentSelector.propTypes = { public_trade_updates_url : React.PropTypes.string.isRequired }
+
+
 
 export default InstrumentSelector;

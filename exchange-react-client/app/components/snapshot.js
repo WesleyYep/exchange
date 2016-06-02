@@ -1,6 +1,6 @@
 
 import React from "react";
-import StompClient from "../services/connection-service";
+import stompConnectTo from "../services/connection-service";
 import _ from "lodash";
 
 class Snapshot extends React.Component {
@@ -17,6 +17,8 @@ class Snapshot extends React.Component {
         var snapshotRequest = new Request(this.props.snapshot_url+"?instrument="+instrument, {
             method: 'GET',
             credentials: 'same-origin',
+            mode: "no-cors",
+            cache: "no-cache",
             headers: new Headers({
                 'Content-Type': 'application/json'
             })
@@ -43,8 +45,8 @@ class Snapshot extends React.Component {
     }
 
     subscribeInstrument(instrument) {
-        console.log("Subscribing to "+instrument);
-        StompClient.then((client) => {
+        console.log("Subscribing to snapshots for "+instrument+" on url "+this.props.updates_url);
+        stompConnectTo(this.props.updates_url).then((client) => {
             this.subscription = client.subscribe(`/topic/snapshot/${instrument}`, (data) => {
                 this.receiveSnapshot(JSON.parse(data.body));
             });
@@ -97,5 +99,6 @@ class Snapshot extends React.Component {
 // Make sure that the instrument string is supplied
 Snapshot.propTypes = { instrument : React.PropTypes.string.isRequired }
 Snapshot.propTypes = { snapshot_url : React.PropTypes.string.isRequired }
+Snapshot.propTypes = { updates_url : React.PropTypes.string.isRequired }
 
 export default Snapshot;

@@ -1,0 +1,8 @@
+export var instrument_list_url='http://exchange.sorted.net:8080/instruments'
+export var order_submit_url='http://exchange.sorted.net:8080/orders'
+export var snapshot_url='http://exchange.sorted.net:8080/snapshot'
+export var order_search_url='http://exchange.sorted.net:8080/orders'
+export var snapshot_updates_url='http://exchange.sorted.net:8080/exchange'
+export var order_updates_url='http://exchange.sorted.net:8080/exchange'
+export var private_trade_updates_url='http://exchange.sorted.net:8080/exchange'
+export var public_trade_updates_url='http://exchange.sorted.net:8080/exchange'

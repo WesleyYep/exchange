@@ -17,7 +17,7 @@ class OrderForm extends React.Component {
 
         console.log("Submitting "+payload.side+" order for "+this.props.instrument+" price="+payload.price+" qty="+payload.quantity );
 
-        fetch('/orders', {
+        fetch(this.props.order_submit_url, {
             method: 'POST',
             body: JSON.stringify(payload),
             credentials: 'same-origin',
@@ -62,5 +62,6 @@ class OrderForm extends React.Component {
 
 // Make sure that the instrument string is supplied
 OrderForm.propTypes = { instrument : React.PropTypes.string.isRequired }
+OrderForm.propTypes = { order_submit_url : React.PropTypes.string.isRequired }
 
 export default OrderForm;

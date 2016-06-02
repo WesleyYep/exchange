@@ -4,10 +4,11 @@ import Stomp from "Stomp";
 import SockJS from "SockJS";
 import Promise from 'bluebird';
 
-var socket = new SockJS('/exchange');
-var stompClient = Stomp.over(socket);
 
-function connect() {
+export default function stompConnectTo(url) {
+    var socket = new SockJS(url);
+    var stompClient = Stomp.over(socket);
+
     return new Promise((resolver, reject) => {
         stompClient.connect({} , () => {
             resolver(stompClient);
@@ -15,6 +16,3 @@ function connect() {
     });
 
 }
-
-// Make stomp client available to other modules
-export default connect();

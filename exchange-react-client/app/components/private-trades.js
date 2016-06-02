@@ -1,6 +1,6 @@
 
 import React from "react";
-import StompClient from "../services/connection-service";
+import stompConnectTo from "../services/connection-service";
 
 class PrivateTrades extends React.Component {
 
@@ -17,7 +17,7 @@ class PrivateTrades extends React.Component {
 
     subscribeTradesForInstrument(instrument) {
         console.log("Subscribing to private trades for "+instrument);
-        StompClient.then((client) => {
+        stompConnectTo(this.props.updates_url).then((client) => {
             this.subscription = client.subscribe(`/user/queue/private.trade/${this.props.instrument}`, (data) => {
                 this.receivePrivateTrade(JSON.parse(data.body));
             });
@@ -60,5 +60,6 @@ class PrivateTrades extends React.Component {
 
 // Make sure that the instrument string is supplied
 PrivateTrades.propTypes = { instrument : React.PropTypes.string.isRequired }
+PrivateTrades.propTypes = { updates_url : React.PropTypes.string.isRequired }
 
 export default PrivateTrades;
