@@ -48,7 +48,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         HandshakeInterceptor interceptor = new HandshakeInterceptor() {
             @Override
             public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-                log.debug("Websocket handshake for user {} to URI ", request.getPrincipal(), request.getURI());
+                //log.debug("Websocket handshake for user {} to URI ", request.getPrincipal(), request.getURI());
 
                 return true;
             }
@@ -72,16 +72,16 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         ChannelInterceptor interceptor = new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                MessageHeaders headers = message.getHeaders();
-                SimpMessageType type = (SimpMessageType) headers.get("simpMessageType");
-                String simpSessionId = (String) headers.get("simpSessionId");
-
-                if (type == SimpMessageType.CONNECT) {
-                    Principal principal = (Principal) headers.get("simpUser");
-                    log.debug("WsSession {}  is connected for user {} ", simpSessionId, principal.getName());
-                } else if (type == SimpMessageType.DISCONNECT) {
-                    log.debug("WsSession {} is disconnected", simpSessionId);
-                }
+//                MessageHeaders headers = message.getHeaders();
+//                SimpMessageType type = (SimpMessageType) headers.get("simpMessageType");
+//                String simpSessionId = (String) headers.get("simpSessionId");
+//
+//                if (type == SimpMessageType.CONNECT) {
+//                    Principal principal = (Principal) headers.get("simpUser");
+//                    log.debug("WsSession {}  is connected for user {} ", simpSessionId, principal.getName());
+//                } else if (type == SimpMessageType.DISCONNECT) {
+//                    log.debug("WsSession {} is disconnected", simpSessionId);
+//                }
                 return message;
             }
 
