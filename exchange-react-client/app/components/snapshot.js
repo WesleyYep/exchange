@@ -2,6 +2,7 @@
 import React from "react";
 import stompConnectTo from "../services/connection-service";
 import _ from "lodash";
+import $ from "jquery";
 
 class Snapshot extends React.Component {
 
@@ -14,20 +15,13 @@ class Snapshot extends React.Component {
     getSnapshot(instrument) {
 
         console.log("Getting order snapshot for "+instrument);
-        var snapshotRequest = new Request(this.props.snapshot_url+"?instrument="+instrument, {
-            method: 'GET',
-            credentials: 'same-origin',
-            mode: "no-cors",
-            cache: "no-cache",
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            })
-        })
 
-
-        fetch(snapshotRequest).then((response) => {
-            console.log("got snapshot");
-            return response.json();
+        $.ajax({
+            url: this.props.snapshot_url+"?instrument="+instrument,
+            crossDomain: true,
+            xhrFields: {
+                withCredentials: true
+            },
         }).then((snapshot) => {
             console.log("Got snapshot data "+snapshot);
             this.receiveSnapshot(snapshot);
@@ -35,6 +29,28 @@ class Snapshot extends React.Component {
         (error) => {
             console.log('failed to get snapshot');
         };
+
+
+        //var snapshotRequest = new Request(this.props.snapshot_url+"?instrument="+instrument, {
+        //    method: 'GET',
+        //    credentials: 'same-origin',
+        //    mode: "no-cors",
+        //    cache: "no-cache",
+        //    headers: new Headers({
+        //        'Content-Type': 'application/json'
+        //    })
+        //})
+        //
+        //fetch(snapshotRequest).then((response) => {
+        //    console.log("got snapshot");
+        //    return response.json();
+        //}).then((snapshot) => {
+        //    console.log("Got snapshot data "+snapshot);
+        //    this.receiveSnapshot(snapshot);
+        //}),
+        //(error) => {
+        //    console.log('failed to get snapshot');
+        //};
     }
 
     receiveSnapshot(snapshot){

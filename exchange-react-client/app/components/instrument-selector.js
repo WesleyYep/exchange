@@ -1,6 +1,7 @@
 import React from "react";
 
 import Instrument from "./instrument";
+import $ from "jquery";
 
 class InstrumentSelector extends React.Component {
 
@@ -11,27 +12,49 @@ class InstrumentSelector extends React.Component {
     }
 
     componentWillMount() {
+        this.getInstrumentList();
 
-        var instrumentRequest = new Request(this.props.instrument_list_url, {
-            method: 'GET',
-            credentials: 'same-origin',
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            })
-        })
+    }
 
-
-        fetch(instrumentRequest).then((response) => {
-            console.log("got instruments");
-            return response.json();
+    getInstrumentList() {
+        $.ajax({
+            url: this.props.instrument_list_url,
+            crossDomain: true,
+            xhrFields: {
+                withCredentials: true
+            },
         }).then((instruments) => {
             console.log("Got instrument data "+instruments);
-            this.setState({ instruments: instruments,
-                instrument: instruments[0]});
+            this.setState({ instruments: instruments, instrument: instruments[0]});
         }),
         (error) => {
             console.log('failed to get instruments');
         };
+
+
+
+
+        //var auth = 'Basic ' + window.btoa(unescape(encodeURIComponent("doug:password")))
+        //var instrumentRequest = new Request(this.props.instrument_list_url, {
+        //    method: 'GET',
+        //    credentials: 'same-origin',
+        //    headers: new Headers({
+        //        'Content-Type': 'application/json',
+        //        'Authorization': auth
+        //    })
+        //})
+        //
+        //fetch(instrumentRequest).then((response) => {
+        //    console.log("got instruments");
+        //    return response.json();
+        //}).then((instruments) => {
+        //    console.log("Got instrument data "+instruments);
+        //    this.setState({ instruments: instruments,
+        //        instrument: instruments[0]});
+        //}),
+        //(error) => {
+        //    console.log('failed to get instruments');
+        //};
     }
 
 

@@ -2,6 +2,7 @@
 import React from "react";
 import stompConnectTo from "../services/connection-service";
 import _ from "lodash";
+import $ from "jquery";
 
 class MyUnfilledOrders extends React.Component {
 
@@ -14,18 +15,14 @@ class MyUnfilledOrders extends React.Component {
     getOpenOrders(instrument) {
 
         console.log("Getting unfilled orders for "+instrument);
-        var ordersRequest = new Request(this.props.order_search_url+"?instrument="+instrument, {
-            method: 'GET',
-            credentials: 'same-origin',
-            headers: new Headers({
-                'Content-Type': 'application/json'
-            })
-        })
 
 
-        fetch(ordersRequest).then((response) => {
-            console.log("got open orders");
-            return response.json();
+        $.ajax({
+            url: this.props.order_search_url+"?instrument="+instrument,
+            crossDomain: true,
+            xhrFields: {
+                withCredentials: true
+            },
         }).then((openOrders) => {
             console.log("Got open orders data "+openOrders);
             this.setState({ openOrders });
@@ -33,6 +30,24 @@ class MyUnfilledOrders extends React.Component {
         (error) => {
             console.log('failed to get open orders');
         };
+
+        //var ordersRequest = new Request(this.props.order_search_url+"?instrument="+instrument, {
+        //    method: 'GET',
+        //    credentials: 'same-origin',
+        //    headers: new Headers({
+        //        'Content-Type': 'application/json'
+        //    })
+        //})
+        //fetch(ordersRequest).then((response) => {
+        //    console.log("got open orders");
+        //    return response.json();
+        //}).then((openOrders) => {
+        //    console.log("Got open orders data "+openOrders);
+        //    this.setState({ openOrders });
+        //}),
+        //(error) => {
+        //    console.log('failed to get open orders');
+        //};
     }
 
     receiveOrderUpdate(update){

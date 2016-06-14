@@ -24,7 +24,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     // Switch off CSRF (Cross Site Request Forgery) - not needed for REST
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
+//        http.csrf().disable();
+//        super.configure(http);
+
+        http.authorizeRequests().anyRequest().fullyAuthenticated().and().
+                httpBasic().and().
+                csrf().disable();
+
         super.configure(http);
     }
 }

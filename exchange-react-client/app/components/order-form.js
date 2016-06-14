@@ -17,6 +17,17 @@ class OrderForm extends React.Component {
 
         console.log("Submitting "+payload.side+" order for "+this.props.instrument+" price="+payload.price+" qty="+payload.quantity );
 
+
+        //$.ajax({
+        //    url: this.props.order_submit_url,
+        //    type: 'post',
+        //    dataType: 'json',
+        //    success: function (data) {
+        //        console.log("Order submitted: "+data.msg);
+        //    },
+        //    data: payload
+        //});
+        //
         fetch(this.props.order_submit_url, {
             method: 'POST',
             body: JSON.stringify(payload),
@@ -27,7 +38,7 @@ class OrderForm extends React.Component {
         }).then((response) => {
             console.log("Order submitted");
         }, (error) => {
-            console.log('save failed');
+            console.log('submit to '+this.props.order_submit_url+' failed');
         });
 
         evt.preventDefault(); // stop the browser submitting the page
